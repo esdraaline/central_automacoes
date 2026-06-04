@@ -78,7 +78,7 @@ python main.py
 ```
 bopm_automation/
 ├── main.py              → Ponto de entrada, orquestração do fluxo
-├── config.py            → Credenciais, URLs, timeouts (EDITE AQUI)
+├── config.py            → URLs, filtros e timeouts não-secretos (EDITE AQUI)
 ├── vpn_manager.py       → Conectar/verificar/desconectar VPN Cisco
 ├── siopm_navigator.py   → Toda a navegação no SIOPM Web
 ├── pdf_handler.py       → Download e salvamento dos PDFs

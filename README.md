@@ -55,7 +55,7 @@ plugável — adicionar uma nova = largar uma pasta em `automacoes/`.
 
 ## Segurança (leia antes de pôr em qualquer git/backup/pendrive)
 
-As credenciais ficam em `segredos.env`, que **nunca** deve ser versionado nem
-sincronizado. O `.gitignore` já protege isso. O código antigo de BOPM
-(`automacoes/baixar_bopm/config.py`) ainda tem senhas embutidas — isso será movido
-para o cofre na Fase 0. Até lá, **não suba esta pasta para nenhum repositório.**
+As credenciais ficam em `segredos.env`, que **nunca** deve ser versionado em
+repositório público. O `.gitignore` já protege isso. O arquivo
+`automacoes/baixar_bopm/config.py` contém apenas configuração operacional não
+secreta da automação BOPM/SIOPM e deve acompanhar o código.
