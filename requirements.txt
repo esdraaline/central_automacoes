@@ -1,0 +1,10 @@
+# Central de Automações — dependências
+playwright>=1.44.0
+requests>=2.31.0
+customtkinter>=5.2.0
+python-dotenv>=1.0.0
+# Fase 4+ (e-mail):
+# google-api-python-client, google-auth-oauthlib   (Gmail API)
+# msal                                              (Outlook/Hotmail via Graph)
+# Fase 6 (assinatura):
+# pyhanko

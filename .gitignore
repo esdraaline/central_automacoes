@@ -1,0 +1,23 @@
+# Segredos — NUNCA versionar
+segredos.env
+*.env
+!*.env.exemplo
+
+# Credenciais antigas embutidas (mover para o cofre na Fase 0)
+automacoes/baixar_bopm/config.py
+
+# Saídas e logs
+saidas/*
+logs/*
+!saidas/.gitkeep
+!logs/.gitkeep
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Artefatos locais
+*.zip
+Desktop.ini
+desktop.ini
