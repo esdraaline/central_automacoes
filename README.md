@@ -59,3 +59,17 @@ As credenciais ficam em `segredos.env`, que **nunca** deve ser versionado em
 repositório público. O `.gitignore` já protege isso. O arquivo
 `automacoes/baixar_bopm/config.py` contém apenas configuração operacional não
 secreta da automação BOPM/SIOPM e deve acompanhar o código.
+
+---
+
+## Sincronização dos projetos
+
+Para atualizar todos os repositórios Git da pasta de projetos, dê dois cliques em:
+
+```text
+atualizar-todos-projetos.cmd
+```
+
+O script procura repositórios Git na pasta acima de `central_automacoes`, incluindo
+repositórios aninhados, e executa `git pull --ff-only` em cada um. Se houver
+alterações locais, ele mostra o status antes de tentar atualizar.
