@@ -10,6 +10,7 @@ import os
 import socket
 import subprocess
 import time
+from pathlib import Path
 from logging import Logger
 from typing import List, Optional
 
@@ -23,8 +24,9 @@ CHROME_ALT_PATH = r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe"
 # quando aponta para o perfil padrão do Chrome (User Data). Por isso usamos um
 # diretório dedicado, não-padrão. Para não precisar logar de novo, na 1ª execução
 # o script CLONA o seu perfil padrão (já logado) para este diretório dedicado.
-CHROME_DEFAULT_USER_DATA = r"C:\Users\pc\AppData\Local\Google\Chrome\User Data"
-CHROME_USER_DATA = r"C:\Users\pc\AppData\Local\Google\Chrome\BOPM_Automation"
+_LOCAL_APPDATA = Path(os.environ.get("LOCALAPPDATA", Path.home() / "AppData" / "Local"))
+CHROME_DEFAULT_USER_DATA = str(_LOCAL_APPDATA / "Google" / "Chrome" / "User Data")
+CHROME_USER_DATA = str(_LOCAL_APPDATA / "Google" / "Chrome" / "BOPM_Automation")
 CDP_PORT        = 9222
 
 
