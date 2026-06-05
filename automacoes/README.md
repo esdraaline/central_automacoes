@@ -5,15 +5,15 @@ painel para adicionar uma automação nova.
 
 ## Como criar uma automação nova
 
-1. Crie uma pasta aqui (ex.: `login_sei/`).
+1. Crie uma pasta aqui (ex.: `login_dejem/`).
 2. Coloque dois arquivos:
 
 ```python
 # manifesto.py
 MANIFESTO = {
-    "id": "login_sei",
-    "nome": "Logar no SEI",
-    "descricao": "Abre o SEI e autentica na minha área",
+    "id": "login_dejem",
+    "nome": "Logar no Dejem",
+    "descricao": "Abre o Dejem e autentica na minha área",
     "categoria": "Logins",
     "precisa_vpn": False,
     "destrutivo": False,

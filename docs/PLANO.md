@@ -49,7 +49,6 @@ central_automacoes/
 │   ├── orion_indicadores/    # 2
 │   ├── correio_pm/           # 3 + 3.1
 │   ├── gmail_relatorio/      # 4 + 4.1 (parametrizável p/ 4 contas)
-│   ├── login_sei/            # 5
 │   ├── login_mapaforca/      # 6
 │   ├── login_dejem/          # 7
 │   └── assinar_pdf/          # 8
@@ -101,7 +100,7 @@ A ordem prioriza **fundação primeiro**, depois **ganhos rápidos e seguros**, 
 | Fase | Entrega | Itens da sua lista | Esforço | Risco |
 |------|---------|--------------------|---------|-------|
 | **0** | Refatorar `bopm` em `nucleo/` + painel-esqueleto rodando a automação 1 | (fundação) | Médio | Baixo |
-| **1** | Automações de login (abrir sistema + autenticar) | 5 SEI · 6 Mapa Força · 7 Dejem/Delegada | Baixo | Baixo |
+| **1** | Automações de login (abrir sistema + autenticar) | 6 Mapa Força · 7 Dejem/Delegada | Baixo | Baixo |
 | **2** | Validar BOPM (formalizar o que o Gemini já faz) | 1.1 | Baixo | Baixo |
 | **3** | Consultar indicadores criminais no Órion | 2 | Médio | Médio |
 | **4** | Relatório de e-mails **não lidos** (só leitura) | 3 correio PM · 4 Gmail (4 contas) | Médio | Médio |
@@ -114,7 +113,7 @@ Os itens marcados ⚠ exigem decisão sua antes (Seção 5).
 
 ## 4. Segurança das credenciais (importante)
 
-Hoje o `config.py` guarda senhas em **texto puro** (VPN, SIOPM). Para 1 automação numa máquina sua, tudo bem. Mas você vai passar a guardar **VPN + SIOPM + Órion + SEI + Mapa Força + Dejem + 4 contas de e-mail** no mesmo lugar. Texto puro fica arriscado — principalmente se a pasta um dia for parar num pen drive, num backup, ou (Deus me livre) num repositório.
+Hoje o `config.py` guarda senhas em **texto puro** (VPN, SIOPM). Para 1 automação numa máquina sua, tudo bem. Mas você vai passar a guardar **VPN + SIOPM + Órion + Mapa Força + Dejem + 4 contas de e-mail** no mesmo lugar. Texto puro fica arriscado — principalmente se a pasta um dia for parar num pen drive, num backup, ou (Deus me livre) num repositório.
 
 **Recomendação:** centralizar tudo em `nucleo/segredos.py`, lendo de **uma destas opções**, em ordem de preferência:
 

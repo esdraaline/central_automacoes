@@ -17,6 +17,7 @@ from dotenv import dotenv_values
 _SCHEMA: Dict[str, List[str]] = {
     "vpn":   ["VPN_USER",   "VPN_PASSWORD"],
     "siopm": ["SIOPM_USER", "SIOPM_PASSWORD"],
+    "dejem": ["DEJEM_USUARIO", "DEJEM_SENHA"],
     "orion": ["ORION_USER", "ORION_PASSWORD"],
 }
 

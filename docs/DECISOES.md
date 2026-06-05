@@ -53,3 +53,12 @@ assinador gov.br**; você faz o 2FA e assina. Sem senha guardada.
 `nucleo/segredos.py` lê de `segredos.env` por padrão, mas com interface abstrata
 (`segredos.get("siopm")`), para trocar depois para o `keyring` do Windows sem
 reescrever nada. Senha nunca aparece no código das automações.
+
+---
+
+## D-06 · SEI fora da automação ✅
+O SEI não será automatizado na Central de Automações. Login, acesso via gov.br,
+2FA e uso do SEI serão feitos manualmente pelo operador.
+**Motivo:** o fluxo gov.br/Minha Área SP envolve identidade pessoal, 2FA e risco
+operacional maior que o ganho de apenas abrir a sessão. Melhor manter o SEI como
+procedimento manual.

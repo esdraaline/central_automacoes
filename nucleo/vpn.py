@@ -73,6 +73,7 @@ class VPNManager:
         self._check_retries = check_retries
         self._cli_path: Optional[str] = None
         self._server: Optional[str] = None
+        self._connected_by_manager = False
 
     # ------------------------------------------------------------------
     # Pública: verificar conectividade
@@ -103,6 +104,7 @@ class VPNManager:
         Conecta na VPN PMESP. Retorna True se bem-sucedido.
         Levanta RuntimeError em caso de falha crítica.
         """
+        self._connected_by_manager = False
         if self.is_intranet_reachable():
             self.log.info("VPN já está conectada ou intranet acessível. Pulando conexão VPN.")
             return True
@@ -134,6 +136,10 @@ class VPNManager:
 
     def disconnect(self) -> None:
         """Desconecta a VPN de forma segura."""
+        if not self._connected_by_manager:
+            self.log.info("VPN não foi conectada por esta execução. Mantendo conexão ativa.")
+            return
+
         cli = self._find_cli()
         if not cli:
             self.log.warning("CLI não encontrado — não foi possível desconectar a VPN.")
@@ -258,6 +264,7 @@ class VPNManager:
                 re.search(r"state:\s+Connect(?:ed|ado)\b", stdout, re.IGNORECASE)
             )
             if connected:
+                self._connected_by_manager = True
                 self.log.info("VPN conectada com sucesso!")
                 time.sleep(4)
                 if self.is_intranet_reachable():

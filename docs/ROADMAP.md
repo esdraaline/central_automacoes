@@ -34,10 +34,21 @@
 
 ---
 
-## Fase 1 — Logins simples  *(sprints a detalhar ao chegar)*
-- [ ] 5 · Login área SEI
-- [ ] 6 · Login Mapa Força 5ª Cia (SIOPM Web)
-- [ ] 7 · Login página Dejem/Delegada
+## Fase 1 — Logins simples  ✅
+
+### Sprint 1 — Logins: Mapa Força · Dejem
+- [x] Criar `nucleo/login_mapa_forca.py` reutilizando credenciais SIOPM e abrindo COMP MAPA FORÇA
+- [x] Criar `nucleo/login_dejem.py` com credenciais do Portal MS
+- [x] Criar `automacoes/abrir_mapa_forca/` para uso real, mantendo Edge aberto
+- [x] Criar `automacoes/abrir_dejem/` para uso real, mantendo Edge aberto
+- [x] Adicionar chaves Dejem em `segredos.env` e `segredos.env.exemplo`
+- [x] Criar `automacoes/teste_logins/` como diagnóstico (`manifesto.py` + `executar.py`)
+- [x] Confirmar descoberta pelo contrato sem alterar `painel.py`
+- [x] Validar pelo painel em ambiente com `customtkinter`, VPN e Edge
+
+### Itens da fase
+- [x] 6 · Login Mapa Força 5ª Cia (SIOPM Web)
+- [x] 7 · Login página Dejem/Delegada
 
 ## Fase 2 — Validar BOPM (1.1)
 - [ ] Formalizar o que o `gemini_submitter.py` já faz como automação própria
@@ -63,3 +74,7 @@
 - **03/06/2026** — Scaffold criado, BOPM migrado, decisões A/B/C registradas, `STATUS.md` criado, Fase 0 detalhada em 2 sprints.
 - **03/06/2026** — Fase 0 · Sprint 1 executado e testado: `nucleo/` criado com `segredos.py`, `log.py`, `vpn.py`, `browser.py`; credenciais migradas para `segredos.env`; `config.py` limpo; BOPM rodando pelo código refatorado.
 - **03/06/2026** — Fase 0 · Sprint 2 concluído e testado: `painel.py` abre, botão "Baixar BOPMs" roda o BOPM com log ao vivo. **Fase 0 fechada.**
+- **05/06/2026** — Decisão D-06 registrada: SEI removido do escopo de automação; acesso ao SEI ficará manual.
+- **05/06/2026** — Fase 1 · Sprint 1 implementado: logins reutilizáveis Mapa Força/Dejem e smoke-test `Teste de Logins` criados. Pendente validação real pelo painel/VPN.
+- **05/06/2026** — Fase 1 · Sprint 1 validado pelo painel: `[OK] Mapa Força` e `[OK] Dejem`. Aprendizados registrados em `docs/APRENDIZADOS.md`. **Fase 1 fechada.**
+- **05/06/2026** — Ajuste pós-validação: criados botões reais **Abrir Mapa Força** e **Abrir Dejem/Delegada**; **Teste de Logins** mantido como diagnóstico.
