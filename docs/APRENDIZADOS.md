@@ -26,6 +26,8 @@
 - **Usar o diagnóstico ampliado** (tags `img`, `span`, `td`; campos `onclick`, `src`, `checked`) para revelar elementos GeneXus não-padrão.
 - **Sempre verificar o número de ícones na linha** antes de assumir qual clicar.
 - **`keep_open=True`** no `BrowserManager.close()` desvincula o Playwright sem fechar o browser — sessão e cookies intactos, janela permanece aberta.
+- **Filtro GeneXus é POST-based:** `page.goto(url)` após filtro aplicado faz GET e exibe formulário vazio. Nunca navegar de volta via goto — usar apenas o botão "Retornar" que o SIOPM fornece na tela.
+- **Double-Retornar bug:** se `_validar_bopm` clicar "Retornar" (Passo 5) E o `go_back_to_list()` do finally também clicar, o Edge fica 2 níveis acima do esperado. Delegue o retorno a um único ponto (o finally do loop).
 
 ---
 

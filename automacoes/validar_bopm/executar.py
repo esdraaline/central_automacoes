@@ -143,12 +143,9 @@ def run(ctx) -> Dict[str, Any]:
         }
 
     finally:
-        try:
-            if 'nav' in dir() and nav._bopm_list_url and 'page' in dir():
-                page.goto(nav._bopm_list_url, wait_until="domcontentloaded", timeout=15_000)
-                log.info(f"Edge mantido aberto na listagem: {nav._bopm_list_url}")
-        except Exception:
-            pass
+        # go_back_to_list() já retornou à lista filtrada — não navegar novamente
+        # (page.goto perderia o estado POST do filtro GeneXus e exibiria form vazio).
+        log.info("Edge mantido aberto na listagem filtrada.")
         try:
             ctx.browser.close(keep_open=True)
         except Exception:
@@ -313,28 +310,7 @@ def _validar_bopm(log, page) -> None:
     validar_btn.click()
     _wait_stable(page)
     log.info("'Validar BO-e' clicado e dialog aceito.")
-
-    # ── Passo 5: clicar em 'Retornar' ────────────────────────────────────
-    log.info("Passo 5: clicando em 'Retornar' para voltar à listagem...")
-    time.sleep(1)
-    retornar_btn = _find_in_frames(
-        page,
-        selectors=[
-            "input[name='W0236BTNRETORNAR']",
-            "input[value='Retornar']",
-            "a:has-text('Retornar')",
-        ],
-        has_text_fallback="Retornar",
-        label="Retornar",
-        log=log,
-    )
-    if retornar_btn is None:
-        log.warning("Botão 'Retornar' não encontrado. O go_back_to_list() do finally cobrirá.")
-    else:
-        retornar_btn.scroll_into_view_if_needed()
-        retornar_btn.click()
-        _wait_stable(page)
-        log.info("'Retornar' clicado. De volta à listagem.")
+    # Retorno à listagem delegado ao go_back_to_list() no finally do loop.
 
 
 # ─────────────────────────────────────────────────────────────────────────────
