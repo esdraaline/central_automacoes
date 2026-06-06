@@ -247,36 +247,38 @@ def _validar_bopm(log, page) -> None:
     except Exception:
         pass
 
-    # ── Passo 2: marcar checkbox 'Outros' ────────────────────────────────
-    log.info("Passo 2: localizando checkbox 'Outros'...")
+    # ── Passo 2: marcar "Outros" (GeneXus usa <img> clicável, não checkbox) ──
+    log.info("Passo 2: localizando 'Outros' (img/link GeneXus)...")
     outros = _find_in_frames(
         page,
         selectors=[
-            "input[type='checkbox'][name*='OUTROS' i]",
-            "input[type='checkbox'][id*='outros' i]",
-            "input[type='checkbox'][value*='outros' i]",
-            "label:has-text('Outros') input[type='checkbox']",
+            "img[id='W0236CHK_OUT']",
+            "img[name='W0236CHK_OUT']",
+            "a[onclick*='CHK_OUT']",
+            "img[src*='UnChecked'][id*='OUT' i]",
         ],
         has_text_fallback="Outros",
-        label="Outros (checkbox)",
+        label="Outros (GeneXus img)",
         log=log,
     )
     if outros is None:
         _log_falha_diagnostico(log, page, "Outros")
         raise RuntimeError(
-            "Checkbox 'Outros' não encontrado. "
+            "Elemento 'Outros' (img GeneXus) não encontrado. "
             "Verifique o log acima para URL e frames disponíveis."
         )
     outros.scroll_into_view_if_needed()
+    # Verifica se já está marcado pelo src da imagem
     try:
-        if not outros.is_checked():
+        src = outros.get_attribute("src") or ""
+        if "UnChecked" in src:
             outros.click()
-            log.info("Checkbox 'Outros' marcado.")
+            log.info("'Outros' marcado (era UnChecked).")
         else:
-            log.info("Checkbox 'Outros' já estava marcado. Pulando.")
+            log.info("'Outros' já estava marcado (Checked). Pulando.")
     except Exception:
         outros.click()
-        log.info("Checkbox 'Outros' clicado.")
+        log.info("'Outros' clicado.")
     time.sleep(0.5)
 
     # ── Passo 3: localizar botão 'Validar BO-e' ──────────────────────────
@@ -387,19 +389,24 @@ def _log_falha_diagnostico(log, page, label: str) -> None:
         try:
             elements = frame.evaluate("""
                 () => {
-                    const tags = ['input', 'button', 'a', 'label'];
+                    const tags = ['input', 'button', 'a', 'label', 'span', 'td', 'img'];
                     const result = [];
                     for (const tag of tags) {
                         for (const el of document.querySelectorAll(tag)) {
+                            const hasOnclick = el.onclick || el.getAttribute('onclick');
                             const r = el.getBoundingClientRect();
-                            if (r.width === 0 || r.height === 0) continue;
+                            // Inclui: tem dimensões, OU tem onclick, OU é input/button qualquer tipo
+                            if (r.width === 0 && r.height === 0 && !hasOnclick && tag !== 'input' && tag !== 'button') continue;
                             result.push({
                                 tag: el.tagName,
                                 type: el.type || '',
                                 value: (el.value || '').slice(0, 60),
-                                text: (el.innerText || '').trim().slice(0, 60),
+                                text: (el.innerText || el.textContent || '').trim().slice(0, 60),
                                 id: el.id || '',
-                                name: el.name || '',
+                                name: el.name || el.getAttribute('name') || '',
+                                src: (el.src || el.getAttribute('src') || '').slice(0, 80),
+                                onclick: (el.getAttribute('onclick') || '').slice(0, 80),
+                                checked: el.checked !== undefined ? el.checked : '',
                             });
                         }
                     }
@@ -412,7 +419,9 @@ def _log_falha_diagnostico(log, page, label: str) -> None:
                     log.warning(
                         f"    <{el['tag'].lower()} type={el['type']!r} "
                         f"id={el['id']!r} name={el['name']!r} "
-                        f"value={el['value']!r} text={el['text']!r}>"
+                        f"value={el['value']!r} text={el['text']!r} "
+                        f"checked={el['checked']!r} onclick={el['onclick']!r} "
+                        f"src={el['src']!r}>"
                     )
         except Exception:
             pass
