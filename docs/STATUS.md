@@ -1,6 +1,6 @@
 # 📍 Status Atual
 Foto do "onde estou agora". Atualizado ao fim de cada sprint (pelo Claude Code durante o build).
-**Última atualização: 05/06/2026**
+**Última atualização: 06/06/2026**
 
 ---
 
@@ -26,6 +26,7 @@ Foto do "onde estou agora". Atualizado ao fim de cada sprint (pelo Claude Code d
 - **Decisão D-07 ✅** — Despachadora: código na Central, corpus no Drive; `GEMINI_API_KEY` e `CORPUS_PATH` via `segredos.env`
 - **Fase 2 · Sprint 2.1 ⏳ (aguardando validação)** — `automacoes/validar_bopm/manifesto.py` e `automacoes/validar_bopm/executar.py` criados; botão "Validar BOPM" aparece no painel automaticamente; seletores "Outros", "Validar BOPM" e "Confirmar" a mapear na primeira execução real
 - Aprendizados da validação registrados em `docs/APRENDIZADOS.md`
+- **Fix Baixar BOPM ✅** — `siopm_navigator.py` corrigido para detectar também BOPMs com status "BO Informal" (antes só detectava "Não Formalizado"); validado com sucesso em execução real
 
 ---
 

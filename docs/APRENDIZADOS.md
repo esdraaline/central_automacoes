@@ -4,6 +4,25 @@
 
 ---
 
+## 06/06/2026 — Fix Baixar BOPM · Detecção de "BO Informal"
+
+### Erro encontrado
+`get_pending_bopms` não detectava BOPMs com status **"BO Informal"** — só reconhecia "Não Formalizado". BOPMs com esse status eram silenciosamente ignorados na listagem.
+
+### Causa raiz
+A detecção opera em 3 camadas independentes (JavaScript na listagem, método `_row_has_orange_indicator` e log de abertura), e todas usavam apenas a string `'nao formalizado'` como critério de texto.
+
+### Correção aplicada
+Três pontos em `siopm_navigator.py`:
+1. Filtro JavaScript (`byText`): adicionado `|| norm.includes('bo informal')`.
+2. Keywords de `_row_has_orange_indicator`: adicionados `"bo informal"` e `"b.o. informal"`.
+3. Log de abertura: atualizado para refletir os dois status detectados.
+
+### Regra para próximas automações
+Ao listar BOPMs por status textual, nunca assumir que existe um único valor possível — o SIOPM usa ao menos dois: "Não Formalizado" e "BO Informal". Qualquer futura automação que filtre por status deve cobrir ambos.
+
+---
+
 ## 05/06/2026 — Fase 1 · Sprint 1 · Logins Mapa Força e Dejem
 
 ### Acertos

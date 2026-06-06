@@ -269,7 +269,7 @@ class SiopmNavigator:
         Detecta BOPMs com status "Não Formalizado" usando JavaScript diretamente
         no browser — contorna problemas de seletor CSS, encoding e frameset.
         """
-        self.log.info("Detectando BOPMs pendentes (Não Formalizado)...")
+        self.log.info("Detectando BOPMs pendentes (Não Formalizado / BO Informal)...")
         pending: List[BopmEntry] = []
 
         frames = self.page.frames or [self.page]
@@ -314,7 +314,7 @@ class SiopmNavigator:
                                 'a, input[type="image"], input[type="submit"], button'
                             );
 
-                            const byText  = norm.includes('nao formalizado');
+                            const byText  = norm.includes('nao formalizado') || norm.includes('bo informal');
                             const byIcons = clickables.length >= 2;
 
                             if (!byText && !byIcons) return;
@@ -637,7 +637,8 @@ class SiopmNavigator:
         try:
             row_text = (row.inner_text() or "").lower()
             keywords = ["pendente", "aguardando", "p/ valid",
-                        "não formalizado", "nao formalizado", "não formalizado"]
+                        "não formalizado", "nao formalizado",
+                        "bo informal", "b.o. informal"]
             if any(kw in row_text for kw in keywords):
                 return True
         except Exception:

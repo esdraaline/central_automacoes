@@ -187,4 +187,6 @@ automacoes/despachadora/
 
 **05/06/2026** — Diagnóstico de consistência (sprint de documentação): D-07 registrada em DECISOES.md; Fases 2–7 detalhadas com sprints e critérios de aceite; Fase 7 (Despachadora) adicionada ao ROADMAP, PLANO e STATUS; `segredos.env.exemplo` atualizado com `GEMINI_API_KEY` e `CORPUS_PATH`; README atualizado.
 
+**06/06/2026** — Fix Baixar BOPM: `siopm_navigator.py` corrigido para detectar BOPMs com status "BO Informal" além de "Não Formalizado". Correção em 3 pontos: log de abertura, filtro JavaScript na listagem e lista de keywords do indicador visual. Validado em execução real.
+
 **05/06/2026** — Fase 2 · Sprint 2.1 implementado: `automacoes/validar_bopm/manifesto.py` e `automacoes/validar_bopm/executar.py` criados. Botão "Validar BOPM" aparece no painel automaticamente (descoberta pelo contrato). Fluxo: login SIOPM → filtro → detecta pendentes → abre cada BOPM → tenta 3 cliques (Outros / Validar BOPM / Confirmar). Seletores dos 3 cliques a mapear na primeira execução real com VPN — log diagnostica URL e elementos visíveis em caso de falha. Pendente validação pelo painel.
