@@ -32,8 +32,9 @@ Foto do "onde estou agora". Atualizado ao fim de cada sprint (pelo Claude Code d
 
 ## ⚠️ PRÓXIMO PASSO IMEDIATO (retomada em outra máquina)
 
-1. `git pull` para puxar Sprint 2.1 completo.
-2. Próxima entrega: Sprint 2.2 — relatório em `saidas/validacao_bopm_<data>.txt` com resultado por BOPM.
+1. `git pull` para puxar fix do double-Retornar.
+2. **Validar em campo (a partir de 08/06/2026):** rodar "Validar BOPM" com um BO pendente real e confirmar que o Edge fica aberto na listagem filtrada (não no formulário vazio). Commit `9a24716` corrige o bug — pendente confirmação em campo por falta de BO pendente no dia 06/06.
+3. Após confirmação: Sprint 2.2 — relatório em `saidas/validacao_bopm_<data>.txt` com resultado por BOPM.
 
 > Sprint 2.1 validado em campo. Fase 2 pode ser considerada 50% concluída (Sprint 2.2 pendente).
 
