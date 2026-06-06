@@ -29,6 +29,18 @@ Foto do "onde estou agora". Atualizado ao fim de cada sprint (pelo Claude Code d
 
 ---
 
+## ⚠️ PRÓXIMO PASSO IMEDIATO (retomada em outra máquina)
+
+1. `git pull` para puxar o Sprint 2.1.
+2. Abrir o painel (`python painel.py`) com **VPN ativa**.
+3. Clicar no botão **"Validar BOPM"** com pelo menos um BOPM pendente real no SIOPM.
+4. Copiar o log completo gerado pelo painel.
+5. Abrir nova sessão com o Claude Code e colar o log — ele ajustará os seletores de "Outros", "Validar BOPM" e "Confirmar" com base no que o log mostrar.
+
+> O código já está pronto. A única coisa pendente é mapear os 3 seletores da tela de validação do SIOPM, o que só é possível com acesso real ao sistema (VPN + SIOPM). O log diagnostica tudo automaticamente.
+
+---
+
 ## Próximo passo
 
 **Trilha principal:** Validar pelo painel — clicar em "Validar BOPM" com VPN ativa e um BOPM pendente real. O log mostrará onde os seletores falharam (se falharem) com URL e elementos visíveis para mapeamento.
