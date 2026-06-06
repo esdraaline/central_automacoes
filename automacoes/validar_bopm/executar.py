@@ -5,13 +5,15 @@ Fluxo:
   1. Login no SIOPM Web (mesma rota do baixar_bopm).
   2. Navegar até a lista de BOPMs pendentes de validação.
   3. Para cada BOPM pendente:
-     a. Abrir o BOPM.
-     b. Selecionar "Outros" em "Enviar para Providências Complementares".
-     c. Clicar em "Validar BOPM".
-     d. Clicar em "Confirmar".
+     a. Abrir o BOPM clicando no ícone "Editar Ocorrência" (2º ícone da linha).
+     b. Se "Validar BO-e" não estiver visível: clicar em "Visualiza PDF" primeiro.
+     c. Marcar checkbox "Outros" em Providências Preliminares > Remessa ao.
+     d. Registrar handler de dialog e clicar em "Validar BO-e".
+     e. Dialog "Deseja validar o BO-e?" é aceito automaticamente.
+     f. Clicar em "Retornar" para voltar à listagem.
   4. Retornar resumo no log e como dict de resultado.
 
-Seletores de (b), (c) e (d) são mapeados por has-text como primeira tentativa.
+Seletores mapeados pelos prints em 06/06/2026 (tela hsioocrwebtco.aspx).
 Se falharem, o log registra URL e frames disponíveis para mapeamento manual.
 
 Pré-condição: se manifesto.precisa_vpn, o painel já chamou ctx.vpn.connect().
@@ -142,7 +144,13 @@ def run(ctx) -> Dict[str, Any]:
 
     finally:
         try:
-            ctx.browser.close()
+            if 'nav' in dir() and nav._bopm_list_url and 'page' in dir():
+                page.goto(nav._bopm_list_url, wait_until="domcontentloaded", timeout=15_000)
+                log.info(f"Edge mantido aberto na listagem: {nav._bopm_list_url}")
+        except Exception:
+            pass
+        try:
+            ctx.browser.close(keep_open=True)
         except Exception:
             pass
 
@@ -157,101 +165,166 @@ def run(ctx) -> Dict[str, Any]:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Lógica de validação (os 3 cliques)
+# Lógica de validação (fluxo real mapeado em 06/06/2026)
 # ─────────────────────────────────────────────────────────────────────────────
 
 def _validar_bopm(log, page) -> None:
     """
-    Executa os 3 cliques de validação dentro do BOPM aberto:
-      1. Selecionar "Outros" em "Enviar para Providências Complementares"
-      2. Clicar em "Validar BOPM"
-      3. Clicar em "Confirmar"
-
-    Estratégia: has-text como primeira tentativa em todos os frames.
-    Se falhar, loga URL e frames disponíveis para mapeamento manual.
+    Fluxo real de validação (mapeado pelos prints em 06/06/2026):
+      1. Se 'Validar BO-e' não estiver visível: clicar em 'Visualiza PDF' primeiro
+         (BOs nunca visualizados não exibem o botão de validação).
+      2. Marcar checkbox 'Outros' em Providências Preliminares > Remessa ao.
+         Pula se já estiver marcado.
+      3. Registrar handler de dialog ANTES do clique (window.confirm nativo).
+      4. Clicar em 'Validar BO-e'.
+      5. Dialog 'Deseja validar o BO-e?' é aceito automaticamente pelo handler.
+      6. Clicar em 'Retornar' para voltar à listagem.
     """
     _wait_stable(page)
 
-    # ── Log diagnóstico: frames disponíveis ─────────────────────────────
+    # Log diagnóstico: frames disponíveis
     frames = page.frames
     log.info(f"Frames disponíveis após abrir BOPM ({len(frames)}):")
     for f in frames:
         log.info(f"  • {f.url}")
 
-    # ── Passo 1: selecionar "Outros" ─────────────────────────────────────
-    log.info("Passo 1: localizando opção 'Outros'...")
+    # ── Passo 1: verificar se 'Validar BO-e' está visível ────────────────
+    log.info("Passo 1: verificando presença de 'Validar BO-e'...")
+    validar_presente = _find_in_frames(
+        page,
+        selectors=[
+            "input[name='W0236BTNVALIDARTCO']",
+            "input[value='Validar BO-e']",
+            "input[type='submit'][value*='Validar' i]",
+        ],
+        has_text_fallback="Validar BO-e",
+        label="Validar BO-e (verificação)",
+        log=log,
+    )
+
+    if validar_presente is None:
+        log.info("'Validar BO-e' não visível. Clicando em 'Visualiza PDF' primeiro...")
+        visualizar_btn = _find_in_frames(
+            page,
+            selectors=[
+                "input[name='W0236BTNVISUALIZARTCO']",
+                "input[value*='Visualiza' i]",
+                "input[type='submit'][value*='PDF' i]",
+            ],
+            has_text_fallback="Visualiza PDF",
+            label="Visualiza PDF",
+            log=log,
+        )
+        if visualizar_btn is None:
+            _log_falha_diagnostico(log, page, "Visualiza PDF")
+            raise RuntimeError(
+                "Botão 'Visualiza PDF' não encontrado e 'Validar BO-e' também ausente. "
+                "Verifique o log acima."
+            )
+        visualizar_btn.scroll_into_view_if_needed()
+
+        # O PDF pode abrir em nova aba — registrar handler para fechar automaticamente
+        def _handle_popup(popup):
+            try:
+                popup.wait_for_load_state("domcontentloaded", timeout=10_000)
+                popup.close()
+                log.info("Aba de PDF fechada.")
+            except Exception:
+                pass
+
+        page.context.once("page", _handle_popup)
+        visualizar_btn.click()
+        _wait_stable(page)
+        time.sleep(2)
+        log.info("'Visualiza PDF' clicado. Verificando 'Validar BO-e' novamente...")
+        _wait_stable(page)
+
+    # ── Passo 2: marcar checkbox 'Outros' ────────────────────────────────
+    log.info("Passo 2: localizando checkbox 'Outros'...")
     outros = _find_in_frames(
         page,
         selectors=[
-            "input[type='radio'][value*='Outros' i]",
-            "input[type='radio'][id*='outros' i]",
-            "input[type='checkbox'][value*='Outros' i]",
-            "label:has-text('Outros') input",
+            "input[type='checkbox'][name*='OUTROS' i]",
+            "input[type='checkbox'][id*='outros' i]",
+            "input[type='checkbox'][value*='outros' i]",
+            "label:has-text('Outros') input[type='checkbox']",
         ],
         has_text_fallback="Outros",
-        label="Outros",
+        label="Outros (checkbox)",
         log=log,
     )
     if outros is None:
         _log_falha_diagnostico(log, page, "Outros")
         raise RuntimeError(
-            "Elemento 'Outros' não encontrado. "
+            "Checkbox 'Outros' não encontrado. "
             "Verifique o log acima para URL e frames disponíveis."
         )
     outros.scroll_into_view_if_needed()
-    outros.click()
-    log.info("'Outros' selecionado.")
+    try:
+        if not outros.is_checked():
+            outros.click()
+            log.info("Checkbox 'Outros' marcado.")
+        else:
+            log.info("Checkbox 'Outros' já estava marcado. Pulando.")
+    except Exception:
+        outros.click()
+        log.info("Checkbox 'Outros' clicado.")
     time.sleep(0.5)
 
-    # ── Passo 2: clicar em "Validar BOPM" ───────────────────────────────
-    log.info("Passo 2: localizando botão 'Validar BOPM'...")
+    # ── Passo 3: localizar botão 'Validar BO-e' ──────────────────────────
+    log.info("Passo 3: localizando botão 'Validar BO-e'...")
     validar_btn = _find_in_frames(
         page,
         selectors=[
-            "input[value*='Validar BOPM' i]",
-            "button:has-text('Validar BOPM')",
-            "a:has-text('Validar BOPM')",
+            "input[name='W0236BTNVALIDARTCO']",
+            "input[value='Validar BO-e']",
             "input[type='submit'][value*='Validar' i]",
         ],
-        has_text_fallback="Validar BOPM",
-        label="Validar BOPM",
+        has_text_fallback="Validar BO-e",
+        label="Validar BO-e",
         log=log,
     )
     if validar_btn is None:
-        _log_falha_diagnostico(log, page, "Validar BOPM")
+        _log_falha_diagnostico(log, page, "Validar BO-e")
         raise RuntimeError(
-            "Botão 'Validar BOPM' não encontrado. "
+            "Botão 'Validar BO-e' não encontrado. "
             "Verifique o log acima para URL e frames disponíveis."
         )
     validar_btn.scroll_into_view_if_needed()
-    validar_btn.click()
-    log.info("'Validar BOPM' clicado.")
-    _wait_stable(page)
 
-    # ── Passo 3: clicar em "Confirmar" ───────────────────────────────────
-    log.info("Passo 3: localizando botão 'Confirmar'...")
-    confirmar_btn = _find_in_frames(
+    # ── Passo 4: registrar handler de dialog e clicar ────────────────────
+    log.info("Passo 4: registrando handler de dialog e clicando em 'Validar BO-e'...")
+
+    def _accept_dialog(dialog):
+        log.info(f"Dialog capturado: '{dialog.message}'. Aceitando...")
+        dialog.accept()
+
+    page.once("dialog", _accept_dialog)
+    validar_btn.click()
+    _wait_stable(page)
+    log.info("'Validar BO-e' clicado e dialog aceito.")
+
+    # ── Passo 5: clicar em 'Retornar' ────────────────────────────────────
+    log.info("Passo 5: clicando em 'Retornar' para voltar à listagem...")
+    time.sleep(1)
+    retornar_btn = _find_in_frames(
         page,
         selectors=[
-            "input[value*='Confirmar' i]",
-            "button:has-text('Confirmar')",
-            "a:has-text('Confirmar')",
-            "input[type='submit'][value*='Confirm' i]",
+            "input[name='W0236BTNRETORNAR']",
+            "input[value='Retornar']",
+            "a:has-text('Retornar')",
         ],
-        has_text_fallback="Confirmar",
-        label="Confirmar",
+        has_text_fallback="Retornar",
+        label="Retornar",
         log=log,
     )
-    if confirmar_btn is None:
-        _log_falha_diagnostico(log, page, "Confirmar")
-        raise RuntimeError(
-            "Botão 'Confirmar' não encontrado. "
-            "Verifique o log acima para URL e frames disponíveis."
-        )
-    confirmar_btn.scroll_into_view_if_needed()
-    confirmar_btn.click()
-    log.info("'Confirmar' clicado.")
-    _wait_stable(page)
+    if retornar_btn is None:
+        log.warning("Botão 'Retornar' não encontrado. O go_back_to_list() do finally cobrirá.")
+    else:
+        retornar_btn.scroll_into_view_if_needed()
+        retornar_btn.click()
+        _wait_stable(page)
+        log.info("'Retornar' clicado. De volta à listagem.")
 
 
 # ─────────────────────────────────────────────────────────────────────────────

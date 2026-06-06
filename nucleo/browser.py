@@ -74,8 +74,23 @@ class BrowserManager:
         """Instância do Playwright em uso — para reaproveitar em outras conexões."""
         return self._playwright
 
-    def close(self) -> None:
-        """Fecha browser e libera recursos do Playwright."""
+    def close(self, keep_open: bool = False) -> None:
+        """
+        Fecha browser e libera recursos do Playwright.
+
+        keep_open=True: encerra apenas o contexto (cookies/sessão), mas mantém
+        a janela do Edge visível para inspeção manual. O processo Playwright
+        continua rodando até o painel ser fechado.
+        """
+        if keep_open:
+            # Desvincula sem fechar nada — browser permanece aberto,
+            # sessão/cookies intactos, usuário vê a última tela da automação.
+            self._context = None
+            self._browser = None
+            self._playwright = None
+            self.log.info("Navegador mantido aberto (keep_open=True).")
+            return
+
         try:
             if self._context:
                 self._context.close()

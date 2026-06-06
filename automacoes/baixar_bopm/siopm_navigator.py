@@ -457,10 +457,20 @@ class SiopmNavigator:
                         )
                         visible = [i for i in icons if i.is_visible()]
                         if visible:
-                            target = visible[0]
+                            if len(visible) >= 2:
+                                # 2 ícones: [0]=visualizar, [1]=editar/validar — queremos o 2º
+                                target = visible[1]
+                                self.log.debug(
+                                    f"[{entry.bopm_id}] 2 ícones encontrados — usando [1] (Editar Ocorrência)"
+                                )
+                            else:
+                                # Só 1 ícone: usa o único disponível
+                                target = visible[0]
+                                self.log.debug(
+                                    f"[{entry.bopm_id}] 1 ícone encontrado — usando [0]"
+                                )
                             self.log.debug(
-                                f"[{entry.bopm_id}] Ícone em cells[-{rev_idx + 1}] "
-                                f"({len(visible)} visível(is))"
+                                f"[{entry.bopm_id}] Ícone em cells[-{rev_idx + 1}]"
                             )
                             break
                     except Exception:
@@ -549,9 +559,11 @@ class SiopmNavigator:
         self.log.info("Voltando para a listagem de BOPMs...")
         try:
             back_btn = self.page.query_selector(
-                "input[value*='Voltar' i], button:has-text('Voltar'), a:has-text('Voltar')"
+                "input[value*='Retornar' i], input[value*='Voltar' i], "
+                "button:has-text('Retornar'), button:has-text('Voltar'), "
+                "a:has-text('Retornar'), a:has-text('Voltar')"
             )
-            if back_btn:
+            if back_btn and back_btn.is_visible():
                 back_btn.click()
                 self._wait_for_stable_page()
                 return

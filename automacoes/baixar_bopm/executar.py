@@ -134,7 +134,13 @@ def run(ctx) -> Dict[str, Any]:
             except Exception as exc:
                 log.warning(f"Erro ao enviar ao Gemini: {exc}")
 
-        ctx.browser.close()
+        try:
+            if 'nav' in dir() and nav._bopm_list_url and 'page' in dir():
+                page.goto(nav._bopm_list_url, wait_until="domcontentloaded", timeout=15_000)
+                log.info(f"Edge mantido aberto na listagem: {nav._bopm_list_url}")
+        except Exception:
+            pass
+        ctx.browser.close(keep_open=True)
 
         log.info("\n" + "═" * 60)
         log.info("  RELATÓRIO FINAL")
