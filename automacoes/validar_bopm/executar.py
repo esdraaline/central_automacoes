@@ -239,6 +239,14 @@ def _validar_bopm(log, page) -> None:
         log.info("'Visualiza PDF' clicado. Verificando 'Validar BO-e' novamente...")
         _wait_stable(page)
 
+    # Scroll até o fim para garantir que 'Providências Preliminares' esteja
+    # no viewport — o GeneXus renderiza checkboxes com dimensões zero até scroll.
+    try:
+        page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
+        time.sleep(0.5)
+    except Exception:
+        pass
+
     # ── Passo 2: marcar checkbox 'Outros' ────────────────────────────────
     log.info("Passo 2: localizando checkbox 'Outros'...")
     outros = _find_in_frames(
