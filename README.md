@@ -1,75 +1,39 @@
-# 🗂️ Central de Automações — PMESP / 5ª Cia
+# Central de Automações — 5ª Cia / 2º BPM-I / CPI-10
 
-> **Comece por aqui.** Este README é o mapa do projeto inteiro.
-> Se você abriu esta pasta sem lembrar do que se trata, leia esta página e a `docs/`.
-
----
-
-## O que é isto
-
-Um painel único que dispara automações do serviço (baixar BOPM, consultar Órion,
-relatório de e-mails, logins, assinatura de PDF, etc.). Cada automação é um módulo
-plugável — adicionar uma nova = largar uma pasta em `automacoes/`.
-
-**Estado atual:** scaffold montado + automação de BOPM já dentro (ainda no formato antigo).
-**Próximo passo:** Fase 0 (ver `docs/ROADMAP.md`).
+Painel desktop único (Python + customtkinter) que descobre e executa automações do serviço. Cada automação vive numa pasta plugável — adicionar uma nova = largar uma pasta nova; o botão aparece sozinho.
 
 ---
 
-## Onde está cada coisa
+## Estado atual
 
-| Pasta / arquivo            | O que é                                                        |
-|----------------------------|----------------------------------------------------------------|
-| `README.md` (este)         | Mapa do projeto. Ponto de partida.                             |
-| `docs/PLANO.md`            | O plano completo de arquitetura e fases.                       |
-| `docs/DECISOES.md`         | Registro das decisões tomadas (e por quê). **Não perca isto.** |
-| `docs/ROADMAP.md`          | Fases e sprints. Checklist do progresso.                       |
-| `docs/STATUS.md`           | "Onde estou agora" — foto viva, atualizada a cada sprint.      |
-| `painel.py`                | (a criar na Fase 0) A interface com os botões.                 |
-| `nucleo/`                  | Código compartilhado por todas as automações (VPN, browser…).  |
-| `automacoes/`              | Uma pasta por automação. Ver `automacoes/README.md`.           |
-| `automacoes/baixar_bopm/`  | A automação atual de BOPM (código original, a ser refatorado). |
-| `saidas/`                  | TUDO que as automações produzem: PDFs, relatórios, listas.     |
-| `logs/`                    | Logs de execução.                                              |
-| `segredos.env.exemplo`     | Modelo de credenciais. Copie para `segredos.env` e preencha.   |
-| `.gitignore`               | Garante que segredos e saídas nunca sejam versionados.         |
+| Fase | Status |
+|---|---|
+| Fase 0 — Fundação (nucleo/ + painel + BOPM) | ✅ Concluída |
+| Fase 1 — Logins (Mapa Força + Dejem/Delegada) | ✅ Concluída |
+| Fase 2 — Validar BOPM | ⏳ Próxima |
+| Fase 7 — Despachadora do Comandante | ⏳ Disponível (trilha paralela) |
+| Fases 3–6 | ⏳ Planejadas |
+
+Para o estado detalhado, consulte `docs/STATUS.md`.
+Para o roadmap completo com sprints e critérios de aceite, consulte `docs/ROADMAP.md`.
 
 ---
 
-## Regra de ouro dos arquivos
+## Como rodar
 
-> **Nada vive só no chat.** Todo plano, código ou decisão que sair de uma conversa
-> com a IA vai para dentro desta pasta — em `docs/` se for documento, no lugar certo
-> se for código. Esta pasta é a **única fonte da verdade**.
-
----
-
-## Como evoluir o projeto (fluxo)
-
-1. Olhe `docs/ROADMAP.md` e veja qual é a próxima fase.
-2. Entenda → planeje → confirme → execute (seu fluxo de sempre).
-3. Ao concluir uma fase, marque no ROADMAP e anote no DECISOES se algo mudou.
-4. Cada automação nova entra como pasta em `automacoes/` (ver o contrato lá).
-
----
-
-## Segurança (leia antes de pôr em qualquer git/backup/pendrive)
-
-As credenciais ficam em `segredos.env`, que **nunca** deve ser versionado em
-repositório público. O `.gitignore` já protege isso. O arquivo
-`automacoes/baixar_bopm/config.py` contém apenas configuração operacional não
-secreta da automação BOPM/SIOPM e deve acompanhar o código.
-
----
-
-## Sincronização dos projetos
-
-Para atualizar todos os repositórios Git da pasta de projetos, dê dois cliques em:
-
-```text
-atualizar-todos-projetos.cmd
+```bash
+cd C:\Projetos\central_automacoes
+python painel.py
 ```
 
-O script procura repositórios Git na pasta acima de `central_automacoes`, incluindo
-repositórios aninhados, e executa `git pull --ff-only` em cada um. Se houver
-alterações locais, ele mostra o status antes de tentar atualizar.
+Requisito: `segredos.env` preenchido (copiar de `segredos.env.exemplo`).
+
+---
+
+## Adicionar uma automação nova
+
+1. Criar `automacoes/<id>/manifesto.py` com o dict `MANIFESTO`.
+2. Criar `automacoes/<id>/executar.py` com `def run(ctx)`.
+3. Abrir o painel — o botão aparece automaticamente.
+
+Detalhes do contrato em `docs/PLANO.md`.
