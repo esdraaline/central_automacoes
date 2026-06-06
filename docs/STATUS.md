@@ -8,9 +8,10 @@ Foto do "onde estou agora". Atualizado ao fim de cada sprint (pelo Claude Code d
 
 | Campo | Valor |
 |---|---|
-| **Fase em execução** | Nenhuma (entre sprints — documentação em dia) |
+| **Fase em execução** | Fase 2 — Validar BOPM |
 | **Última fase concluída** | Fase 1 — Logins simples ✅ |
-| **Próximo passo (trilha principal)** | Fase 2 — Validar BOPM (Sprint 2.1) |
+| **Sprint atual** | Sprint 2.1 — implementado, aguardando validação pelo painel |
+| **Próximo passo (trilha principal)** | Testar pelo painel: clicar em "Validar BOPM" e mapear seletores desconhecidos |
 | **Trilha paralela disponível** | Fase 7 — Despachadora (Sprint 7.1 de investigação) — pode ser iniciada a qualquer momento |
 
 ---
@@ -23,13 +24,14 @@ Foto do "onde estou agora". Atualizado ao fim de cada sprint (pelo Claude Code d
 - **Fase 1 · Sprint 1 ✅** — módulos `nucleo/login_mapa_forca.py` e `nucleo/login_dejem.py` criados; botões reais Abrir Mapa Força e Abrir Dejem/Delegada criados; Teste de Logins mantido como diagnóstico
 - **Decisão D-06 ✅** — SEI removido do escopo de automação; acesso ao SEI será manual
 - **Decisão D-07 ✅** — Despachadora: código na Central, corpus no Drive; `GEMINI_API_KEY` e `CORPUS_PATH` via `segredos.env`
+- **Fase 2 · Sprint 2.1 ⏳ (aguardando validação)** — `automacoes/validar_bopm/manifesto.py` e `automacoes/validar_bopm/executar.py` criados; botão "Validar BOPM" aparece no painel automaticamente; seletores "Outros", "Validar BOPM" e "Confirmar" a mapear na primeira execução real
 - Aprendizados da validação registrados em `docs/APRENDIZADOS.md`
 
 ---
 
 ## Próximo passo
 
-**Trilha principal:** Iniciar Fase 2 — Validar BOPM (Sprint 2.1) quando autorizado.
+**Trilha principal:** Validar pelo painel — clicar em "Validar BOPM" com VPN ativa e um BOPM pendente real. O log mostrará onde os seletores falharam (se falharem) com URL e elementos visíveis para mapeamento.
 
 **Trilha paralela (pode iniciar a qualquer momento):** Fase 7 — Despachadora · Sprint 7.1 (investigação — Claude Code lê a Central e propõe plano de port, sem escrever código).
 
@@ -37,7 +39,10 @@ Foto do "onde estou agora". Atualizado ao fim de cada sprint (pelo Claude Code d
 
 ## Bloqueios / pendências
 
-Nenhum bloqueio técnico. Dependências instaladas e painel abre.
+**Fase 2 · Sprint 2.1 — seletores a mapear na primeira execução real:**
+- `"Outros"` (radio/checkbox em "Enviar para Providências Complementares") — seletor desconhecido; log diagnostica na falha.
+- `"Validar BOPM"` (botão) — seletor desconhecido; log diagnostica na falha.
+- `"Confirmar"` (botão pós-validação) — seletor desconhecido; log diagnostica na falha.
 
 **Restrições técnicas identificadas para a Fase 7 (não bloqueiam hoje — investigar no Sprint 7.1):**
 - Input de arquivo: painel atual não tem campo para receber arquivo(s) — extensão necessária.

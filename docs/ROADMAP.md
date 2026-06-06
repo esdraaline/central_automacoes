@@ -50,15 +50,15 @@ Como ler: as fases são o mapa geral. Cada fase é quebrada em sprints com taref
 
 ## Fase 2 — Validar BOPM (1.1)
 
-**Objetivo:** formalizar dentro do painel o que `gemini_submitter.py` standalone já faz.
+**Objetivo:** validar os BOPMs pendentes no SIOPM Web (Enviar para Providências Complementares → Outros → Confirmar).
 
 | Sprint | Escopo | Critério de aceite |
 |---|---|---|
-| 2.1 | Mover lógica do `gemini_submitter.py` para `automacoes/validar_bopm/executar.py`. Integrar `GEMINI_API_KEY` via `nucleo/segredos`. | Botão "Validar BOPM" aparece no painel e executa a validação sem erro. |
+| 2.1 | Criar `automacoes/validar_bopm/` com contrato `manifesto.py` + `executar.py`. Fluxo: login SIOPM → filtro → detecta pendentes → abre cada BOPM → seleciona "Outros" → clica "Validar BOPM" → clica "Confirmar". | Botão "Validar BOPM" aparece no painel; executa com log ao vivo; seletores mapeados na primeira execução real. |
 | 2.2 | Saída: relatório em `saidas/validacao_bopm_<data>.txt` com resultado por BOPM. | Arquivo gerado corretamente; log ao vivo durante execução. |
 
 **Itens da fase:**
-- [ ] 1.1 · Formalizar o que o `gemini_submitter.py` já faz como automação própria
+- [ ] 1.1 · Validar BOPMs pendentes no SIOPM Web (Sprint 2.1 implementado ⏳ aguardando validação)
 
 ---
 
@@ -186,3 +186,5 @@ automacoes/despachadora/
 **05/06/2026** — Ajuste pós-validação: criados botões reais Abrir Mapa Força e Abrir Dejem/Delegada; Teste de Logins mantido como diagnóstico.
 
 **05/06/2026** — Diagnóstico de consistência (sprint de documentação): D-07 registrada em DECISOES.md; Fases 2–7 detalhadas com sprints e critérios de aceite; Fase 7 (Despachadora) adicionada ao ROADMAP, PLANO e STATUS; `segredos.env.exemplo` atualizado com `GEMINI_API_KEY` e `CORPUS_PATH`; README atualizado.
+
+**05/06/2026** — Fase 2 · Sprint 2.1 implementado: `automacoes/validar_bopm/manifesto.py` e `automacoes/validar_bopm/executar.py` criados. Botão "Validar BOPM" aparece no painel automaticamente (descoberta pelo contrato). Fluxo: login SIOPM → filtro → detecta pendentes → abre cada BOPM → tenta 3 cliques (Outros / Validar BOPM / Confirmar). Seletores dos 3 cliques a mapear na primeira execução real com VPN — log diagnostica URL e elementos visíveis em caso de falha. Pendente validação pelo painel.
