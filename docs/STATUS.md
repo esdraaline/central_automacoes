@@ -1,6 +1,6 @@
 # 📍 Status Atual
 Foto do "onde estou agora". Atualizado ao fim de cada sprint (pelo Claude Code durante o build).
-**Última atualização: 06/06/2026**
+**Última atualização: 06/06/2026 (tarde)**
 
 ---
 
@@ -8,10 +8,10 @@ Foto do "onde estou agora". Atualizado ao fim de cada sprint (pelo Claude Code d
 
 | Campo | Valor |
 |---|---|
-| **Fase em execução** | Fase 2 — Validar BOPM |
-| **Última fase concluída** | Fase 1 — Logins simples ✅ |
-| **Sprint atual** | Sprint 2.1 — hotfix aplicado, aguardando re-teste em campo |
-| **Próximo passo (trilha principal)** | Re-testar pelo painel com VPN + BOPM pendente real — fluxo real mapeado e corrigido em 06/06/2026 |
+| **Fase em execução** | Fase 2 — Validar BOPM ✅ |
+| **Última fase concluída** | Fase 2 — Validar BOPM ✅ |
+| **Sprint atual** | Sprint 2.1 ✅ — validado em campo: 1/1 BOPMs validados, zero falhas |
+| **Próximo passo (trilha principal)** | Sprint 2.2 — relatório em `saidas/validacao_bopm_<data>.txt` |
 | **Trilha paralela disponível** | Fase 7 — Despachadora (Sprint 7.1 de investigação) — pode ser iniciada a qualquer momento |
 
 ---
@@ -24,7 +24,7 @@ Foto do "onde estou agora". Atualizado ao fim de cada sprint (pelo Claude Code d
 - **Fase 1 · Sprint 1 ✅** — módulos `nucleo/login_mapa_forca.py` e `nucleo/login_dejem.py` criados; botões reais Abrir Mapa Força e Abrir Dejem/Delegada criados; Teste de Logins mantido como diagnóstico
 - **Decisão D-06 ✅** — SEI removido do escopo de automação; acesso ao SEI será manual
 - **Decisão D-07 ✅** — Despachadora: código na Central, corpus no Drive; `GEMINI_API_KEY` e `CORPUS_PATH` via `segredos.env`
-- **Fase 2 · Sprint 2.1 ⏳ (hotfix aplicado — re-teste pendente)** — primeiro teste em campo (06/06/2026) revelou fluxo real: ícone correto é o 2º ("Editar Ocorrência"), botão é "Validar BO-e" (não "Validar BOPM"), confirmação via `window.confirm` nativo (não elemento HTML), e BOs não visualizados precisam de "Visualiza PDF" antes. Hotfix aplicado em `executar.py` e `siopm_navigator.py`.
+- **Fase 2 · Sprint 2.1 ✅** — validado em campo em 06/06/2026: fluxo completo (2º ícone → Visualiza PDF se necessário → Outros → Validar BO-e → dialog → Retornar). "Outros" é `<img id='W0236CHK_OUT'>` GeneXus, não checkbox HTML. Edge mantido aberto na listagem ao fim.
 - Aprendizados da validação registrados em `docs/APRENDIZADOS.md`
 - **Fix Baixar BOPM ✅** — `siopm_navigator.py` corrigido para detectar também BOPMs com status "BO Informal" (antes só detectava "Não Formalizado"); validado com sucesso em execução real
 
@@ -32,13 +32,10 @@ Foto do "onde estou agora". Atualizado ao fim de cada sprint (pelo Claude Code d
 
 ## ⚠️ PRÓXIMO PASSO IMEDIATO (retomada em outra máquina)
 
-1. `git pull` para puxar o hotfix.
-2. Abrir o painel (`python painel.py`) com **VPN ativa**.
-3. Clicar no botão **"Validar BOPM"** com pelo menos um BOPM pendente real no SIOPM.
-4. Observar se o fluxo completo roda: Editar Ocorrência → (Visualiza PDF se necessário) → checkbox Outros → Validar BO-e → dialog aceito → Retornar.
-5. Se ainda falhar: copiar o log e abrir nova sessão com o Claude Code.
+1. `git pull` para puxar Sprint 2.1 completo.
+2. Próxima entrega: Sprint 2.2 — relatório em `saidas/validacao_bopm_<data>.txt` com resultado por BOPM.
 
-> O fluxo real foi mapeado pelos prints de 06/06/2026 e o hotfix está aplicado. O re-teste confirma se todos os seletores batem.
+> Sprint 2.1 validado em campo. Fase 2 pode ser considerada 50% concluída (Sprint 2.2 pendente).
 
 ---
 
@@ -52,8 +49,8 @@ Foto do "onde estou agora". Atualizado ao fim de cada sprint (pelo Claude Code d
 
 ## Bloqueios / pendências
 
-**Fase 2 · Sprint 2.1 — pendência remanescente após hotfix:**
-- Comportamento pós-"Retornar" — confirmar no re-teste se a página volta corretamente à listagem e o próximo BOPM é processado sem erro.
+**Fase 2 · Sprint 2.2 — próxima entrega:**
+- Gerar relatório em `saidas/validacao_bopm_<data>.txt` com resultado por BOPM (critério de aceite da fase).
 
 **Restrições técnicas identificadas para a Fase 7 (não bloqueiam hoje — investigar no Sprint 7.1):**
 - Input de arquivo: painel atual não tem campo para receber arquivo(s) — extensão necessária.

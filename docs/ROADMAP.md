@@ -58,7 +58,7 @@ Como ler: as fases são o mapa geral. Cada fase é quebrada em sprints com taref
 | 2.2 | Saída: relatório em `saidas/validacao_bopm_<data>.txt` com resultado por BOPM. | Arquivo gerado corretamente; log ao vivo durante execução. |
 
 **Itens da fase:**
-- [ ] 1.1 · Validar BOPMs pendentes no SIOPM Web (Sprint 2.1 implementado ⏳ aguardando validação)
+- [x] 1.1 · Validar BOPMs pendentes no SIOPM Web (Sprint 2.1 ✅ validado em campo 06/06/2026)
 
 ---
 
@@ -186,6 +186,8 @@ automacoes/despachadora/
 **05/06/2026** — Ajuste pós-validação: criados botões reais Abrir Mapa Força e Abrir Dejem/Delegada; Teste de Logins mantido como diagnóstico.
 
 **05/06/2026** — Diagnóstico de consistência (sprint de documentação): D-07 registrada em DECISOES.md; Fases 2–7 detalhadas com sprints e critérios de aceite; Fase 7 (Despachadora) adicionada ao ROADMAP, PLANO e STATUS; `segredos.env.exemplo` atualizado com `GEMINI_API_KEY` e `CORPUS_PATH`; README atualizado.
+
+**06/06/2026 (tarde)** — Fase 2 · Sprint 2.1 validado em campo: 1/1 BOPMs validados, zero falhas. Fluxo completo executado: 2º ícone (Editar Ocorrência) → Visualiza PDF se necessário → Outros (img GeneXus W0236CHK_OUT) → Validar BO-e → window.confirm aceito → Retornar → Edge mantido aberto na listagem. Sprint 2.1 fechado.
 
 **06/06/2026** — Fix Baixar BOPM: `siopm_navigator.py` corrigido para detectar BOPMs com status "BO Informal" além de "Não Formalizado". Correção em 3 pontos: log de abertura, filtro JavaScript na listagem e lista de keywords do indicador visual. Validado em execução real.
 

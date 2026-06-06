@@ -4,6 +4,31 @@
 
 ---
 
+## 06/06/2026 — Fase 2 · Sprint 2.1 · Validar BOPM — fluxo real mapeado em campo
+
+### Acertos
+- O contrato `manifesto.py` + `executar.py` funcionou: botão "Validar BOPM" apareceu no painel sem editar `painel.py`.
+- Diagnóstico automático (log de frames + elementos visíveis) foi decisivo para mapear cada seletor sem acesso ao código-fonte do SIOPM.
+- `page.once("dialog", ...)` registrado antes do clique capturou o `window.confirm` nativo sem race condition.
+- `keep_open=True` no `BrowserManager` manteve o Edge aberto na listagem filtrada após a automação — útil para inspeção.
+
+### Erros encontrados
+- **Ícone errado:** o código clicava no 1º ícone da linha (visualizar). O ícone correto é o 2º (Editar Ocorrência).
+- **"Validar BOPM" vs "Validar BO-e":** o botão real tem `value='Validar BO-e'` e `name='W0236BTNVALIDARTCO'` — nome diferente do planejado.
+- **Confirmação não é HTML:** após clicar em "Validar BO-e" o SIOPM dispara `window.confirm` nativo do browser, não um elemento HTML. Seletor CSS nunca funcionaria.
+- **"Outros" não é checkbox:** o GeneXus implementa o checkbox "Outros" como `<img id='W0236CHK_OUT'>` clicável. `input[type='checkbox']` nunca o encontraria. Estado (marcado/desmarcado) verificado pelo `src` da imagem: `UnChecked` = desmarcado.
+- **Scroll necessário:** a seção "Providências Preliminares" fica abaixo do fold. `window.scrollTo(0, document.body.scrollHeight)` antes do Passo 2 garante que o elemento esteja no viewport.
+- **BOs nunca visualizados:** se o BO nunca foi aberto em PDF, o botão "Validar BO-e" não aparece. Solução: clicar em "Visualiza PDF" primeiro e fechar a aba que abre.
+
+### Regras para próximas automações no SIOPM/GeneXus
+- **Nunca assumir que checkboxes são `<input type='checkbox'>`** — o GeneXus usa `<img>` clicável com `id` padronizado. Inspecionar pelo diagnóstico antes de escrever seletores.
+- **Confirmar tipo de dialog antes de escrever seletor:** dialogs nativos do browser (`alert`, `confirm`, `prompt`) exigem `page.once("dialog", ...)` — não são elementos HTML.
+- **Usar o diagnóstico ampliado** (tags `img`, `span`, `td`; campos `onclick`, `src`, `checked`) para revelar elementos GeneXus não-padrão.
+- **Sempre verificar o número de ícones na linha** antes de assumir qual clicar.
+- **`keep_open=True`** no `BrowserManager.close()` desvincula o Playwright sem fechar o browser — sessão e cookies intactos, janela permanece aberta.
+
+---
+
 ## 06/06/2026 — Fix Baixar BOPM · Detecção de "BO Informal"
 
 ### Erro encontrado
