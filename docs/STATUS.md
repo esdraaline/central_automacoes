@@ -1,6 +1,6 @@
 # 📍 Status Atual
 Foto do "onde estou agora". Atualizado ao fim de cada sprint (pelo Claude Code durante o build).
-**Última atualização: 06/06/2026 (tarde)**
+**Última atualização: 06/06/2026 (noite)**
 
 ---
 
@@ -8,11 +8,11 @@ Foto do "onde estou agora". Atualizado ao fim de cada sprint (pelo Claude Code d
 
 | Campo | Valor |
 |---|---|
-| **Fase em execução** | Fase 2 — Validar BOPM ✅ |
-| **Última fase concluída** | Fase 2 — Validar BOPM ✅ |
-| **Sprint atual** | Sprint 2.1 ✅ — validado em campo: 1/1 BOPMs validados, zero falhas |
-| **Próximo passo (trilha principal)** | Sprint 2.2 — relatório em `saidas/validacao_bopm_<data>.txt` |
-| **Trilha paralela disponível** | Fase 7 — Despachadora (Sprint 7.1 de investigação) — pode ser iniciada a qualquer momento |
+| **Fase em execução** | Fase 7 — Despachadora (em paralelo com Fase 2) |
+| **Última fase concluída** | Fase 2 · Sprint 2.1 ✅ (validado em campo 06/06/2026) |
+| **Sprint atual** | Sprint 7.2 — port do núcleo da Despachadora |
+| **Próximo passo (trilha principal)** | Sprint 7.2: colar implementação do Drive em `nucleo_despachadora/`, rodar caso de teste end-to-end |
+| **Trilha pendente (Fase 2)** | Sprint 2.2 — relatório em `saidas/validacao_bopm_<data>.txt` (após validar fix double-Retornar em 08/06) |
 
 ---
 
@@ -27,31 +27,39 @@ Foto do "onde estou agora". Atualizado ao fim de cada sprint (pelo Claude Code d
 - **Fase 2 · Sprint 2.1 ✅** — validado em campo em 06/06/2026: fluxo completo (2º ícone → Visualiza PDF se necessário → Outros → Validar BO-e → dialog → Retornar). "Outros" é `<img id='W0236CHK_OUT'>` GeneXus, não checkbox HTML. Edge mantido aberto na listagem ao fim.
 - Aprendizados da validação registrados em `docs/APRENDIZADOS.md`
 - **Fix Baixar BOPM ✅** — `siopm_navigator.py` corrigido para detectar também BOPMs com status "BO Informal" (antes só detectava "Não Formalizado"); validado com sucesso em execução real
+- **Fase 7 · Sprint 7.1 ✅** — Diagnóstico completo: mecanismo de descoberta/contrato mapeado; lacunas de input e saída longa identificadas; adaptações mínimas de `despachadora.py` descritas; .gitignore e `segredos.env.exemplo` verificados. Decisões aprovadas: Input=A (Contexto opcional), Saída=A (CTkToplevel), corpus_index=git direto.
 
 ---
 
 ## ⚠️ PRÓXIMO PASSO IMEDIATO (retomada em outra máquina)
 
-1. `git pull` para puxar fix do double-Retornar.
-2. **Validar em campo (a partir de 08/06/2026):** rodar "Validar BOPM" com um BO pendente real e confirmar que o Edge fica aberto na listagem filtrada (não no formulário vazio). Commit `9a24716` corrige o bug — pendente confirmação em campo por falta de BO pendente no dia 06/06.
-3. Após confirmação: Sprint 2.2 — relatório em `saidas/validacao_bopm_<data>.txt` com resultado por BOPM.
+1. `git pull` para puxar todos os commits recentes (fix double-Retornar + scaffold Sprint 7.2).
+2. **Sprint 7.2 — completar port do núcleo:**
+   - Copiar `despachadora.py` e `indexar_corpus.py` do Drive para `automacoes/despachadora/nucleo_despachadora/`
+   - Colar a implementação do Drive nas seções marcadas com `# COLE AQUI` de cada arquivo
+   - Rodar caso de teste end-to-end com um expediente real
+3. **Validar fix double-Retornar (a partir de 08/06/2026):** rodar "Validar BOPM" com um BO pendente real e confirmar Edge na listagem. Após confirmação: Sprint 2.2.
 
-> Sprint 2.1 validado em campo. Fase 2 pode ser considerada 50% concluída (Sprint 2.2 pendente).
+> Sprint 7.1 concluído. Sprint 7.2 scaffold criado — pendente cola da implementação do Drive.
 
 ---
 
 ## Próximo passo
 
-**Trilha principal:** Validar pelo painel — clicar em "Validar BOPM" com VPN ativa e um BOPM pendente real. O log mostrará onde os seletores falharam (se falharem) com URL e elementos visíveis para mapeamento.
+**Trilha principal:** Sprint 7.2 — colar implementação do Drive nos scaffolds de `nucleo_despachadora/` e rodar caso de teste end-to-end.
 
-**Trilha paralela (pode iniciar a qualquer momento):** Fase 7 — Despachadora · Sprint 7.1 (investigação — Claude Code lê a Central e propõe plano de port, sem escrever código).
+**Trilha pendente:** Sprint 2.2 — relatório `saidas/validacao_bopm_<data>.txt` (aguarda validação do fix double-Retornar em 08/06/2026).
 
 ---
 
 ## Bloqueios / pendências
 
-**Fase 2 · Sprint 2.2 — próxima entrega:**
-- Gerar relatório em `saidas/validacao_bopm_<data>.txt` com resultado por BOPM (critério de aceite da fase).
+**Fase 7 · Sprint 7.2 — em andamento:**
+- Scaffold criado: `automacoes/despachadora/`, `nucleo_despachadora/despachadora.py`, `nucleo_despachadora/indexar_corpus.py`
+- Pendente: colar implementação do Drive nas seções `# COLE AQUI` e validar end-to-end
+
+**Fase 2 · Sprint 2.2 — pendente (aguarda 08/06/2026):**
+- Validar fix double-Retornar em campo, então gerar relatório `saidas/validacao_bopm_<data>.txt`
 
 **Restrições técnicas identificadas para a Fase 7 (não bloqueiam hoje — investigar no Sprint 7.1):**
 - Input de arquivo: painel atual não tem campo para receber arquivo(s) — extensão necessária.

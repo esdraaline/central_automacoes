@@ -162,7 +162,7 @@ automacoes/despachadora/
 | 7.4 | Testes com casos reais; ajuste system prompt → v1.3 (promover `[VERIFICAR]` confirmados; corrigir desvios de formato). | Pelo menos 3 casos reais testados; nenhum FUNDAMENTO inventado detectado. |
 
 **Itens da fase:**
-- [ ] Sprint 7.1 — Investigação e plano de port
+- [x] Sprint 7.1 — Investigação e plano de port ✅ (06/06/2026)
 - [ ] Sprint 7.2 — Port do núcleo
 - [ ] Sprint 7.3 — Integração UI
 - [ ] Sprint 7.4 — Testes e system prompt v1.3
@@ -190,5 +190,7 @@ automacoes/despachadora/
 **06/06/2026 (tarde)** — Fase 2 · Sprint 2.1 validado em campo: 1/1 BOPMs validados, zero falhas. Fluxo completo executado: 2º ícone (Editar Ocorrência) → Visualiza PDF se necessário → Outros (img GeneXus W0236CHK_OUT) → Validar BO-e → window.confirm aceito → Retornar → Edge mantido aberto na listagem. Sprint 2.1 fechado.
 
 **06/06/2026** — Fix Baixar BOPM: `siopm_navigator.py` corrigido para detectar BOPMs com status "BO Informal" além de "Não Formalizado". Correção em 3 pontos: log de abertura, filtro JavaScript na listagem e lista de keywords do indicador visual. Validado em execução real.
+
+**06/06/2026 (noite)** — Fase 7 · Sprint 7.1 concluído: diagnóstico completo do painel (mecanismo de descoberta, contrato `run(ctx)`, lacunas de input e saída longa, adaptações mínimas da Despachadora). Decisões aprovadas: Input=A (Contexto opcional), Saída=A (CTkToplevel), corpus_index=git direto. Sprint 7.2 iniciado: scaffold de `automacoes/despachadora/` criado; `nucleo/segredos.py` e `nucleo/contexto.py` atualizados; `.gitignore` e `requirements.txt` atualizados. Pendente: colar implementação do Drive nos scaffolds de `nucleo_despachadora/`.
 
 **05/06/2026** — Fase 2 · Sprint 2.1 implementado: `automacoes/validar_bopm/manifesto.py` e `automacoes/validar_bopm/executar.py` criados. Botão "Validar BOPM" aparece no painel automaticamente (descoberta pelo contrato). Fluxo: login SIOPM → filtro → detecta pendentes → abre cada BOPM → tenta 3 cliques (Outros / Validar BOPM / Confirmar). Seletores dos 3 cliques a mapear na primeira execução real com VPN — log diagnostica URL e elementos visíveis em caso de falha. Pendente validação pelo painel.

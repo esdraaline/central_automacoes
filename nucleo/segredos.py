@@ -15,10 +15,15 @@ from dotenv import dotenv_values
 
 # Chaves esperadas por serviço → mapeadas para campos no dict retornado
 _SCHEMA: Dict[str, List[str]] = {
-    "vpn":   ["VPN_USER",   "VPN_PASSWORD"],
-    "siopm": ["SIOPM_USER", "SIOPM_PASSWORD"],
-    "dejem": ["DEJEM_USUARIO", "DEJEM_SENHA"],
-    "orion": ["ORION_USER", "ORION_PASSWORD"],
+    "vpn":    ["VPN_USER",      "VPN_PASSWORD"],
+    "siopm":  ["SIOPM_USER",    "SIOPM_PASSWORD"],
+    "dejem":  ["DEJEM_USUARIO", "DEJEM_SENHA"],
+    "orion":  ["ORION_USER",    "ORION_PASSWORD"],
+    # Fase 7 — Despachadora
+    # get("gemini")  → {"api_key": "..."}
+    # get("corpus")  → {"path": "G:\\Meu Drive\\..."}  (letra de unidade por máquina)
+    "gemini": ["GEMINI_API_KEY"],
+    "corpus": ["CORPUS_PATH"],
 }
 
 # Raiz do projeto: nucleo/ está um nível abaixo da raiz

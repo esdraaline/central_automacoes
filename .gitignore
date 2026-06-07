@@ -18,3 +18,14 @@ __pycache__/
 *.zip
 Desktop.ini
 desktop.ini
+
+# Corpus Despachadora (sigiloso + pesado — NUNCA versionar)
+# As pastas ficam no Drive (CORPUS_PATH), mas esta entrada protege
+# contra cópia acidental dentro do projeto.
+automacoes/despachadora/P1/
+automacoes/despachadora/P2/
+automacoes/despachadora/P3/
+automacoes/despachadora/P4/
+automacoes/despachadora/P5/
+automacoes/despachadora/JD/
+automacoes/despachadora/Notebooklm/

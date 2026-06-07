@@ -3,6 +3,8 @@ playwright>=1.44.0
 requests>=2.31.0
 customtkinter>=5.2.0
 python-dotenv>=1.0.0
+# Fase 7 — Despachadora (SDK Gemini novo; NÃO usar google-generativeai legado):
+google-genai>=1.0.0
 # Fase 4+ (e-mail):
 # google-api-python-client, google-auth-oauthlib   (Gmail API)
 # msal                                              (Outlook/Hotmail via Graph)
