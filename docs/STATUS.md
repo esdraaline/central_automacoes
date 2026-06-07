@@ -9,10 +9,10 @@ Foto do "onde estou agora". Atualizado ao fim de cada sprint.
 | Campo | Valor |
 |---|---|
 | **Fase em execucao** | Fase 7 - Despachadora (em paralelo com Fase 2) |
-| **Ultima fase concluida** | Fase 2 - Sprint 2.1 (validado em campo 06/06/2026) |
-| **Sprint atual** | Sprint 7.3 - integracao UI no painel |
-| **Ultimo sprint concluido** | Sprint 7.2 - port do nucleo da Despachadora (07/06/2026) |
-| **Proximo passo (trilha principal)** | Integrar input de texto/arquivo no card da Despachadora e exibir `saida_longa` em janela filha |
+| **Ultima fase concluida** | Fase 7 - Sprint 7.3 (integracao UI no painel em 07/06/2026) |
+| **Sprint atual** | Sprint 7.4 - testes com casos reais e system prompt v1.3 |
+| **Ultimo sprint concluido** | Sprint 7.3 - integracao UI da Despachadora no painel (07/06/2026) |
+| **Proximo passo (trilha principal)** | Testar a Despachadora com expedientes reais; ajustar system prompt para v1.3 |
 | **Trilha pendente (Fase 2)** | Sprint 2.2 - relatorio em `saidas/validacao_bopm_<data>.txt` apos BO pendente real |
 
 ---
@@ -30,6 +30,7 @@ Foto do "onde estou agora". Atualizado ao fim de cada sprint.
 - **Fix Baixar BOPM concluido** - `siopm_navigator.py` corrigido para detectar tambem BOPMs com status "BO Informal"; validado com sucesso em execucao real
 - **Fase 7 - Sprint 7.1 concluida em 07/06/2026** - diagnostico completo: mecanismo de descoberta/contrato mapeado; lacunas de input e saida longa identificadas; adaptacoes minimas de `despachadora.py` descritas; `.gitignore` e `segredos.env.exemplo` verificados. Decisoes aprovadas: Input=A (Contexto opcional), Saida=A (CTkToplevel), `corpus_index.json`=git direto.
 - **Fase 7 - Sprint 7.2 concluida em 07/06/2026** - nucleo da Despachadora portado para a Central e testado end-to-end nos dois notebooks.
+- **Fase 7 - Sprint 7.3 concluida em 07/06/2026** - painel agora exibe input de texto e seletor de arquivo para automacoes que declaram `requer_texto`/`requer_arquivo`; `saida_longa` abre em janela filha com Copiar, Salvar e Fechar; `_run_thread()` usa `status_txt` sem quebrar o status detalhado dos BOPMs.
 
 ---
 
@@ -62,14 +63,13 @@ Teste end-to-end:
 
 ## Proximo passo
 
-**Trilha principal:** Sprint 7.3 - integrar a Despachadora ao painel.
+**Trilha principal:** Sprint 7.4 - testes com casos reais e system prompt v1.3.
 
 Escopo imediato:
 
-- Adicionar input de texto colado e seletor de arquivo ao card da Despachadora.
-- Ler flags `requer_arquivo` e `requer_texto` do manifesto.
-- Exibir `saida_longa` em `CTkToplevel`, com botoes "Copiar" e "Salvar".
-- Generalizar `_run_thread()` para usar `result.get("status_txt", "Concluido")` e `result.get("saida_longa")`, sem quebrar automacoes existentes.
+- Testar pelo menos 3 expedientes reais na Despachadora pelo painel.
+- Conferir se os 6 blocos mantem formato, proveniencia e texto pronto.
+- Promover `[VERIFICAR]` confirmados e corrigir desvios no system prompt v1.3.
 
 **Trilha pendente:** Sprint 2.2 - relatorio `saidas/validacao_bopm_<data>.txt`, aguardando BO pendente real para validacao em campo.
 
@@ -77,10 +77,10 @@ Escopo imediato:
 
 ## Bloqueios / pendencias
 
-**Fase 7 - Sprint 7.3 - proximo:**
-- Painel ainda precisa receber texto/arquivo para automacoes que declarem esse requisito.
-- Saida longa da Despachadora ainda precisa de janela propria para leitura, copia e salvamento.
-- `_run_thread()` ainda precisa deixar de depender da logica curta/hardcoded do BOPM.
+**Fase 7 - Sprint 7.4 - proximo:**
+- Validar a Despachadora pelo painel com expedientes reais.
+- Ajustar system prompt para v1.3 apos os testes.
+- Confirmar que nenhum FUNDAMENTO inventado aparece nos casos reais.
 
 **Fase 2 - Sprint 2.2 - pendente:**
 - Validar fix double-Retornar com BO pendente real em campo.

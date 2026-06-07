@@ -12,6 +12,7 @@ import importlib.util
 import logging
 import sys
 import threading
+from tkinter import filedialog
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -121,6 +122,9 @@ class Painel(ctk.CTk):
         self._automacoes = _discover()
         self._btn_refs: Dict[str, ctk.CTkButton] = {}
         self._status_refs: Dict[str, ctk.CTkLabel] = {}
+        self._entrada_texto_refs: Dict[str, ctk.CTkEntry] = {}
+        self._entrada_arquivo_refs: Dict[str, ctk.CTkLabel] = {}
+        self._entrada_arquivo_path_refs: Dict[str, Optional[Path]] = {}
 
         self._build_ui()
 
@@ -188,6 +192,7 @@ class Painel(ctk.CTk):
         card = ctk.CTkFrame(parent, corner_radius=8)
         card.grid(row=row, column=0, padx=8, pady=6, sticky="ew")
         card.grid_columnconfigure(1, weight=1)
+        aid = m["id"]
 
         # Linha 0: badges (categoria + VPN)
         badges = ctk.CTkFrame(card, fg_color="transparent")
@@ -244,28 +249,78 @@ class Painel(ctk.CTk):
         )
         status.grid(row=3, column=1, padx=8, pady=(0, 12), sticky="w")
 
-        self._btn_refs[m["id"]] = btn
-        self._status_refs[m["id"]] = status
+        self._btn_refs[aid] = btn
+        self._status_refs[aid] = status
+
+        if m.get("requer_texto") or m.get("requer_arquivo"):
+            inputs = ctk.CTkFrame(card, fg_color="transparent")
+            inputs.grid(row=4, column=0, columnspan=2, padx=12, pady=(0, 12), sticky="ew")
+            inputs.grid_columnconfigure(1, weight=1)
+
+            input_row = 0
+            if m.get("requer_texto"):
+                entrada = ctk.CTkEntry(
+                    inputs,
+                    placeholder_text="Cole o texto do expediente...",
+                )
+                entrada.grid(row=input_row, column=0, columnspan=2, pady=(0, 6), sticky="ew")
+                self._entrada_texto_refs[aid] = entrada
+                input_row += 1
+
+            if m.get("requer_arquivo"):
+                escolher = ctk.CTkButton(
+                    inputs,
+                    text="Selecionar arquivo",
+                    width=150,
+                    command=lambda auto_id=aid: self._selecionar_arquivo(auto_id),
+                )
+                escolher.grid(row=input_row, column=0, padx=(0, 8), sticky="w")
+
+                arquivo_lbl = ctk.CTkLabel(
+                    inputs,
+                    text="Nenhum arquivo selecionado",
+                    font=ctk.CTkFont(size=11),
+                    text_color=("gray40", "gray70"),
+                    anchor="w",
+                )
+                arquivo_lbl.grid(row=input_row, column=1, sticky="ew")
+                self._entrada_arquivo_refs[aid] = arquivo_lbl
+                self._entrada_arquivo_path_refs[aid] = None
 
     # ------------------------------------------------------------------
     # Execução da automação
     # ------------------------------------------------------------------
 
     def _on_run(self, auto_dir: Path, manifesto: dict) -> None:
+        aid = manifesto["id"]
         if self._running:
             self._gui_log("⚠ Já há uma automação em execução. Aguarde o término.")
             return
+
+        entrada_texto = None
+        entrada_texto_ref = self._entrada_texto_refs.get(aid)
+        if entrada_texto_ref is not None:
+            valor = entrada_texto_ref.get().strip()
+            entrada_texto = valor or None
+
+        entrada_arquivo = self._entrada_arquivo_path_refs.get(aid)
+
         self._running = True
-        aid = manifesto["id"]
         self._set_status(aid, "▶ Iniciando…", "orange")
         self._btn_refs[aid].configure(state="disabled")
         threading.Thread(
             target=self._run_thread,
-            args=(auto_dir, manifesto),
+            args=(auto_dir, manifesto, entrada_texto, entrada_arquivo),
             daemon=True,
         ).start()
 
-    def _run_thread(self, auto_dir: Path, manifesto: dict) -> None:
+    def _run_thread(
+        self,
+        auto_dir: Path,
+        manifesto: dict,
+        entrada_texto: Optional[str],
+        entrada_arquivo: Optional[Path],
+    ) -> None:
         aid = manifesto["id"]
         log = setup_logger(name=aid, level="INFO")
 
@@ -295,15 +350,24 @@ class Painel(ctk.CTk):
                 vpn=vpn,
                 browser=BrowserManager(log),
                 saidas=_SAIDAS_DIR,
+                entrada_arquivo=entrada_arquivo,
+                entrada_texto=entrada_texto,
             )
 
             mod = _load_executar(auto_dir)
             result = mod.run(ctx)
 
-            s = result.get("salvos", 0)
-            e = result.get("encontrados", 0)
-            txt = f"✓ {s}/{e} BOPMs" if e > 0 else "✓ Concluído (sem pendentes)"
+            if result.get("status_txt"):
+                txt = result["status_txt"]
+            elif "salvos" in result or "encontrados" in result:
+                s = result.get("salvos", 0)
+                e = result.get("encontrados", 0)
+                txt = f"✓ {s}/{e} BOPMs" if e > 0 else "✓ Concluído (sem pendentes)"
+            else:
+                txt = "✓ Concluído"
             self._set_status(aid, txt, "green")
+            if result.get("saida_longa"):
+                self.after(0, self._abrir_saida_longa, result["saida_longa"], manifesto["nome"])
 
         except Exception as exc:
             log.error(f"Erro fatal: {exc}")
@@ -338,6 +402,51 @@ class Painel(ctk.CTk):
             return
         tc = self._COLOR_MAP.get(color, ("white", "white"))
         lbl.after(0, lambda: lbl.configure(text=text, text_color=tc))
+
+    def _selecionar_arquivo(self, aid: str) -> None:
+        caminho = filedialog.askopenfilename(title="Selecionar expediente")
+        if not caminho:
+            return
+
+        path = Path(caminho)
+        self._entrada_arquivo_path_refs[aid] = path
+        lbl = self._entrada_arquivo_refs.get(aid)
+        if lbl is not None:
+            lbl.configure(text=str(path))
+
+    def _abrir_saida_longa(self, texto: str, titulo: str) -> None:
+        janela = ctk.CTkToplevel(self)
+        janela.title(f"Resultado — {titulo}")
+        janela.geometry("800x600")
+        janela.minsize(700, 500)
+        janela.grid_columnconfigure(0, weight=1)
+        janela.grid_rowconfigure(0, weight=1)
+
+        caixa = ctk.CTkTextbox(janela, wrap="word")
+        caixa.grid(row=0, column=0, padx=12, pady=(12, 8), sticky="nsew")
+        caixa.insert("1.0", texto)
+        caixa.configure(state="disabled")
+
+        botoes = ctk.CTkFrame(janela, fg_color="transparent")
+        botoes.grid(row=1, column=0, padx=12, pady=(0, 12), sticky="e")
+
+        def copiar() -> None:
+            self.clipboard_clear()
+            self.clipboard_append(texto)
+
+        def salvar() -> None:
+            caminho = filedialog.asksaveasfilename(
+                title="Salvar resultado",
+                initialdir=_SAIDAS_DIR,
+                defaultextension=".txt",
+                filetypes=[("Texto", "*.txt")],
+            )
+            if caminho:
+                Path(caminho).write_text(texto, encoding="utf-8")
+
+        ctk.CTkButton(botoes, text="Copiar", width=90, command=copiar).pack(side="left", padx=(0, 8))
+        ctk.CTkButton(botoes, text="Salvar", width=90, command=salvar).pack(side="left", padx=(0, 8))
+        ctk.CTkButton(botoes, text="Fechar", width=90, command=janela.destroy).pack(side="left")
 
     def _gui_log(self, msg: str) -> None:
         self._log_box.configure(state="normal")

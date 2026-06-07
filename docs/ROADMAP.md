@@ -164,7 +164,7 @@ automacoes/despachadora/
 **Itens da fase:**
 - [x] Sprint 7.1 — Investigação e plano de port ✅ (07/06/2026)
 - [x] Sprint 7.2 — Port do núcleo ✅ (07/06/2026; end-to-end OK nos dois notebooks)
-- [ ] Sprint 7.3 — Integração UI
+- [x] Sprint 7.3 — Integração UI ✅ (07/06/2026)
 - [ ] Sprint 7.4 — Testes e system prompt v1.3
 
 ---
@@ -194,5 +194,7 @@ automacoes/despachadora/
 **07/06/2026** — Fase 7 · Sprint 7.1 concluído: diagnóstico completo do painel (mecanismo de descoberta, contrato `run(ctx)`, lacunas de input e saída longa, adaptações mínimas da Despachadora). Decisões aprovadas: Input=A (Contexto opcional), Saída=A (CTkToplevel), corpus_index=git direto.
 
 **07/06/2026** — Fase 7 · Sprint 7.2 concluído: port do núcleo da Despachadora entregue e testado end-to-end nos dois notebooks. `nucleo/segredos.py` expandido para `gemini` e `corpus`; `nucleo/contexto.py` recebeu `entrada_arquivo` e `entrada_texto`; `requirements.txt` recebeu `google-genai`; `.gitignore` cobre P1-P5, JD e Notebooklm; `manifesto.py`, `executar.py`, `despachadora.py`, `indexar_corpus.py` e `corpus_index.json` integrados. `corpus_index.json` versionado com 714 entradas e 644 válidas. Chamada ao `gemini-2.5-flash` bem-sucedida e 6 blocos gerados corretamente.
+
+**07/06/2026** — Fase 7 · Sprint 7.3 concluído: integração UI da Despachadora entregue no painel. Cards agora podem exibir controles condicionais por `requer_texto` e `requer_arquivo`; a Despachadora recebe texto colado ou arquivo via `Contexto`; `_run_thread()` usa `status_txt`/`saida_longa`; resultado longo abre em `CTkToplevel` com Copiar, Salvar e Fechar. Status detalhado dos BOPMs foi preservado quando `salvos/encontrados` estiverem presentes.
 
 **05/06/2026** — Fase 2 · Sprint 2.1 implementado: `automacoes/validar_bopm/manifesto.py` e `automacoes/validar_bopm/executar.py` criados. Botão "Validar BOPM" aparece no painel automaticamente (descoberta pelo contrato). Fluxo: login SIOPM → filtro → detecta pendentes → abre cada BOPM → tenta 3 cliques (Outros / Validar BOPM / Confirmar). Seletores dos 3 cliques a mapear na primeira execução real com VPN — log diagnostica URL e elementos visíveis em caso de falha. Pendente validação pelo painel.
