@@ -156,14 +156,14 @@ automacoes/despachadora/
 
 | Sprint | Escopo | Critério de aceite |
 |---|---|---|
-| 7.1 | **Investigação:** Claude Code lê a Central e propõe plano de port (input de arquivo, exibição de saída longa, adaptações mínimas). **Nenhum código escrito.** | Plano aprovado por Josemar com mapeamento das restrições técnicas acima. |
-| 7.2 | Port do núcleo: mover `despachadora.py` e `indexar_corpus.py` para `nucleo_despachadora/`. Adaptar `main()` → função chamável. Corrigir `SKILL_ROOT` e `CORPUS_FILE`. Atualizar `.gitignore`. | `run(ctx)` executa end-to-end sem erro com caso de teste. |
-| 7.3 | Integração UI: extensão do painel para input por arquivo e por texto colado; área de saída longa para os 6 blocos com botões Copiar e Salvar. | Dois modos funcionando no painel; saída dos 6 blocos legível sem truncamento. |
+| 7.1 | **Investigação:** Claude Code lê a Central e propõe plano de port (input de arquivo, exibição de saída longa, adaptações mínimas). **Nenhum código escrito.** | Plano aprovado por Josemar com mapeamento das restrições técnicas acima. ✅ 07/06/2026 |
+| 7.2 | Port do núcleo: mover `despachadora.py` e `indexar_corpus.py` para `nucleo_despachadora/`. Adaptar `main()` → função chamável. Corrigir `SKILL_ROOT` e `CORPUS_FILE`. Atualizar `.gitignore`. Versionar `corpus_index.json`. | `run(ctx)` executa end-to-end sem erro com caso de teste. ✅ 07/06/2026 — OK nos dois notebooks. |
+| 7.3 | Integração UI: adicionar controles de input ao card (campo texto + botão selecionar arquivo), lendo flags `requer_arquivo`/`requer_texto` do manifesto; implementar `CTkToplevel` para exibir `saida_longa` com botões "Copiar" e "Salvar"; generalizar `_run_thread()` para `result.get("status_txt", "✓ Concluído")` e `result.get("saida_longa")`, sem quebrar automações existentes. | Clicar no card Despachadora no painel, colar texto e receber os 6 blocos na janela filha. |
 | 7.4 | Testes com casos reais; ajuste system prompt → v1.3 (promover `[VERIFICAR]` confirmados; corrigir desvios de formato). | Pelo menos 3 casos reais testados; nenhum FUNDAMENTO inventado detectado. |
 
 **Itens da fase:**
-- [x] Sprint 7.1 — Investigação e plano de port ✅ (06/06/2026)
-- [ ] Sprint 7.2 — Port do núcleo
+- [x] Sprint 7.1 — Investigação e plano de port ✅ (07/06/2026)
+- [x] Sprint 7.2 — Port do núcleo ✅ (07/06/2026; end-to-end OK nos dois notebooks)
 - [ ] Sprint 7.3 — Integração UI
 - [ ] Sprint 7.4 — Testes e system prompt v1.3
 
@@ -191,6 +191,8 @@ automacoes/despachadora/
 
 **06/06/2026** — Fix Baixar BOPM: `siopm_navigator.py` corrigido para detectar BOPMs com status "BO Informal" além de "Não Formalizado". Correção em 3 pontos: log de abertura, filtro JavaScript na listagem e lista de keywords do indicador visual. Validado em execução real.
 
-**06/06/2026 (noite)** — Fase 7 · Sprint 7.1 concluído: diagnóstico completo do painel (mecanismo de descoberta, contrato `run(ctx)`, lacunas de input e saída longa, adaptações mínimas da Despachadora). Decisões aprovadas: Input=A (Contexto opcional), Saída=A (CTkToplevel), corpus_index=git direto. Sprint 7.2 iniciado: scaffold de `automacoes/despachadora/` criado; `nucleo/segredos.py` e `nucleo/contexto.py` atualizados; `.gitignore` e `requirements.txt` atualizados. Pendente: colar implementação do Drive nos scaffolds de `nucleo_despachadora/`.
+**07/06/2026** — Fase 7 · Sprint 7.1 concluído: diagnóstico completo do painel (mecanismo de descoberta, contrato `run(ctx)`, lacunas de input e saída longa, adaptações mínimas da Despachadora). Decisões aprovadas: Input=A (Contexto opcional), Saída=A (CTkToplevel), corpus_index=git direto.
+
+**07/06/2026** — Fase 7 · Sprint 7.2 concluído: port do núcleo da Despachadora entregue e testado end-to-end nos dois notebooks. `nucleo/segredos.py` expandido para `gemini` e `corpus`; `nucleo/contexto.py` recebeu `entrada_arquivo` e `entrada_texto`; `requirements.txt` recebeu `google-genai`; `.gitignore` cobre P1-P5, JD e Notebooklm; `manifesto.py`, `executar.py`, `despachadora.py`, `indexar_corpus.py` e `corpus_index.json` integrados. `corpus_index.json` versionado com 714 entradas e 644 válidas. Chamada ao `gemini-2.5-flash` bem-sucedida e 6 blocos gerados corretamente.
 
 **05/06/2026** — Fase 2 · Sprint 2.1 implementado: `automacoes/validar_bopm/manifesto.py` e `automacoes/validar_bopm/executar.py` criados. Botão "Validar BOPM" aparece no painel automaticamente (descoberta pelo contrato). Fluxo: login SIOPM → filtro → detecta pendentes → abre cada BOPM → tenta 3 cliques (Outros / Validar BOPM / Confirmar). Seletores dos 3 cliques a mapear na primeira execução real com VPN — log diagnostica URL e elementos visíveis em caso de falha. Pendente validação pelo painel.

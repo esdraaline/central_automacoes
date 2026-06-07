@@ -61,3 +61,36 @@ O SEI não será automatizado na Central de Automações. Login, acesso via gov.
 **Justificativa:** O corpus é sigiloso (expedientes da 5ª Cia) e pesa ~34 MB — não deve entrar no git. O Drive já sincroniza entre os dois notebooks. O índice (`corpus_index.json`) é derivado e seguro para versionar. Separar caminho por máquina via `segredos.env` resolve a diferença de letra de unidade entre os notebooks.
 
 **Alternativa descartada:** Versionar o corpus no git — descartado por sigilo e tamanho.
+
+---
+
+## D-08 · Chave de API Gemini formato `AQ.` ✅
+**Data:** 07/06/2026
+
+**Contexto:** Durante a configuracao da Despachadora, a conta Google do projeto gerou uma chave Gemini no formato `AQ.Ab8RN6...`, associada a projeto `gen-lang-client-*`.
+
+**Decisao:**
+- Chaves Gemini no formato `AQ.` sao validas para este projeto.
+- A chave deve ser copiada exatamente como exibida no AI Studio.
+- Usar normalmente com `genai.Client(api_key=chave)` do SDK `google-genai`.
+- Nunca adicionar prefixo `AIzaSy` nem tentar converter o formato da chave.
+
+**Risco registrado:** Foi adicionado indevidamente o prefixo `AIzaSy` antes da chave `AQ.`, gerando `GEMINI_API_KEY=AIzaSyAQ.Ab8RN6...`, que e invalida. A chave correta e apenas `AQ.Ab8RN6...`, exatamente como fornecida pelo AI Studio.
+
+**Motivo:** O SDK `google-genai` aceita a chave `AQ.` quando ela e passada sem alteracao. Alterar o valor causa erro `API_KEY_INVALID`.
+
+---
+
+## D-09 · `corpus_index.json` vai no git direto ✅
+**Data:** 07/06/2026
+
+**Contexto:** A Despachadora precisa do indice derivado do corpus para recuperar fundamentos e modelos rapidamente. O arquivo gerado tem cerca de 34 MB.
+
+**Decisao:**
+- Versionar `automacoes/despachadora/corpus_index.json` diretamente no git.
+- Nao usar Git LFS por ora.
+- Regenerar quando necessario com:
+  `python automacoes/despachadora/nucleo_despachadora/indexar_corpus.py`
+- O indexador opera em modo incremental, processando apenas arquivos novos quando possivel.
+
+**Motivo:** O arquivo esta dentro do limite de 100 MB do GitHub e permite sincronizar os dois notebooks sem depender de reindexacao manual em cada maquina. O corpus original continua fora do git.

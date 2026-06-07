@@ -1,6 +1,6 @@
-# 📍 Status Atual
-Foto do "onde estou agora". Atualizado ao fim de cada sprint (pelo Claude Code durante o build).
-**Última atualização: 06/06/2026 (noite)**
+# Status Atual
+Foto do "onde estou agora". Atualizado ao fim de cada sprint.
+**Ultima atualizacao: 07/06/2026**
 
 ---
 
@@ -8,69 +8,98 @@ Foto do "onde estou agora". Atualizado ao fim de cada sprint (pelo Claude Code d
 
 | Campo | Valor |
 |---|---|
-| **Fase em execução** | Fase 7 — Despachadora (em paralelo com Fase 2) |
-| **Última fase concluída** | Fase 2 · Sprint 2.1 ✅ (validado em campo 06/06/2026) |
-| **Sprint atual** | Sprint 7.2 — port do núcleo da Despachadora |
-| **Próximo passo (trilha principal)** | Sprint 7.2: colar implementação do Drive em `nucleo_despachadora/`, rodar caso de teste end-to-end |
-| **Trilha pendente (Fase 2)** | Sprint 2.2 — relatório em `saidas/validacao_bopm_<data>.txt` (após validar fix double-Retornar em 08/06) |
+| **Fase em execucao** | Fase 7 - Despachadora (em paralelo com Fase 2) |
+| **Ultima fase concluida** | Fase 2 - Sprint 2.1 (validado em campo 06/06/2026) |
+| **Sprint atual** | Sprint 7.3 - integracao UI no painel |
+| **Ultimo sprint concluido** | Sprint 7.2 - port do nucleo da Despachadora (07/06/2026) |
+| **Proximo passo (trilha principal)** | Integrar input de texto/arquivo no card da Despachadora e exibir `saida_longa` em janela filha |
+| **Trilha pendente (Fase 2)** | Sprint 2.2 - relatorio em `saidas/validacao_bopm_<data>.txt` apos BO pendente real |
 
 ---
 
-## Já feito
+## Ja feito
 
-- Scaffold, migração do BOPM, decisões A/B/C
-- **Fase 0 · Sprint 1 ✅** — `nucleo/` criado (segredos, log, vpn, browser), credenciais migradas para `segredos.env`, BOPM testado pela linha de comando
-- **Fase 0 · Sprint 2 ✅** — Contrato (`manifesto.py` + `executar.py`), `painel.py` com customtkinter; botão "Baixar BOPMs" roda o BOPM com log ao vivo na janela
-- **Fase 1 · Sprint 1 ✅** — módulos `nucleo/login_mapa_forca.py` e `nucleo/login_dejem.py` criados; botões reais Abrir Mapa Força e Abrir Dejem/Delegada criados; Teste de Logins mantido como diagnóstico
-- **Decisão D-06 ✅** — SEI removido do escopo de automação; acesso ao SEI será manual
-- **Decisão D-07 ✅** — Despachadora: código na Central, corpus no Drive; `GEMINI_API_KEY` e `CORPUS_PATH` via `segredos.env`
-- **Fase 2 · Sprint 2.1 ✅** — validado em campo em 06/06/2026: fluxo completo (2º ícone → Visualiza PDF se necessário → Outros → Validar BO-e → dialog → Retornar). "Outros" é `<img id='W0236CHK_OUT'>` GeneXus, não checkbox HTML. Edge mantido aberto na listagem ao fim.
-- Aprendizados da validação registrados em `docs/APRENDIZADOS.md`
-- **Fix Baixar BOPM ✅** — `siopm_navigator.py` corrigido para detectar também BOPMs com status "BO Informal" (antes só detectava "Não Formalizado"); validado com sucesso em execução real
-- **Fase 7 · Sprint 7.1 ✅** — Diagnóstico completo: mecanismo de descoberta/contrato mapeado; lacunas de input e saída longa identificadas; adaptações mínimas de `despachadora.py` descritas; .gitignore e `segredos.env.exemplo` verificados. Decisões aprovadas: Input=A (Contexto opcional), Saída=A (CTkToplevel), corpus_index=git direto.
-
----
-
-## ⚠️ PRÓXIMO PASSO IMEDIATO (retomada em outra máquina)
-
-1. `git pull` para puxar todos os commits recentes (fix double-Retornar + scaffold Sprint 7.2).
-2. **Sprint 7.2 — completar port do núcleo:**
-   - Copiar `despachadora.py` e `indexar_corpus.py` do Drive para `automacoes/despachadora/nucleo_despachadora/`
-   - Colar a implementação do Drive nas seções marcadas com `# COLE AQUI` de cada arquivo
-   - Rodar caso de teste end-to-end com um expediente real
-3. **Validar fix double-Retornar (a partir de 08/06/2026):** rodar "Validar BOPM" com um BO pendente real e confirmar Edge na listagem. Após confirmação: Sprint 2.2.
-
-> Sprint 7.1 concluído. Sprint 7.2 scaffold criado — pendente cola da implementação do Drive.
+- Scaffold, migracao do BOPM, decisoes A/B/C
+- **Fase 0 - Sprint 1 concluida** - `nucleo/` criado (segredos, log, vpn, browser), credenciais migradas para `segredos.env`, BOPM testado pela linha de comando
+- **Fase 0 - Sprint 2 concluida** - Contrato (`manifesto.py` + `executar.py`), `painel.py` com customtkinter; botao "Baixar BOPMs" roda o BOPM com log ao vivo na janela
+- **Fase 1 - Sprint 1 concluida** - modulos `nucleo/login_mapa_forca.py` e `nucleo/login_dejem.py` criados; botoes reais Abrir Mapa Forca e Abrir Dejem/Delegada criados; Teste de Logins mantido como diagnostico
+- **Decisao D-06 concluida** - SEI removido do escopo de automacao; acesso ao SEI sera manual
+- **Decisao D-07 concluida** - Despachadora: codigo na Central, corpus no Drive; `GEMINI_API_KEY` e `CORPUS_PATH` via `segredos.env`
+- **Fase 2 - Sprint 2.1 concluida** - validado em campo em 06/06/2026: fluxo completo (2o icone -> Visualiza PDF se necessario -> Outros -> Validar BO-e -> dialog -> Retornar). "Outros" e `<img id='W0236CHK_OUT'>` GeneXus, nao checkbox HTML. Edge mantido aberto na listagem ao fim.
+- Aprendizados da validacao registrados em `docs/APRENDIZADOS.md`
+- **Fix Baixar BOPM concluido** - `siopm_navigator.py` corrigido para detectar tambem BOPMs com status "BO Informal"; validado com sucesso em execucao real
+- **Fase 7 - Sprint 7.1 concluida em 07/06/2026** - diagnostico completo: mecanismo de descoberta/contrato mapeado; lacunas de input e saida longa identificadas; adaptacoes minimas de `despachadora.py` descritas; `.gitignore` e `segredos.env.exemplo` verificados. Decisoes aprovadas: Input=A (Contexto opcional), Saida=A (CTkToplevel), `corpus_index.json`=git direto.
+- **Fase 7 - Sprint 7.2 concluida em 07/06/2026** - nucleo da Despachadora portado para a Central e testado end-to-end nos dois notebooks.
 
 ---
 
-## Próximo passo
+## Sprint 7.2 - resultado
 
-**Trilha principal:** Sprint 7.2 — colar implementação do Drive nos scaffolds de `nucleo_despachadora/` e rodar caso de teste end-to-end.
+Arquivos entregues:
 
-**Trilha pendente:** Sprint 2.2 — relatório `saidas/validacao_bopm_<data>.txt` (aguarda validação do fix double-Retornar em 08/06/2026).
+| Arquivo | Resultado |
+|---|---|
+| `nucleo/segredos.py` | `_SCHEMA` expandido com `gemini` e `corpus` |
+| `nucleo/contexto.py` | `entrada_arquivo` e `entrada_texto` adicionados |
+| `requirements.txt` | `google-genai>=1.0.0` adicionado |
+| `.gitignore` | Pastas P1-P5, JD e Notebooklm cobertas |
+| `automacoes/despachadora/manifesto.py` | Novo manifesto da categoria `Redacao`, sem VPN |
+| `automacoes/despachadora/executar.py` | Novo ponto de entrada chamando `processar(ctx)` |
+| `automacoes/despachadora/nucleo_despachadora/despachadora.py` | Codigo real do Drive integrado |
+| `automacoes/despachadora/nucleo_despachadora/indexar_corpus.py` | Indexador real integrado, com modo incremental |
+| `automacoes/despachadora/corpus_index.json` | Versionado no git; 714 entradas, 644 validas |
+
+Teste end-to-end:
+
+- Corpus carregado com 641-644 entradas validas, conforme notebook/execucao.
+- Chamada ao `gemini-2.5-flash` bem-sucedida.
+- Os 6 blocos foram gerados corretamente com fundamentacao real do corpus.
+- `segredos.env` preenchido manualmente nos dois notebooks com `GEMINI_API_KEY` e `CORPUS_PATH`.
+- `google-genai` instalado nos dois notebooks.
+- `corpus_index.json` sincronizado via git; remoto com 644 validas.
 
 ---
 
-## Bloqueios / pendências
+## Proximo passo
 
-**Fase 7 · Sprint 7.2 — em andamento:**
-- Scaffold criado: `automacoes/despachadora/`, `nucleo_despachadora/despachadora.py`, `nucleo_despachadora/indexar_corpus.py`
-- Pendente: colar implementação do Drive nas seções `# COLE AQUI` e validar end-to-end
+**Trilha principal:** Sprint 7.3 - integrar a Despachadora ao painel.
 
-**Fase 2 · Sprint 2.2 — pendente (aguarda 08/06/2026):**
-- Validar fix double-Retornar em campo, então gerar relatório `saidas/validacao_bopm_<data>.txt`
+Escopo imediato:
 
-**Restrições técnicas identificadas para a Fase 7 (não bloqueiam hoje — investigar no Sprint 7.1):**
-- Input de arquivo: painel atual não tem campo para receber arquivo(s) — extensão necessária.
-- Saída longa: mecanismo de exibição dos 6 blocos ainda a definir.
-- `indexar_corpus.py`: `SKILL_ROOT` hardcoded na linha 38 — adaptar para `CORPUS_PATH` de `segredos.env`.
-- `despachadora.py`: `CORPUS_FILE` relativo ao script — ajuste de path ao mover para `nucleo_despachadora/`.
-- `.gitignore`: cobrir pastas do corpus (P1–P5, JD, Notebooklm) antes do Sprint 7.2.
-- `segredos.env.exemplo`: atualizado com `GEMINI_API_KEY` e `CORPUS_PATH` ✅
+- Adicionar input de texto colado e seletor de arquivo ao card da Despachadora.
+- Ler flags `requer_arquivo` e `requer_texto` do manifesto.
+- Exibir `saida_longa` em `CTkToplevel`, com botoes "Copiar" e "Salvar".
+- Generalizar `_run_thread()` para usar `result.get("status_txt", "Concluido")` e `result.get("saida_longa")`, sem quebrar automacoes existentes.
+
+**Trilha pendente:** Sprint 2.2 - relatorio `saidas/validacao_bopm_<data>.txt`, aguardando BO pendente real para validacao em campo.
+
+---
+
+## Bloqueios / pendencias
+
+**Fase 7 - Sprint 7.3 - proximo:**
+- Painel ainda precisa receber texto/arquivo para automacoes que declarem esse requisito.
+- Saida longa da Despachadora ainda precisa de janela propria para leitura, copia e salvamento.
+- `_run_thread()` ainda precisa deixar de depender da logica curta/hardcoded do BOPM.
+
+**Fase 2 - Sprint 2.2 - pendente:**
+- Validar fix double-Retornar com BO pendente real em campo.
+- Gerar relatorio `saidas/validacao_bopm_<data>.txt`.
+
+---
+
+## Dois notebooks
+
+Ambos os notebooks estao sincronizados em 07/06/2026:
+
+- `segredos.env` preenchido manualmente em cada maquina.
+- `CORPUS_PATH` ajustado conforme a letra de unidade local.
+- `google-genai` instalado.
+- `corpus_index.json` sincronizado pelo git.
+- Teste end-to-end da Despachadora executado com sucesso.
 
 ---
 
 ## Como manter este arquivo
 
-Ao fim de cada sprint, atualizar: a data, **Onde estou**, **Já feito**, **Próximo passo** e **Bloqueios**. Mantenha curto — é uma foto, não um diário. O diário detalhado fica no ROADMAP.md (Histórico).
+Ao fim de cada sprint, atualizar: a data, **Onde estou**, **Ja feito**, **Proximo passo** e **Bloqueios**. Mantenha curto - e uma foto, nao um diario. O diario detalhado fica no ROADMAP.md (Historico).
