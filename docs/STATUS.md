@@ -1,6 +1,6 @@
 # Status Atual
 Foto do "onde estou agora". Atualizado ao fim de cada sprint.
-**Ultima atualizacao: 07/06/2026**
+**Ultima atualizacao: 08/06/2026**
 
 ---
 
@@ -9,9 +9,9 @@ Foto do "onde estou agora". Atualizado ao fim de cada sprint.
 | Campo | Valor |
 |---|---|
 | **Fase em execucao** | Fase 7 - Despachadora (em paralelo com Fase 2) |
-| **Ultima fase concluida** | Fase 7 - Sprint 7.3 (integracao UI no painel em 07/06/2026) |
+| **Ultima fase concluida** | Fase 7 - fix retry Gemini (08/06/2026) |
 | **Sprint atual** | Sprint 7.4 - testes com casos reais e system prompt v1.3 |
-| **Ultimo sprint concluido** | Sprint 7.3 - integracao UI da Despachadora no painel (07/06/2026) |
+| **Ultimo sprint concluido** | Fix retry Gemini 503/429 + revert gemini-2.5-flash (08/06/2026) |
 | **Proximo passo (trilha principal)** | Testar a Despachadora com expedientes reais; ajustar system prompt para v1.3 |
 | **Trilha pendente (Fase 2)** | Sprint 2.2 - relatorio em `saidas/validacao_bopm_<data>.txt` apos BO pendente real |
 
@@ -31,6 +31,7 @@ Foto do "onde estou agora". Atualizado ao fim de cada sprint.
 - **Fase 7 - Sprint 7.1 concluida em 07/06/2026** - diagnostico completo: mecanismo de descoberta/contrato mapeado; lacunas de input e saida longa identificadas; adaptacoes minimas de `despachadora.py` descritas; `.gitignore` e `segredos.env.exemplo` verificados. Decisoes aprovadas: Input=A (Contexto opcional), Saida=A (CTkToplevel), `corpus_index.json`=git direto.
 - **Fase 7 - Sprint 7.2 concluida em 07/06/2026** - nucleo da Despachadora portado para a Central e testado end-to-end nos dois notebooks.
 - **Fase 7 - Sprint 7.3 concluida em 07/06/2026** - painel agora exibe input de texto e seletor de arquivo para automacoes que declaram `requer_texto`/`requer_arquivo`; `saida_longa` abre em janela filha com Copiar, Salvar e Fechar; `_run_thread()` usa `status_txt` sem quebrar o status detalhado dos BOPMs.
+- **Fix retry Gemini concluido em 08/06/2026** - `despachadora.py`: `MODELO_GEMINI` revertido para `gemini-2.5-flash`; funcao `_chamar_gemini()` adicionada com retry 3 tentativas (5s, 15s, 30s) para erros 503/429; `processar()` e `main()` usam o helper; sem nova dependencia.
 
 ---
 

@@ -838,6 +838,40 @@ def extract_inputs(file_paths: list) -> list:
     return results
 
 
+# ── Retry Gemini ─────────────────────────────────────────────────────────────
+
+_RETRY_WAITS = [5, 15, 30]  # segundos entre tentativas 1→2, 2→3, e falha final
+_RETRY_KEYWORDS = ("503", "UNAVAILABLE", "429", "RESOURCE_EXHAUSTED")
+
+
+def _chamar_gemini(client, model: str, contents: str, system_instruction: str, log_fn):
+    """
+    Chama client.models.generate_content com retry automático em 503/429.
+    log_fn recebe a string de aviso (ctx.log.warning ou print conforme o caller).
+    """
+    import time
+    from google.genai import types as genai_types
+
+    tentativas = len(_RETRY_WAITS) + 1  # 3 esperas = 4 tentativas no máximo
+    for n in range(1, tentativas + 1):
+        try:
+            return client.models.generate_content(
+                model=model,
+                contents=contents,
+                config=genai_types.GenerateContentConfig(
+                    system_instruction=system_instruction,
+                ),
+            )
+        except Exception as e:
+            msg = str(e)
+            retryable = any(kw in msg for kw in _RETRY_KEYWORDS)
+            if not retryable or n > len(_RETRY_WAITS):
+                raise
+            espera = _RETRY_WAITS[n - 1]
+            log_fn(f"Gemini indisponível (tentativa {n}/{len(_RETRY_WAITS) + 1}), aguardando {espera}s... [{msg[:80]}]")
+            time.sleep(espera)
+
+
 # ── Ponto de entrada para o painel (Sprint 7.2+) ─────────────────────────────
 
 def processar(ctx) -> str:
@@ -900,18 +934,11 @@ def processar(ctx) -> str:
     user_prompt = build_user_prompt(input_texts, pool_f, pool_m, empty_recovery)
 
     from google import genai
-    from google.genai import types as genai_types
 
     client = genai.Client(api_key=api_key)
     ctx.log.info(f"Chamando {MODELO_GEMINI}...")
 
-    resp = client.models.generate_content(
-        model=MODELO_GEMINI,
-        contents=user_prompt,
-        config=genai_types.GenerateContentConfig(
-            system_instruction=MASTER_SYSTEM_PROMPT,
-        ),
-    )
+    resp = _chamar_gemini(client, MODELO_GEMINI, user_prompt, MASTER_SYSTEM_PROMPT, ctx.log.warning)
     return resp.text
 
 
@@ -996,7 +1023,6 @@ def main():
 
     try:
         from google import genai
-        from google.genai import types as genai_types
     except ImportError:
         print("[Erro] Biblioteca google-genai não instalada.")
         print("Instale com: pip install google-genai")
@@ -1006,13 +1032,7 @@ def main():
 
     print(f"Chamando {MODELO_GEMINI} ...", flush=True)
     try:
-        resp = client.models.generate_content(
-            model=MODELO_GEMINI,
-            contents=user_prompt,
-            config=genai_types.GenerateContentConfig(
-                system_instruction=MASTER_SYSTEM_PROMPT,
-            ),
-        )
+        resp = _chamar_gemini(client, MODELO_GEMINI, user_prompt, MASTER_SYSTEM_PROMPT, print)
     except Exception as e:
         print(f"[Erro] Falha na chamada à API Gemini: {e}")
         sys.exit(1)
