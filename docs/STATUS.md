@@ -8,11 +8,11 @@ Foto do "onde estou agora". Atualizado ao fim de cada sprint.
 
 | Campo | Valor |
 |---|---|
-| **Fase em execucao** | Fase 7 - Despachadora (em paralelo com Fase 2) |
-| **Ultima fase concluida** | Fase 7 - fix retry Gemini (08/06/2026) |
-| **Sprint atual** | Sprint 7.4 - testes com casos reais e system prompt v1.3 |
-| **Ultimo sprint concluido** | Fix retry Gemini 503/429 + revert gemini-2.5-flash (08/06/2026) |
-| **Proximo passo (trilha principal)** | Testar a Despachadora com expedientes reais; ajustar system prompt para v1.3 |
+| **Fase em execucao** | Fase 2 - Validar BOPM |
+| **Ultima fase concluida** | Fase 7 - Sprint 7.4 (testes reais em 08/06/2026); Fase 7 encerrada |
+| **Sprint atual** | Sprint 2.2 - relatorio validacao_bopm |
+| **Ultimo sprint concluido** | Sprint 7.4 - testes reais + system prompt v1.3 (08/06/2026) |
+| **Proximo passo (trilha principal)** | Sprint 2.2 - relatorio `saidas/validacao_bopm_<data>.txt`, aguardando BO pendente real |
 | **Trilha pendente (Fase 2)** | Sprint 2.2 - relatorio em `saidas/validacao_bopm_<data>.txt` apos BO pendente real |
 
 ---
@@ -32,6 +32,8 @@ Foto do "onde estou agora". Atualizado ao fim de cada sprint.
 - **Fase 7 - Sprint 7.2 concluida em 07/06/2026** - nucleo da Despachadora portado para a Central e testado end-to-end nos dois notebooks.
 - **Fase 7 - Sprint 7.3 concluida em 07/06/2026** - painel agora exibe input de texto e seletor de arquivo para automacoes que declaram `requer_texto`/`requer_arquivo`; `saida_longa` abre em janela filha com Copiar, Salvar e Fechar; `_run_thread()` usa `status_txt` sem quebrar o status detalhado dos BOPMs.
 - **Fix retry Gemini concluido em 08/06/2026** - `despachadora.py`: `MODELO_GEMINI` revertido para `gemini-2.5-flash`; funcao `_chamar_gemini()` adicionada com retry 3 tentativas (5s, 15s, 30s) para erros 503/429; `processar()` e `main()` usam o helper; sem nova dependencia.
+- **Fase 7 - Sprint 7.4 concluida em 08/06/2026** - 3 expedientes reais testados pelo painel; 6 blocos gerados corretamente com fundamentos rastreáveis; nenhum FUNDAMENTO inventado detectado; Fase 7 encerrada.
+- **Migracao de modelo Gemini em 08/06/2026** - `MODELO_GEMINI` migrado de `gemini-2.5-flash` para `gemini-3.5-flash` em `despachadora.py` por deprecacao iminente do 2.5-flash.
 
 ---
 
@@ -64,27 +66,21 @@ Teste end-to-end:
 
 ## Proximo passo
 
-**Trilha principal:** Sprint 7.4 - testes com casos reais e system prompt v1.3.
+**Trilha principal:** Sprint 2.2 - relatorio `saidas/validacao_bopm_<data>.txt`, aguardando BO pendente real para validacao em campo.
 
 Escopo imediato:
 
-- Testar pelo menos 3 expedientes reais na Despachadora pelo painel.
-- Conferir se os 6 blocos mantem formato, proveniencia e texto pronto.
-- Promover `[VERIFICAR]` confirmados e corrigir desvios no system prompt v1.3.
-
-**Trilha pendente:** Sprint 2.2 - relatorio `saidas/validacao_bopm_<data>.txt`, aguardando BO pendente real para validacao em campo.
+- Aguardar BO pendente real aparecer no SIOPM.
+- Rodar "Validar BOPM" pelo painel e confirmar que o relatorio `saidas/validacao_bopm_<data>.txt` e gerado corretamente.
+- Validar fix double-Retornar em campo.
 
 ---
 
 ## Bloqueios / pendencias
 
-**Fase 7 - Sprint 7.4 - proximo:**
-- Validar a Despachadora pelo painel com expedientes reais.
-- Ajustar system prompt para v1.3 apos os testes.
-- Confirmar que nenhum FUNDAMENTO inventado aparece nos casos reais.
-
-**Fase 2 - Sprint 2.2 - pendente:**
-- Validar fix double-Retornar com BO pendente real em campo.
+**Fase 2 - Sprint 2.2 - atual:**
+- Aguardando BO pendente real no SIOPM para validacao em campo.
+- Validar fix double-Retornar com BO pendente real.
 - Gerar relatorio `saidas/validacao_bopm_<data>.txt`.
 
 ---

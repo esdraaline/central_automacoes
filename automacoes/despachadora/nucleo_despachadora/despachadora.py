@@ -41,7 +41,7 @@ except ImportError as e:
     sys.exit(1)
 
 # ── Parâmetros de recuperação ─────────────────────────────────────────────────
-MODELO_GEMINI     = "gemini-2.5-flash"
+MODELO_GEMINI     = "gemini-3.5-flash"
 
 # CORPUS_FILE: corpus_index.json fica em automacoes/despachadora/ (pai deste dir)
 CORPUS_FILE       = SCRIPT_DIR.parent / "corpus_index.json"
