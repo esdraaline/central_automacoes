@@ -46,7 +46,7 @@ MODELO_GEMINI     = "gemini-3.5-flash"
 # CORPUS_FILE: corpus_index.json fica em automacoes/despachadora/ (pai deste dir)
 CORPUS_FILE       = SCRIPT_DIR.parent / "corpus_index.json"
 
-MIN_TEXTO_CHARS   = 30
+MIN_TEXTO_CHARS   = 150
 POOL_FUNDAMENTO_N = 12
 POOL_MODELO_N     = 8
 CHUNK_MAX_CHARS   = 2000
@@ -752,11 +752,28 @@ def recover_chunks(corpus: list, keywords: set) -> list:
     return merged, pool_f, pool_m
 
 
+def _extract_window(texto: str, keywords: set, window: int = CHUNK_MAX_CHARS) -> str:
+    if not texto:
+        return ""
+    texto_lower = texto.lower()
+    pivot = len(texto)
+    for kw in keywords:
+        pos = texto_lower.find(kw)
+        if pos != -1 and pos < pivot:
+            pivot = pos
+    if pivot == len(texto):
+        return texto[:window]
+    start = max(0, pivot - window // 2)
+    end = min(len(texto), start + window)
+    return texto[start:end]
+
+
 def build_user_prompt(
     input_texts: list,
     pool_f: list,
     pool_m: list,
     empty_recovery: bool,
+    keywords: set,
 ) -> str:
     parts = []
 
@@ -772,7 +789,7 @@ def build_user_prompt(
         parts.append("\n\nCONTEXTO NORMATIVO (corpus 5ª Cia):")
         for entry in pool_f:
             fonte = entry["_key"]
-            texto = (entry.get("texto") or "")[:CHUNK_MAX_CHARS]
+            texto = _extract_window(entry.get("texto") or "", keywords)
             parts.append(f"\n[FONTE: {fonte}]\n{texto}")
 
     f_keys = {e["_key"] for e in pool_f}
@@ -781,7 +798,7 @@ def build_user_prompt(
         parts.append("\n\nMODELOS DE REDAÇÃO (para forma, não para fundamento):")
         for entry in modelos:
             fonte = entry["_key"]
-            texto = (entry.get("texto") or "")[:CHUNK_MAX_CHARS]
+            texto = _extract_window(entry.get("texto") or "", keywords)
             parts.append(f"\n[FONTE: {fonte}]\n{texto}")
 
     if empty_recovery:
@@ -931,7 +948,7 @@ def processar(ctx) -> str:
         excl_m = [e for e in pool_m if e["_key"] not in f_keys]
         ctx.log.info(f"Chunks: {len(pool_f)} fundamento + {len(excl_m)} modelo exclusivo.")
 
-    user_prompt = build_user_prompt(input_texts, pool_f, pool_m, empty_recovery)
+    user_prompt = build_user_prompt(input_texts, pool_f, pool_m, empty_recovery, keywords)
 
     from google import genai
 
@@ -1019,7 +1036,7 @@ def main():
         print(f"Chunks recuperados: {len(pool_f)} fundamento + "
               f"{len(excl_m)} modelo exclusivo.", flush=True)
 
-    user_prompt = build_user_prompt(input_texts, pool_f, pool_m, empty_recovery)
+    user_prompt = build_user_prompt(input_texts, pool_f, pool_m, empty_recovery, keywords)
 
     try:
         from google import genai
