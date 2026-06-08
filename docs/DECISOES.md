@@ -94,3 +94,27 @@ O SEI não será automatizado na Central de Automações. Login, acesso via gov.
 - O indexador opera em modo incremental, processando apenas arquivos novos quando possivel.
 
 **Motivo:** O arquivo esta dentro do limite de 100 MB do GitHub e permite sincronizar os dois notebooks sem depender de reindexacao manual em cada maquina. O corpus original continua fora do git.
+
+---
+
+## D-10 · OCR de PDFs imagem: script separado, corpus_index.json atualizado no lugar ✅
+**Data:** 08/06/2026
+
+**Contexto:** 67 dos 714 arquivos do corpus estavam marcados como `error: "pdf_imagem_sem_ocr"` pelo `indexar_corpus.py` — PDFs escaneados que PyMuPDF e pypdf não conseguem ler. A Despachadora os ignorava completamente na busca (score = 0 por ausência de texto).
+
+**Decisão:**
+- Criar script separado `ocr_pdfs_imagem.py` em `nucleo_despachadora/` — não alterar `indexar_corpus.py`.
+- O script filtra apenas entradas com `error == "pdf_imagem_sem_ocr"` e texto vazio, aplica OCR (pdf2image + pytesseract, lang=por, 300 DPI) e atualiza `corpus_index.json` no lugar (atomic write via `.tmp` + `os.replace`).
+- Dependências OCR (pdf2image, pytesseract, Tesseract, Poppler) instaladas apenas na máquina que executa o OCR — não são necessárias nas demais para usar a Despachadora.
+- `corpus_index.json` atualizado sincroniza para os demais notebooks via Google Drive automaticamente.
+
+**Resultado:** 67/67 PDFs processados com sucesso; 552.992 chars adicionados ao índice. corpus_index.json atualizado em 08/06/2026.
+
+**Fluxo para novos PDFs escaneados:**
+1. `python indexar_corpus.py` — marca os novos como `pdf_imagem_sem_ocr`
+2. `python ocr_pdfs_imagem.py` — extrai o texto via OCR
+3. Drive sincroniza o índice atualizado para os demais notebooks
+
+**Alternativa descartada:** Integrar OCR diretamente no `indexar_corpus.py` — descartado para não adicionar dependências pesadas (pdf2image, Tesseract) ao fluxo principal de indexação, que roda com frequência.
+
+---

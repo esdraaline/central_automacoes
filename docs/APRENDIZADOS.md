@@ -4,6 +4,35 @@
 
 ---
 
+## 08/06/2026 — Despachadora · OCR de PDFs imagem
+
+### Contexto
+67 dos 714 arquivos do corpus_index.json estavam marcados como `error: "pdf_imagem_sem_ocr"` com texto vazio — PDFs escaneados que PyMuPDF e pypdf não conseguem ler. A Despachadora os ignorava na busca (score = 0).
+
+### Solução entregue
+Script `automacoes/despachadora/nucleo_despachadora/ocr_pdfs_imagem.py`:
+- Lê corpus_index.json e filtra só entradas com `error == "pdf_imagem_sem_ocr"`
+- Localiza o arquivo físico via `Segredos().get("corpus")["path"]` — igual ao indexar_corpus.py
+- Aplica OCR com `pdf2image.convert_from_path(dpi=300)` + `pytesseract.image_to_string(lang="por")` por página
+- Salva corpus_index.json via arquivo temporário + `os.replace` (atomic write — sem risco de corrupção)
+- Resultado: 67/67 OK, 552.992 chars adicionados ao índice
+
+### Arquivos agora visíveis para a Despachadora (que antes eram cegos)
+- NI_001_02_15_resolução 57.pdf — 84.442 chars (P3)
+- DTZ PM3_002_02_16 DEJEM.pdf — 36.514 chars (Notebooklm)
+- NI PM3-002-02-17.pdf — 25.062 chars (P3)
+- Oitiva como testemunha acusacao sd garcia.pdf — 16.130 chars (JD)
+- Resolução CONTRAN nº 432-13.pdf — 13.670 chars (P3)
+- Ata Reunião com Prefeito Assinada.pdf — 10.105 chars (P3)
+
+### Regras para manutenção futura
+- O script é idempotente: só processa entradas com `error == "pdf_imagem_sem_ocr"` e texto vazio — rodar de novo não reprocessa o que já foi extraído.
+- Novos PDFs escaneados adicionados ao corpus: rodar `indexar_corpus.py` primeiro (marca como `pdf_imagem_sem_ocr`) e depois `ocr_pdfs_imagem.py`.
+- O corpus_index.json fica no Google Drive junto com o corpus físico — sincroniza automaticamente para outras máquinas. Não é necessário instalar pdf2image/pytesseract nas demais máquinas para usar a Despachadora.
+- O Tesseract detecta automaticamente via PATH ou `C:/Program Files/Tesseract-OCR/tesseract.exe` — sem configuração manual.
+
+---
+
 ## 06/06/2026 — Fase 2 · Sprint 2.1 · Validar BOPM — fluxo real mapeado em campo
 
 ### Acertos
