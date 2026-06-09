@@ -118,3 +118,34 @@ O SEI não será automatizado na Central de Automações. Login, acesso via gov.
 **Alternativa descartada:** Integrar OCR diretamente no `indexar_corpus.py` — descartado para não adicionar dependências pesadas (pdf2image, Tesseract) ao fluxo principal de indexação, que roda com frequência.
 
 ---
+
+## D-11 · MODELO_PRECEDENTE como terceira natureza da base da Despachadora ✅
+**Data:** 09/06/2026
+
+**Contexto:** Na base documental da 5ª Cia, muitos modelos de redação são documentos reais antigos reutilizados como espelho. Em vários casos, o texto tem forma I-7-PM clara, mas não há sinal seguro para dizer se nasceu como molde ou como caso real.
+
+**Decisão:**
+- Criar a natureza `MODELO_PRECEDENTE`.
+- `MODELO_PRECEDENTE` significa: documento-espelho da casa, com forma I-7-PM reconhecível, cujo tipo exato — molde ou caso real — não pôde ser cravado por sinal.
+- `MODELO_DE_REDACAO` e `PRECEDENTE` continuam válidos quando houver sinal claro.
+- A segunda passada só pode promover entradas de baixa confiança para `MODELO_PRECEDENTE`; não pode renomear nem migrar entradas já classificadas em alta confiança.
+
+**Motivo:** O rótulo preserva honestidade classificatória sem desperdiçar documentos úteis para a recuperação. Ele evita chute entre "modelo" e "precedente" quando a função prática é a mesma: servir de espelho de redação.
+
+---
+
+## D-12 · `corpus_index.json` sincroniza pelo Drive, não pelo git ✅
+**Data:** 09/06/2026
+
+**Contexto:** A decisão D-09 previa versionar `automacoes/despachadora/corpus_index.json` diretamente no git. Na prática, após OCR e enriquecimento do corpus, o fluxo operacional passou a tratar o índice como artefato derivado/sigiloso sincronizado pelo Google Drive, e o arquivo está protegido no `.gitignore`.
+
+**Decisão:**
+- `automacoes/despachadora/corpus_index.json` não deve ser commitado.
+- O índice atualizado deve ser copiado para `CORPUS_PATH/corpus_index.json` no Google Drive.
+- Backups do índice devem ficar em `G:\Meu Drive\Arquivos Josemar\Trabalho\backups_corpus_index_despachadora\`, fora do `CORPUS_PATH`.
+- Artefatos de saída ignorados pelo git que precisem migrar entre máquinas devem ser copiados para uma pasta de sincronização no Drive fora do corpus físico.
+- A decisão D-12 substitui o fluxo operacional descrito na D-09 para o índice.
+
+**Motivo:** O índice contém texto extraído de documentos sensíveis e muda por operações locais de OCR/classificação. O Drive já sincroniza os notebooks e evita expor esse artefato no repositório remoto.
+
+---

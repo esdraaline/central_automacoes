@@ -170,6 +170,43 @@ automacoes/despachadora/
 
 ---
 
+## Fase 8 — Enriquecimento da Base de Conhecimento da Despachadora
+
+**Objetivo:** tornar a base de conhecimento da Despachadora mais rica e confiável, de forma aditiva e curada, cobrindo fundamentos normativos, metadados de vigência, espécies documentais e lacunas procedimentais sem perder a riqueza real da 5ª Cia.
+
+**Independente das Fases 3–6 — pode rodar em paralelo, como a Fase 7.**
+
+**Regra-mãe:** aditividade. O corpus físico no Drive é intocável: não renomear, não mover, não deletar e não empobrecer entradas existentes. Antes de qualquer reindexação futura, fazer backup de `corpus_index.json`. Fonte oficial pode virar FUNDAMENTO; fonte não-oficial entra, no máximo, como referência marcada `[VERIFICAR]`.
+
+| Sprint | Escopo | Critério de aceite |
+|---|---|---|
+| 8.1 | Diagnóstico do corpus, somente leitura: inventário físico, cruzamento Drive × índice, classificação por natureza/espécie, normas presentes e lacunas contra as 5 camadas. | ✅ 08/06/2026 — `docs/DIAGNOSTICO_CORPUS.md` e `saidas/inventario_corpus.csv` gerados; ROADMAP e STATUS atualizados; nenhuma alteração em `corpus_index.json` ou corpus físico; nenhuma chamada de rede/API/IA. |
+| 8.2 | Metadados e vigência: extensão retrocompatível do esquema do índice com natureza, espécie, vigência, hierarquia, fonte e auditoria de classificação. | ✅ 09/06/2026 — `classificar_corpus.py`, `docs/METADADOS_8_2.md`, `saidas/revisao_classificacao.csv` e `saidas/relatorio_193_nao_indexados.csv` gerados; 729 entradas preservadas; 479 alta confiança e 250 baixa confiança. |
+| 8.3 | Segunda passada de classificação: adicionar `MODELO_PRECEDENTE` e promover apenas baixas com estrutura I-7-PM inequívoca, sem tocar altas existentes. | ✅ 09/06/2026 — D-11 registrada; 36 entradas promovidas para `MODELO_PRECEDENTE`; planilha caiu de 250 para 214 linhas; 39 quase promovidas listadas; altas `MODELO_DE_REDACAO`/`PRECEDENTE` preservadas. |
+| 8.4 | Curadoria de fontes oficiais: ingestão manual e curada de legislação-base e normativos PMESP de fontes brancas, com URL, data de captura e proveniência. | Novos fundamentos entram apenas com origem rastreável e vigência atestável. |
+| 8.5 | IA buscadora assistida: localizar e sugerir fontes oficiais para confirmação humana antes de qualquer ingestão. | Nenhuma ingestão direta por IA; humano confirma no portão de verificação. |
+
+**Patch pendente do Sprint 8.3:** corrigir detector I-7-PM para analisar cabeça + cauda do texto indexado antes da revisão manual. Prompt pronto em `docs/PROMPT_PATCH_8_3_CABECA_CAUDA.md`.
+
+### Sprint 8.1 — Diagnóstico do Corpus
+
+Restrição absoluta: somente leitura. Não modificar `corpus_index.json`, não baixar, mover ou editar arquivos, não chamar API de IA e não acessar a internet.
+
+Tarefas:
+- Inventário físico do `CORPUS_PATH`, por seção real existente no Drive, com contagem por tipo, tamanho e datas.
+- Cruzamento com `corpus_index.json`: arquivos não indexados, entradas órfãs, entradas com erro, textos abaixo do mínimo e prováveis duplicatas.
+- Classificação heurística por natureza: `NORMA`, `MODELO_DE_REDACAO`, `PRECEDENTE`, `JURISPRUDENCIA`, `PROCEDIMENTAL`, `OUTRO`, `NAO_CLASSIFICADO`.
+- Classificação por espécie documental da casa: parte, ofício, despacho, sindicância, IPM, TC, relatório, escala, ata, outro.
+- Levantamento de normas presentes/citadas por busca textual, sem afirmar vigência.
+- Mapa de lacunas contra as 5 camadas: legislação-base, normativos internos, modelos de redação, jurisprudência operacional e procedimental.
+
+Entregáveis:
+- `docs/DIAGNOSTICO_CORPUS.md`
+- `saidas/inventario_corpus.csv`
+- Lista explícita de suposições de classificação e itens `NAO_CLASSIFICADO`.
+
+---
+
 ## Histórico (diário)
 
 **03/06/2026** — Scaffold criado, BOPM migrado, decisões A/B/C registradas, STATUS.md criado, Fase 0 detalhada em 2 sprints.
@@ -203,3 +240,5 @@ automacoes/despachadora/
 **08/06/2026** — Fix retry Gemini: `MODELO_GEMINI` revertido para `gemini-2.5-flash` (havia sido alterado manualmente para `gemini-2.5-pro`). Adicionada função `_chamar_gemini()` com retry automático (3 tentativas, backoff 5s → 15s → 30s) para erros 503 UNAVAILABLE e 429 RESOURCE_EXHAUSTED; outros erros falham imediatamente. Tanto `processar()` (painel) quanto `main()` (CLI) usam o helper. Sem nova dependência.
 
 **05/06/2026** — Fase 2 · Sprint 2.1 implementado: `automacoes/validar_bopm/manifesto.py` e `automacoes/validar_bopm/executar.py` criados. Botão "Validar BOPM" aparece no painel automaticamente (descoberta pelo contrato). Fluxo: login SIOPM → filtro → detecta pendentes → abre cada BOPM → tenta 3 cliques (Outros / Validar BOPM / Confirmar). Seletores dos 3 cliques a mapear na primeira execução real com VPN — log diagnostica URL e elementos visíveis em caso de falha. Pendente validação pelo painel.
+
+**09/06/2026** — Fase 8 · Sprints 8.2 e 8.3 concluídos: metadados aditivos aplicados a 729 entradas; 36 entradas promovidas para `MODELO_PRECEDENTE`; planilha de revisão em 214 linhas. D-12 registrada reconciliando o fluxo real do `corpus_index.json`: índice e artefatos derivados sincronizam pelo Drive, não pelo git. Próximo passo é o patch cabeça+cauda do detector I-7-PM antes da revisão manual.

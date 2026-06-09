@@ -1,6 +1,6 @@
 # Status Atual
 Foto do "onde estou agora". Atualizado ao fim de cada sprint.
-**Ultima atualizacao: 08/06/2026**
+**Ultima atualizacao: 09/06/2026**
 
 ---
 
@@ -8,11 +8,11 @@ Foto do "onde estou agora". Atualizado ao fim de cada sprint.
 
 | Campo | Valor |
 |---|---|
-| **Fase em execucao** | Fase 2 - Validar BOPM |
+| **Fase em execucao** | Fase 8 — Enriquecimento da Base |
 | **Ultima fase concluida** | Fase 7 - Sprint 7.4 (testes reais em 08/06/2026); Fase 7 encerrada |
-| **Sprint atual** | Sprint 2.2 - relatorio validacao_bopm |
-| **Ultimo sprint concluido** | Sprint 7.4 - testes reais + system prompt v1.3 (08/06/2026) |
-| **Proximo passo (trilha principal)** | Sprint 2.2 - relatorio `saidas/validacao_bopm_<data>.txt`, aguardando BO pendente real |
+| **Sprint atual** | Patch 8.3 pendente — detector cabeça+cauda |
+| **Ultimo sprint concluido** | Sprint 8.3 — Segunda passada de classificação (09/06/2026) |
+| **Proximo passo (trilha principal)** | seguir `docs/PROMPT_PATCH_8_3_CABECA_CAUDA.md`; depois revisar `saidas/revisao_classificacao.csv` |
 | **Trilha pendente (Fase 2)** | Sprint 2.2 - relatorio em `saidas/validacao_bopm_<data>.txt` apos BO pendente real |
 
 ---
@@ -36,6 +36,9 @@ Foto do "onde estou agora". Atualizado ao fim de cada sprint.
 - **Migracao de modelo Gemini em 08/06/2026** - `MODELO_GEMINI` migrado de `gemini-2.5-flash` para `gemini-3.5-flash` em `despachadora.py` por deprecacao iminente do 2.5-flash.
 - **OCR corpus Despachadora concluído em 08/06/2026** — `ocr_pdfs_imagem.py` criado em `automacoes/despachadora/nucleo_despachadora/`; 67 PDFs imagem processados com OCR (pdf2image + pytesseract, lang=por, 300 DPI); 67/67 OK, zero erros; 552.992 chars novos adicionados ao índice; corpus_index.json atualizado. Dependências instaladas: pdf2image, pytesseract, Tesseract OCR UB-Mannheim, idioma por, Poppler.
 - **Enriquecimento do corpus concluído em 08/06/2026** — varredura de 7.845 arquivos em `G:\Meu Drive\Arquivos Josemar\Trabalho`; 14 documentos novos adicionados ao corpus (8 em Normas/, 6 em JD/): I-1-PM Publicações, 5 NIs operacionais, I-15-PM, I-36-PM, 3 modelos de despacho/portaria IPM e 3 ofícios a autoridade judicial. Total do corpus: 728 entradas indexadas.
+- **Fase 8 - Sprint 8.2 concluído em 09/06/2026** — `classificar_corpus.py` criado; 729 entradas receberam metadados aditivos; 479 alta confiança, 250 baixa confiança; `vigencia=nao_avaliado` em 100%; reimportador testado e idempotente.
+- **Fase 8 - Sprint 8.3 concluído em 09/06/2026** — D-11 registrada; `MODELO_PRECEDENTE` adicionado; segunda passada promoveu 36 entradas de baixa para alta confiança; planilha de revisão caiu de 250 para 214 linhas; 39 entradas ficaram no grupo "quase".
+- **Decisão D-12 registrada em 09/06/2026** — `corpus_index.json` deixou de ir pelo git; fluxo atual é Drive + `.gitignore`, com backups fora do `CORPUS_PATH`.
 
 ---
 
@@ -68,17 +71,22 @@ Teste end-to-end:
 
 ## Proximo passo
 
-**Trilha principal:** Sprint 2.2 - relatorio `saidas/validacao_bopm_<data>.txt`, aguardando BO pendente real para validacao em campo.
+**Trilha principal:** executar o patch `docs/PROMPT_PATCH_8_3_CABECA_CAUDA.md` antes da revisão manual.
 
 Escopo imediato:
 
-- Aguardar BO pendente real aparecer no SIOPM.
-- Rodar "Validar BOPM" pelo painel e confirmar que o relatorio `saidas/validacao_bopm_<data>.txt` e gerado corretamente.
-- Validar fix double-Retornar em campo.
+- Corrigir o detector I-7-PM para analisar cabeça + cauda, sem baixar a régua.
+- Reprocessar as 109 baixas ainda sugeridas como `MODELO_DE_REDACAO`.
+- Depois do patch, revisar a planilha restante e reimportar com `python automacoes/despachadora/nucleo_despachadora/classificar_corpus.py --reimport saidas/revisao_classificacao.csv`.
 
 ---
 
 ## Bloqueios / pendencias
+
+**Fase 8 - patch 8.3 - atual:**
+- Sprint 8.3 aprovado tecnicamente pela prova de aditividade.
+- Foi detectado bug de miopia no detector: ele analisou só o começo do texto, mas fecho/assinatura ficam no fim.
+- Prompt do patch pronto em `docs/PROMPT_PATCH_8_3_CABECA_CAUDA.md`.
 
 **Fase 2 - Sprint 2.2 - atual:**
 - Aguardando BO pendente real no SIOPM para validacao em campo.
