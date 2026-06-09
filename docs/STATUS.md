@@ -35,6 +35,7 @@ Foto do "onde estou agora". Atualizado ao fim de cada sprint.
 - **Fase 7 - Sprint 7.4 concluida em 08/06/2026** - 3 expedientes reais testados pelo painel; 6 blocos gerados corretamente com fundamentos rastreáveis; nenhum FUNDAMENTO inventado detectado; Fase 7 encerrada.
 - **Migracao de modelo Gemini em 08/06/2026** - `MODELO_GEMINI` migrado de `gemini-2.5-flash` para `gemini-3.5-flash` em `despachadora.py` por deprecacao iminente do 2.5-flash.
 - **OCR corpus Despachadora concluído em 08/06/2026** — `ocr_pdfs_imagem.py` criado em `automacoes/despachadora/nucleo_despachadora/`; 67 PDFs imagem processados com OCR (pdf2image + pytesseract, lang=por, 300 DPI); 67/67 OK, zero erros; 552.992 chars novos adicionados ao índice; corpus_index.json atualizado. Dependências instaladas: pdf2image, pytesseract, Tesseract OCR UB-Mannheim, idioma por, Poppler.
+- **Enriquecimento do corpus concluído em 08/06/2026** — varredura de 7.845 arquivos em `G:\Meu Drive\Arquivos Josemar\Trabalho`; 14 documentos novos adicionados ao corpus (8 em Normas/, 6 em JD/): I-1-PM Publicações, 5 NIs operacionais, I-15-PM, I-36-PM, 3 modelos de despacho/portaria IPM e 3 ofícios a autoridade judicial. Total do corpus: 728 entradas indexadas.
 
 ---
 
