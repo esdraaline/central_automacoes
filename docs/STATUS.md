@@ -10,9 +10,9 @@ Foto do "onde estou agora". Atualizado ao fim de cada sprint.
 |---|---|
 | **Fase em execucao** | Fase 8 — Enriquecimento da Base |
 | **Ultima fase concluida** | Fase 7 - Sprint 7.4 (testes reais em 08/06/2026); Fase 7 encerrada |
-| **Sprint atual** | Patch 8.3 pendente — detector cabeça+cauda |
-| **Ultimo sprint concluido** | Sprint 8.3 — Segunda passada de classificação (09/06/2026) |
-| **Proximo passo (trilha principal)** | seguir `docs/PROMPT_PATCH_8_3_CABECA_CAUDA.md`; depois revisar `saidas/revisao_classificacao.csv` |
+| **Sprint atual** | Revisão humana da classificação restante (triagem assistida pronta) |
+| **Ultimo sprint concluido** | Triagem Assistida das 199 Entradas restante (09/06/2026) |
+| **Proximo passo (trilha principal)** | revisar `saidas/triagem_assistida_199.csv` (com sugestões assistidas); depois reimportar com `python automacoes/despachadora/nucleo_despachadora/classificar_corpus.py --reimport saidas/triagem_assistida_199.csv` |
 | **Trilha pendente (Fase 2)** | Sprint 2.2 - relatorio em `saidas/validacao_bopm_<data>.txt` apos BO pendente real |
 
 ---
@@ -39,6 +39,8 @@ Foto do "onde estou agora". Atualizado ao fim de cada sprint.
 - **Fase 8 - Sprint 8.2 concluído em 09/06/2026** — `classificar_corpus.py` criado; 729 entradas receberam metadados aditivos; 479 alta confiança, 250 baixa confiança; `vigencia=nao_avaliado` em 100%; reimportador testado e idempotente.
 - **Fase 8 - Sprint 8.3 concluído em 09/06/2026** — D-11 registrada; `MODELO_PRECEDENTE` adicionado; segunda passada promoveu 36 entradas de baixa para alta confiança; planilha de revisão caiu de 250 para 214 linhas; 39 entradas ficaram no grupo "quase".
 - **Decisão D-12 registrada em 09/06/2026** — `corpus_index.json` deixou de ir pelo git; fluxo atual é Drive + `.gitignore`, com backups fora do `CORPUS_PATH`.
+- **Patch 8.3 cabeça+cauda concluído em 09/06/2026** — detector I-7-PM passou a analisar cabeça de 12.000 chars + cauda de 6.000 chars; 15 novas entradas promovidas para `MODELO_PRECEDENTE`; planilha caiu de 214 para 199 linhas; SHA-256 final do índice: `3adf96695bcab1b080533ef049fb2c613ada822e1400d250ad3f0128045059e7`.
+- **Triagem Assistida das 199 concluída em 09/06/2026** — Planilha de sugestões `saidas/triagem_assistida_199.csv` gerada a partir da leitura do texto completo do índice; 10 lotes non-JD e 5 lotes JD processados de forma consistente, com JD ordenado por último, atenção redobrada no grupo JD, e justificativas curtas citando trechos/sinais concretos.
 
 ---
 
@@ -71,22 +73,22 @@ Teste end-to-end:
 
 ## Proximo passo
 
-**Trilha principal:** executar o patch `docs/PROMPT_PATCH_8_3_CABECA_CAUDA.md` antes da revisão manual.
+**Trilha principal:** revisar manualmente `saidas/triagem_assistida_199.csv` e depois reimportar.
 
 Escopo imediato:
 
-- Corrigir o detector I-7-PM para analisar cabeça + cauda, sem baixar a régua.
-- Reprocessar as 109 baixas ainda sugeridas como `MODELO_DE_REDACAO`.
-- Depois do patch, revisar a planilha restante e reimportar com `python automacoes/despachadora/nucleo_despachadora/classificar_corpus.py --reimport saidas/revisao_classificacao.csv`.
+- Revisar as 199 linhas de sugestões de triagem em `saidas/triagem_assistida_199.csv`.
+- Preencher `natureza_correta`, `especie_correta` e, se necessário, `observacao` baseando-se nas sugestões assistidas geradas.
+- Reimportar com `python automacoes/despachadora/nucleo_despachadora/classificar_corpus.py --reimport saidas/triagem_assistida_199.csv`.
 
 ---
 
 ## Bloqueios / pendencias
 
-**Fase 8 - patch 8.3 - atual:**
-- Sprint 8.3 aprovado tecnicamente pela prova de aditividade.
-- Foi detectado bug de miopia no detector: ele analisou só o começo do texto, mas fecho/assinatura ficam no fim.
-- Prompt do patch pronto em `docs/PROMPT_PATCH_8_3_CABECA_CAUDA.md`.
+**Fase 8 - revisão humana - atual:**
+- Triagem assistida de 199 linhas concluída com sucesso e salva em `saidas/triagem_assistida_199.csv`.
+- JD agrupado no final com atenção redobrada e `revisar_obrigatorio=SIM`.
+- Pronto para revisão humana antes da reimportação no índice.
 
 **Fase 2 - Sprint 2.2 - atual:**
 - Aguardando BO pendente real no SIOPM para validacao em campo.

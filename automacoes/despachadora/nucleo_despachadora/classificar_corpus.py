@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
 import json
 import os
 import re
@@ -180,6 +181,14 @@ def create_backups(index_path: Path, corpus_root: Path) -> tuple[Path, Path]:
     return local_backup, drive_backup
 
 
+def file_sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as f:
+        for chunk in iter(lambda: f.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
 def has_any(haystack: str, patterns: list[str]) -> list[str]:
     found: list[str] = []
     for pattern in patterns:
@@ -191,11 +200,18 @@ def has_any(haystack: str, patterns: list[str]) -> list[str]:
     return found
 
 
+def head_tail_window(texto: str, head_chars: int = 12000, tail_chars: int = 6000) -> str:
+    if len(texto) <= head_chars + tail_chars:
+        return texto
+    return f"{texto[:head_chars]} {texto[-tail_chars:]}"
+
+
 def detect_i7pm_structure(entry: dict[str, Any]) -> StructureScore:
     section = str(entry.get("section") or "")
     arquivo = str(entry.get("arquivo") or "")
     texto = str(entry.get("texto") or "")
-    haystack = normalize(f"{section} {arquivo} {texto[:12000]}")
+    janela = head_tail_window(texto)
+    haystack = normalize(f"{section} {arquivo} {janela}")
     section_norm = normalize(section)
     is_jd = section_norm == "jd"
 
@@ -253,6 +269,9 @@ def detect_i7pm_structure(entry: dict[str, Any]) -> StructureScore:
             "quartel em",
             "renovo protestos",
             "aproveito o ensejo",
+            "nos policiais militares sob a protecao de deus",
+            "assinado no original",
+            "certifico que o presente arquivo eletronico confere",
         ],
         "assinatura": [
             "cap pm",
@@ -261,9 +280,19 @@ def detect_i7pm_structure(entry: dict[str, Any]) -> StructureScore:
             "cel pm",
             "sgt pm",
             "sd pm",
+            "encarregado",
+            "presidente",
+            "oficial ppjm",
+            "chefe p/3",
+            "chefe p3",
+            "cmt",
+            "cmt pel",
+            "cmt cia",
             "comandante",
             "subcomandante",
             "re:\\brg\\s*\\d",
+            "re:\\b[a-z]{2,}(?:\\s+[a-z]{2,}){1,5}\\s+(cap|ten|maj|cel|sgt|sd)\\s+pm\\b",
+            "re:\\b(cap|ten|maj|cel|sgt|sd)\\s+pm\\s+[a-z]{2,}(?:\\s+[a-z]{2,}){1,5}\\b",
         ],
     }
 
@@ -994,6 +1023,7 @@ def write_second_pass_summary(
     drive_backup: Path,
     verify_messages: list[str],
     py_compile_summary: str,
+    final_sha256: str,
 ) -> None:
     promoted_by_section = Counter(row["pasta"] or "[raiz]" for row in promoted_rows)
     remaining_by_section = Counter(row["pasta"] or "[raiz]" for row in review_rows)
@@ -1027,7 +1057,64 @@ def write_second_pass_summary(
     else:
         near_lines.append("| - | - | - | - | - |")
 
-    content = f"""# Segunda Passada 8.3
+    section_content = f"""## Patch cabeça+cauda
+
+Executado em {datetime.now().strftime("%d/%m/%Y %H:%M:%S")}.
+
+### Resultado executivo
+
+- Novas promoções para `MODELO_PRECEDENTE`: {len(promoted_rows)}
+- Linhas restantes na revisão manual: {len(review_rows)}
+- Entradas que ficaram a um marcador do limiar: {len(near_rows)}
+- Backup local: `{local_backup}`
+- Backup Drive: `{drive_backup}`
+- SHA-256 do índice final: `{final_sha256}`
+
+### Promovidas por pasta
+
+{simple_table(promoted_by_section, "Pasta")}
+
+### Revisão restante por pasta
+
+{simple_table(remaining_by_section, "Pasta")}
+
+### Revisão restante por pasta e sugestão
+
+{chr(10).join(remaining_lines)}
+
+### Quase promovidas
+
+Entradas que ficaram a exatamente um marcador do limiar de promoção, ou bateram o limiar mas falharam em um obrigatório.
+
+{chr(10).join(near_lines)}
+
+### Prova de aditividade pura
+
+```
+{chr(10).join(verify_messages)}
+```
+
+### Compilação
+
+```
+{py_compile_summary}
+```
+
+### Observações
+
+- O patch analisou cabeça de 12.000 caracteres e cauda de 6.000 caracteres do texto já indexado.
+- As réguas foram mantidas: P1-P5 com 4/6 e JD com 5/6.
+- O corpus físico não foi reindexado, movido, renomeado ou editado.
+"""
+
+    if path.exists():
+        existing = path.read_text(encoding="utf-8")
+        marker = "\n## Patch cabeça+cauda\n"
+        if marker in existing:
+            existing = existing.split(marker, 1)[0].rstrip() + "\n"
+        content = existing.rstrip() + "\n\n" + section_content
+    else:
+        content = f"""# Segunda Passada 8.3
 
 Sprint 8.3 executado em {datetime.now().strftime("%d/%m/%Y %H:%M:%S")}.
 
@@ -1146,6 +1233,7 @@ def run_second_pass(index_path: Path, review_csv: Path, corpus_root: Path) -> di
     save_index_atomic(index_path, updated_data)
 
     final_data = load_index(index_path)
+    final_sha256 = file_sha256(index_path)
     verify_ok, verify_messages, verify_errors = verify_second_pass(original_snapshot, final_data)
     if not verify_ok:
         raise RuntimeError("Falha na verificacao da segunda passada:\n" + "\n".join(verify_errors))
@@ -1160,6 +1248,7 @@ def run_second_pass(index_path: Path, review_csv: Path, corpus_root: Path) -> di
         drive_backup,
         verify_messages,
         py_compile_summary,
+        final_sha256,
     )
 
     return {
@@ -1170,6 +1259,7 @@ def run_second_pass(index_path: Path, review_csv: Path, corpus_root: Path) -> di
         "local_backup": local_backup,
         "drive_backup": drive_backup,
         "verify_messages": verify_messages,
+        "final_sha256": final_sha256,
     }
 
 
@@ -1207,6 +1297,21 @@ def reimport_review(index_path: Path, csv_path: Path, make_backup: bool = True) 
             if not chave or not natureza:
                 counts["linhas_vazias_ou_incompletas"] += 1
                 continue
+
+            entry = by_key.get(chave)
+            if entry is None:
+                counts["chave_nao_encontrada"] += 1
+                continue
+
+            if natureza == "EXCLUIR":
+                if entry.get("classificacao_origem") == "humana":
+                    counts["ja_humana_preservada"] += 1
+                    continue
+                data.remove(entry)
+                del by_key[chave]
+                counts["excluidas"] += 1
+                continue
+
             if natureza not in NATUREZAS:
                 counts["natureza_invalida"] += 1
                 continue
@@ -1214,10 +1319,6 @@ def reimport_review(index_path: Path, csv_path: Path, make_backup: bool = True) 
                 especie = normalize_species(especie_raw)
             except ValueError:
                 counts["especie_invalida"] += 1
-                continue
-            entry = by_key.get(chave)
-            if entry is None:
-                counts["chave_nao_encontrada"] += 1
                 continue
             if entry.get("classificacao_origem") == "humana":
                 counts["ja_humana_preservada"] += 1
