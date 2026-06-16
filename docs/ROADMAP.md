@@ -187,7 +187,7 @@ automacoes/despachadora/
 | 8.3 | Segunda passada de classificação: adicionar `MODELO_PRECEDENTE` e promover apenas baixas com estrutura I-7-PM inequívoca, sem tocar altas existentes. | ✅ 09/06/2026 — D-11 registrada; 36 entradas promovidas para `MODELO_PRECEDENTE`; planilha caiu de 250 para 214 linhas; 39 quase promovidas listadas; altas `MODELO_DE_REDACAO`/`PRECEDENTE` preservadas. |
 | Patch 8.3 | Cabeça+cauda: corrigir detector I-7-PM para analisar cabeça de 12k + cauda de 6k chars. | ✅ 09/06/2026 — 15 novas promoções; planilha caiu para 199 linhas. |
 | Revisão 8.3 | Revisão humana assistida das 199 entradas NAO_CLASSIFICADO restantes. | ✅ 16/06/2026 — 75 mantidas, 124 excluídas; reimportador estendido com suporte a EXCLUIR; corpus em 605 entradas. |
-| 8.4 | Curadoria de fontes oficiais: ingestão manual e curada de legislação-base e normativos PMESP de fontes brancas, com URL, data de captura e proveniência. | Em andamento. Segmentações do Vademecum e das Doutrinas PM concluídas em 16/06/2026; SHA-256 final `0c7f59568d53d6d7708f1f720a36d718f8b51933e79d0b90fe4799896691f149`. ← **ATUAL** |
+| 8.4 | Curadoria de fontes oficiais: ingestão manual e curada de legislação-base e normativos PMESP de fontes brancas, com URL, data de captura e proveniência. | Em andamento. Segmentações do Vademecum, Doutrinas PM e POPs concluídas em 16/06/2026; corpus com 674 entradas; SHA-256 final `a31b54687e62fe0be12ad9a3aec00a8e1c807c2fba864f951a359108665f7384`. ← **ATUAL** |
 | 8.5 | IA buscadora assistida: localizar e sugerir fontes oficiais para confirmação humana antes de qualquer ingestão. | Nenhuma ingestão direta por IA; humano confirma no portão de verificação. |
 
 > **Nota de numeração (16/06/2026):** O `PROMPT_FASE8.md` original numerava "Curadoria de fontes" como Sprint 8.3 e "IA buscadora" como Sprint 8.4. O Patch cabeça+cauda e a Revisão humana foram intercalados entre os sprints, deslocando a numeração para 8.4 e 8.5 respectivamente. O conteúdo é o mesmo; só a numeração interna divergiu. Ver D-13 para o EXCLUIR introduzido na Revisão humana.
@@ -205,6 +205,8 @@ Rodar 3 expedientes reais recentes pelo painel (tipos diferentes: parte, ofício
 - Algum artigo de lei citado sem fonte?
 Essa anotação transforma o 8.4 de "ingestão genérica" em "ingestão cirúrgica".
 
+Após Vademecum, Doutrinas PM e POPs, este passo volta a ser prioritário antes de abrir nova fonte grande, especialmente com expediente real sobre uso de força, transporte de presos ou algemas.
+
 **Passo 1 — Quick wins (reclassificar sem ingestão nova)**
 Entradas já no corpus com texto mas `NAO_CLASSIFICADO` — reimportar com natureza correta:
 - [ ] `JD/PPJM/Manuais, Leis, Regulamentos/I-7-PM_7ª ed. Atual.pdf` → `NORMA` (95k chars, já indexado)
@@ -216,6 +218,7 @@ Entradas já no corpus com texto mas `NAO_CLASSIFICADO` — reimportar com natur
 - [ ] **I-7-PM completa e limpa** — versão P1 classificada (102k chars), versão JD reclassificar (Passo 1). Confirmar se cobre todos os capítulos.
 - [x] **Vademecum segmentado** — 6 segmentos temáticos em `Normas/Vademecum_Segmentos/` (CTB, ECA, CP Militar, CPP flagrante, Maria da Penha e Drogas), todos `NORMA + humana`, `error=None`, entre 20k e 150k chars.
 - [x] **Doutrinas PM segmentadas** — 31 segmentos temáticos em `Normas/Doutrinas_PM_Segmentos/`, todos `NORMA + humana`, `error=None`, entre 20k e 150k chars.
+- [x] **POPs segmentados** — 32 segmentos em `Normas/POPs_Segmentos/`; 30 `PROCEDIMENTAL + humana`, 2 `NORMA + humana` por fundamento jurídico embutido; todos `error=None`, entre 20k e 150k chars.
 - [x] **CTB** — artigos operacionais (abordagem de veículo, alcoolemia, acidente com vítima) cobertos por `Vademecum_CTB.txt`.
 - [x] **ECA** — artigos que a 5ª Cia usa (apreensão de menor, medidas protetivas) cobertos por `Vademecum_ECA.txt`.
 
@@ -294,3 +297,5 @@ Entregáveis:
 **16/06/2026** — Sprint 8.4 · Segmentação do Vademecum concluída: `Vademecum.pdf` de 7,3M chars segmentado em 6 arquivos temáticos (`CTB`, `ECA`, `CP Militar`, `CPP flagrante`, `Maria da Penha`, `Drogas`) em `Normas/Vademecum_Segmentos/`; corpus passou de 605 para 611 entradas; todos os segmentos ficaram `NORMA`, `classificacao_origem=humana`, `error=None`, entre 20k e 150k chars; prova de aditividade passou; índice final copiado para o Drive; SHA-256 final `12c29eec5983347e6b20e973c140030bb905c1ec728a5c8fc5b23d45e83f0705`. Relatório em `docs/SEGMENTACAO_VADEMECUM.md`.
 
 **16/06/2026** — Sprint 8.4 · Segmentação das Doutrinas PM concluída: `Doutrinas pm_compressed (1).pdf` de 1.643 páginas segmentado em 31 arquivos temáticos em `Normas/Doutrinas_PM_Segmentos/`; corpus passou de 611 para 642 entradas; todos os segmentos ficaram `NORMA`, `classificacao_origem=humana`, `error=None`, entre 20k e 150k chars; prova de aditividade passou; índice final copiado para o Drive; SHA-256 final `0c7f59568d53d6d7708f1f720a36d718f8b51933e79d0b90fe4799896691f149`. Relatório em `docs/SEGMENTACAO_DOUTRINAS_PM.md`.
+
+**16/06/2026** — Sprint 8.4 · Segmentação dos POPs concluída: `POPs.pdf` segmentado em 32 arquivos em `Normas/POPs_Segmentos/`; corpus passou de 642 para 674 entradas; 30 segmentos ficaram `PROCEDIMENTAL + humana` e 2 com fundamento jurídico embutido (`Transporte/Guarda de Presos` e `Uso de Algemas`) ficaram `NORMA + humana`; todos com `error=None`, entre 20k e 150k chars; prova de aditividade passou; índice final copiado para o Drive; SHA-256 final `a31b54687e62fe0be12ad9a3aec00a8e1c807c2fba864f951a359108665f7384`. Relatório em `docs/SEGMENTACAO_POPS.md`. Próximo passo recomendado: teste de campo da Despachadora com expediente real envolvendo POPs antes da próxima segmentação grande.
