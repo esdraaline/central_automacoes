@@ -195,18 +195,37 @@ automacoes/despachadora/
 
 **Regra:** Nenhuma ingestão por IA. Humano localiza, confere vigência e autoriza. A IA apenas indexa o que o humano trouxer.
 
-**Checklist de abertura — verificar se já estão no corpus:**
-- [ ] Lei estadual nº 18.442/2026 (reorganização dos quadros da PMESP) — mencionada no PROMPT_FASE8.md como exemplo motivador
-- [ ] Lei 11.343/2006 (Lei de Drogas) — citada como lacuna da Camada 1
-- [ ] Lei 8.069/1990 (ECA) — referenciada em documentos de P3/Outros
-- [ ] Decreto-Lei 667/1969 (Lei das PMs) e Lei Complementar 893/2001 (RDPM SP) — base normativa da casa
+**Problema real do 8.4:** A Despachadora tem dois pools de recuperação — Fundamento (top 12 normas por densidade) e Modelo de redação (top 8 da casa). O corpus é forte em modelos da casa mas fraco em fundamento normativo: normas presentes como PDF escaneado sem texto limpo ou citadas em outros docs mas não indexadas diretamente. Resultado: Bloco 2 (Análise Jurídica) cita `[VERIFICAR]` onde deveria citar artigo de lei com confiança.
 
-**Fluxo por fonte:**
-1. Localizar documento oficial (site do governo, Diário Oficial, ALESP)
+**Passo 0 — Teste de campo (fazer antes de qualquer ingestão)**
+Rodar 3 expedientes reais recentes pelo painel (tipos diferentes: parte, ofício, despacho de sindicância ou IPM). Para cada um anotar:
+- Quantos `[VERIFICAR]` no Bloco 2 (Análise Jurídica)?
+- O fundamento citado foi rastreável `[FONTE: section/arquivo]` ou genérico?
+- Algum artigo de lei citado sem fonte?
+Essa anotação transforma o 8.4 de "ingestão genérica" em "ingestão cirúrgica".
+
+**Passo 1 — Quick wins (reclassificar sem ingestão nova)**
+Entradas já no corpus com texto mas `NAO_CLASSIFICADO` — reimportar com natureza correta:
+- [ ] `JD/PPJM/Manuais, Leis, Regulamentos/I-7-PM_7ª ed. Atual.pdf` → `NORMA` (95k chars, já indexado)
+- [ ] `JD/PPJM/Manuais, Leis, Regulamentos/RDPM atualizado 21MAR25.pdf` → `NORMA` (134k chars)
+- [ ] `JD/PPJM/Manuais, Leis, Regulamentos/RDPM_LC915_out07.pdf` → `NORMA` (140k chars)
+
+**Passo 2 — Alta prioridade (ingestão nova)**
+- [ ] **Lei 18.442/2026** — ausente no corpus (0 entradas). Reorganiza quadros PMESP. Qualquer expediente sobre pessoal que citar norma anterior está errado.
+- [ ] **I-7-PM completa e limpa** — versão P1 classificada (102k chars), versão JD reclassificar (Passo 1). Confirmar se cobre todos os capítulos.
+- [ ] **CTB** — artigos operacionais (abordagem de veículo, alcoolemia, acidente com vítima)
+- [ ] **ECA** — artigos que a 5ª Cia usa (apreensão de menor, medidas protetivas)
+
+**Deixar para depois:**
+- Jurisprudência — só entra com URL verificável e data de captura. Risco jurídico sem fonte atestada.
+- CP/CPP completos — textos muito longos, busca por densidade se perde sem recorte.
+
+**Fluxo por fonte nova:**
+1. Localizar no site oficial (governo, Diário Oficial, ALESP)
 2. Registrar URL + data de captura + vigência
-3. Salvar o arquivo em pasta adequada do corpus no Drive
+3. Salvar em pasta adequada do corpus no Drive
 4. Rodar `indexar_corpus.py` incremental
-5. Verificar entrada no índice e confirmar natureza = `NORMA`
+5. Verificar entrada e confirmar `natureza=NORMA`
 
 ### Sprint 8.1 — Diagnóstico do Corpus
 
