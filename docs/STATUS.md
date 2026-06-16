@@ -12,7 +12,7 @@ Foto do "onde estou agora". Atualizado ao fim de cada sprint.
 | **Ultima fase concluida** | Fase 2 - Sprint 2.2 validado em campo (16/06/2026); Fase 2 encerrada |
 | **Sprint atual** | Sprint 8.4 — Curadoria de fontes oficiais |
 | **Ultimo sprint concluido** | Sprint 2.2 — relatório validacao_bopm gerado e log ao vivo OK (16/06/2026) |
-| **Proximo passo (trilha principal)** | Sprint 8.4: ingerir legislação-base e normativos PMESP de fontes brancas (URL + data de captura + proveniência) |
+| **Proximo passo (trilha principal)** | Sprint 8.4: continuar curadoria de fontes oficiais após segmentação do Vademecum |
 | **Proxima fase** | Fase 3 — Órion (consulta de indicadores criminais) |
 
 ---
@@ -43,6 +43,7 @@ Foto do "onde estou agora". Atualizado ao fim de cada sprint.
 - **Triagem Assistida das 199 concluída em 09/06/2026** — Planilha de sugestões `saidas/triagem_assistida_199.csv` gerada a partir da leitura do texto completo do índice; 10 lotes non-JD e 5 lotes JD processados de forma consistente, com JD ordenado por último, atenção redobrada no grupo JD, e justificativas curtas citando trechos/sinais concretos.
 - **Fase 2 - Sprint 2.2 concluído em 16/06/2026** — validado em campo com BO pendente real; relatório `saidas/validacao_bopm_<data>.txt` gerado corretamente; log ao vivo funcionando. Fase 2 encerrada.
 - **Revisão humana e reimport concluídos em 16/06/2026** — 199 entradas revisadas com auxílio de IA agêntica: 75 mantidas com natureza correta, 124 excluídas do índice. Reimportador estendido para suportar `natureza_correta=EXCLUIR` (remove entrada do índice). Corpus final: 605 entradas classificadas com `classificacao_origem=humana` ou `alta`. Pasta `saidas/` limpa de artefatos obsoletos.
+- **Sprint 8.4 - Segmentação do Vademecum concluída em 16/06/2026** — Vademecum de 7,3M chars segmentado em 6 arquivos temáticos em `Normas/Vademecum_Segmentos/`; corpus passou de 605 para 611 entradas; todos os segmentos ficaram `NORMA`, `classificacao_origem=humana`, `error=None`, entre 20k e 150k chars; prova de aditividade passou; SHA-256 final do índice: `12c29eec5983347e6b20e973c140030bb905c1ec728a5c8fc5b23d45e83f0705`.
 
 ---
 
@@ -80,7 +81,8 @@ Teste end-to-end:
 Escopo imediato:
 
 - Identificar lacunas de fundamento no corpus (legislação-base, normativos PMESP não indexados).
-- Ingerir documentos de fontes brancas com URL, data de captura e proveniência rastreável.
+- Continuar ingerindo documentos de fontes brancas com URL, data de captura e proveniência rastreável.
+- Segmentação do Vademecum concluída e documentada em `docs/SEGMENTACAO_VADEMECUM.md`.
 - Nenhuma ingestão direta por IA — humano confirma no portão de verificação antes de reimportar.
 
 ---
@@ -89,7 +91,8 @@ Escopo imediato:
 
 **Fase 8 - Sprint 8.4 - atual:**
 - Revisão humana das 199 entradas concluída em 16/06/2026; corpus limpo e reimportado.
-- Próximo passo: levantar lacunas de fontes oficiais e iniciar curadoria do Sprint 8.4.
+- Segmentação do Vademecum concluída em 16/06/2026; índice final sincronizado no Drive com SHA-256 `12c29eec5983347e6b20e973c140030bb905c1ec728a5c8fc5b23d45e83f0705`.
+- Próximo passo: continuar levantamento de lacunas de fontes oficiais no Sprint 8.4.
 
 **Dívida técnica — Despachadora:**
 - PDF escaneado como entrada retorna erro `pdf_imagem_sem_ocr`. Workaround: colar texto no painel.
