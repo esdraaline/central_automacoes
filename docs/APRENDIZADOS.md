@@ -108,3 +108,25 @@ Ao listar BOPMs por status textual, nunca assumir que existe um único valor pos
 - Fechar cada instância de Playwright antes de iniciar outra dentro da mesma automação sequencial.
 - Registrar no log a URL atual e opções visíveis quando um dropdown esperado não for encontrado.
 - Validar pelo painel, não só por linha de comando, quando o critério envolve thread, VPN e Edge visível.
+
+---
+
+## 16/06/2026 — PDF escaneado como entrada da Despachadora
+
+### Contexto
+PDF escaneado usado como entrada na Despachadora pelo painel retorna `pdf_imagem_sem_ocr`
+e erro fatal: "Nenhum texto extraído dos arquivos de entrada." O expediente não é processado.
+
+### Causa
+O extrator do arquivo de entrada usa a mesma cadeia do indexador (PyMuPDF → pypdf),
+que falha em PDF imagem. O `ocr_pdfs_imagem.py` existe mas só opera sobre o corpus,
+não sobre arquivo avulso de entrada.
+
+### Workaround atual
+Colar o texto do expediente manualmente no campo de texto do painel. Funciona sem
+nenhuma alteração no código.
+
+### Melhoria futura registrada (Sprint 7.5)
+Quando `pdf_imagem_sem_ocr` for detectado no input, a Despachadora roda OCR
+(pdf2image + pytesseract, lang=por, 300 DPI) no arquivo avulso e prossegue com
+o texto extraído. Não exige nova dependência — já estão instaladas para o corpus.

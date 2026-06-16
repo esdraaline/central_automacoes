@@ -168,6 +168,7 @@ automacoes/despachadora/
 - [x] Sprint 7.3 — Integração UI ✅ (07/06/2026)
 - [x] Fix retry Gemini ✅ (08/06/2026) — `_chamar_gemini()` com backoff 5s/15s/30s para 503/429; `MODELO_GEMINI` revertido para `gemini-2.5-flash`
 - [x] Sprint 7.4 — Testes e system prompt v1.3 ✅ (08/06/2026)
+- [ ] Sprint 7.5 (dívida técnica, futuro) — OCR automático no arquivo de entrada: quando o PDF de entrada for escaneado (`pdf_imagem_sem_ocr`), aplicar OCR antes de passar para a Despachadora. Workaround atual: colar texto manualmente no painel. Registrado em 16/06/2026.
 
 ---
 

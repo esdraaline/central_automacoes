@@ -91,6 +91,10 @@ Escopo imediato:
 - Revisão humana das 199 entradas concluída em 16/06/2026; corpus limpo e reimportado.
 - Próximo passo: levantar lacunas de fontes oficiais e iniciar curadoria do Sprint 8.4.
 
+**Dívida técnica — Despachadora:**
+- PDF escaneado como entrada retorna erro `pdf_imagem_sem_ocr`. Workaround: colar texto no painel.
+- Sprint 7.5 registrado no ROADMAP para OCR automático no input.
+
 **Fase 2 - encerrada em 16/06/2026.**
 
 **Fase 3 - Órion - pendente:**
