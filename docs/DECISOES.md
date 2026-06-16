@@ -149,3 +149,19 @@ O SEI não será automatizado na Central de Automações. Login, acesso via gov.
 **Motivo:** O índice contém texto extraído de documentos sensíveis e muda por operações locais de OCR/classificação. O Drive já sincroniza os notebooks e evita expor esse artefato no repositório remoto.
 
 ---
+
+## D-13 · Reimportador pode remover entradas via EXCLUIR (operação humana) ✅
+**Data:** 16/06/2026
+
+**Contexto:** As regras invioláveis dos sprints 8.2 e 8.3 diziam explicitamente "nenhuma entrada existente pode ser removida" e o fluxo era estritamente aditivo. Na revisão humana das 199 entradas (16/06/2026), 124 documentos foram marcados como `natureza_correta=EXCLUIR` na planilha de triagem, e o reimportador precisava suportá-los.
+
+**Decisão:**
+- O `classificar_corpus.py` foi estendido: quando `natureza_correta=EXCLUIR`, a entrada é removida do índice em vez de atualizada.
+- A regra "nenhuma remoção" valia para operações automáticas de IA — a IA não pode excluir. O humano pode, via planilha revisada linha a linha.
+- Entradas com `classificacao_origem=humana` continuam protegidas mesmo contra EXCLUIR.
+- A operação é sempre precedida de backup automático com timestamp.
+- Resultado do primeiro uso: corpus passou de 729 para 605 entradas; 124 documentos sem valor documental removidos.
+
+**Motivo:** Aditividade é regra para a IA, não para o humano. O portão de verificação (planilha revisada linha a linha) garante que nenhuma remoção acontece sem decisão consciente do operador.
+
+---

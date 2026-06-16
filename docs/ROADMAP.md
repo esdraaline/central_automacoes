@@ -188,6 +188,25 @@ automacoes/despachadora/
 | 8.4 | Curadoria de fontes oficiais: ingestão manual e curada de legislação-base e normativos PMESP de fontes brancas, com URL, data de captura e proveniência. | Novos fundamentos entram apenas com origem rastreável e vigência atestável. ← **ATUAL** |
 | 8.5 | IA buscadora assistida: localizar e sugerir fontes oficiais para confirmação humana antes de qualquer ingestão. | Nenhuma ingestão direta por IA; humano confirma no portão de verificação. |
 
+> **Nota de numeração (16/06/2026):** O `PROMPT_FASE8.md` original numerava "Curadoria de fontes" como Sprint 8.3 e "IA buscadora" como Sprint 8.4. O Patch cabeça+cauda e a Revisão humana foram intercalados entre os sprints, deslocando a numeração para 8.4 e 8.5 respectivamente. O conteúdo é o mesmo; só a numeração interna divergiu. Ver D-13 para o EXCLUIR introduzido na Revisão humana.
+
+### Sprint 8.4 — Curadoria de Fontes Oficiais ← ATUAL
+
+**Regra:** Nenhuma ingestão por IA. Humano localiza, confere vigência e autoriza. A IA apenas indexa o que o humano trouxer.
+
+**Checklist de abertura — verificar se já estão no corpus:**
+- [ ] Lei estadual nº 18.442/2026 (reorganização dos quadros da PMESP) — mencionada no PROMPT_FASE8.md como exemplo motivador
+- [ ] Lei 11.343/2006 (Lei de Drogas) — citada como lacuna da Camada 1
+- [ ] Lei 8.069/1990 (ECA) — referenciada em documentos de P3/Outros
+- [ ] Decreto-Lei 667/1969 (Lei das PMs) e Lei Complementar 893/2001 (RDPM SP) — base normativa da casa
+
+**Fluxo por fonte:**
+1. Localizar documento oficial (site do governo, Diário Oficial, ALESP)
+2. Registrar URL + data de captura + vigência
+3. Salvar o arquivo em pasta adequada do corpus no Drive
+4. Rodar `indexar_corpus.py` incremental
+5. Verificar entrada no índice e confirmar natureza = `NORMA`
+
 ### Sprint 8.1 — Diagnóstico do Corpus
 
 Restrição absoluta: somente leitura. Não modificar `corpus_index.json`, não baixar, mover ou editar arquivos, não chamar API de IA e não acessar a internet.
