@@ -183,10 +183,10 @@ automacoes/despachadora/
 | 8.1 | Diagnóstico do corpus, somente leitura: inventário físico, cruzamento Drive × índice, classificação por natureza/espécie, normas presentes e lacunas contra as 5 camadas. | ✅ 08/06/2026 — `docs/DIAGNOSTICO_CORPUS.md` e `saidas/inventario_corpus.csv` gerados; ROADMAP e STATUS atualizados; nenhuma alteração em `corpus_index.json` ou corpus físico; nenhuma chamada de rede/API/IA. |
 | 8.2 | Metadados e vigência: extensão retrocompatível do esquema do índice com natureza, espécie, vigência, hierarquia, fonte e auditoria de classificação. | ✅ 09/06/2026 — `classificar_corpus.py`, `docs/METADADOS_8_2.md`, `saidas/revisao_classificacao.csv` e `saidas/relatorio_193_nao_indexados.csv` gerados; 729 entradas preservadas; 479 alta confiança e 250 baixa confiança. |
 | 8.3 | Segunda passada de classificação: adicionar `MODELO_PRECEDENTE` e promover apenas baixas com estrutura I-7-PM inequívoca, sem tocar altas existentes. | ✅ 09/06/2026 — D-11 registrada; 36 entradas promovidas para `MODELO_PRECEDENTE`; planilha caiu de 250 para 214 linhas; 39 quase promovidas listadas; altas `MODELO_DE_REDACAO`/`PRECEDENTE` preservadas. |
-| 8.4 | Curadoria de fontes oficiais: ingestão manual e curada de legislação-base e normativos PMESP de fontes brancas, com URL, data de captura e proveniência. | Novos fundamentos entram apenas com origem rastreável e vigência atestável. |
+| Patch 8.3 | Cabeça+cauda: corrigir detector I-7-PM para analisar cabeça de 12k + cauda de 6k chars. | ✅ 09/06/2026 — 15 novas promoções; planilha caiu para 199 linhas. |
+| Revisão 8.3 | Revisão humana assistida das 199 entradas NAO_CLASSIFICADO restantes. | ✅ 16/06/2026 — 75 mantidas, 124 excluídas; reimportador estendido com suporte a EXCLUIR; corpus em 605 entradas. |
+| 8.4 | Curadoria de fontes oficiais: ingestão manual e curada de legislação-base e normativos PMESP de fontes brancas, com URL, data de captura e proveniência. | Novos fundamentos entram apenas com origem rastreável e vigência atestável. ← **ATUAL** |
 | 8.5 | IA buscadora assistida: localizar e sugerir fontes oficiais para confirmação humana antes de qualquer ingestão. | Nenhuma ingestão direta por IA; humano confirma no portão de verificação. |
-
-**Patch pendente do Sprint 8.3:** corrigir detector I-7-PM para analisar cabeça + cauda do texto indexado antes da revisão manual. Prompt pronto em `docs/PROMPT_PATCH_8_3_CABECA_CAUDA.md`.
 
 ### Sprint 8.1 — Diagnóstico do Corpus
 
@@ -244,3 +244,5 @@ Entregáveis:
 **09/06/2026** — Fase 8 · Sprints 8.2 e 8.3 concluídos: metadados aditivos aplicados a 729 entradas; 36 entradas promovidas para `MODELO_PRECEDENTE`; planilha de revisão em 214 linhas. D-12 registrada reconciliando o fluxo real do `corpus_index.json`: índice e artefatos derivados sincronizam pelo Drive, não pelo git. Próximo passo é o patch cabeça+cauda do detector I-7-PM antes da revisão manual.
 
 **09/06/2026** — Patch 8.3 cabeça+cauda concluído: detector I-7-PM corrigido para analisar cabeça de 12.000 caracteres + cauda de 6.000 caracteres, sem baixar a régua. Foram promovidas mais 15 entradas para `MODELO_PRECEDENTE`; planilha de revisão caiu para 199 linhas; índice final sincronizado no Drive com SHA-256 `3adf96695bcab1b080533ef049fb2c613ada822e1400d250ad3f0128045059e7`.
+
+**16/06/2026** — Fase 8 · Revisão humana e reimport concluídos: triagem assistida das 199 entradas revisada com auxílio de IA agêntica (Codex); 75 entradas mantidas com natureza correta, 124 excluídas do índice. Reimportador (`classificar_corpus.py`) estendido para suportar `natureza_correta=EXCLUIR`, removendo a entrada do índice em vez de atualizar. Corpus final com 605 entradas classificadas. Pasta `saidas/` limpa de artefatos obsoletos. Próximo passo: Sprint 8.4 — curadoria de fontes oficiais.
