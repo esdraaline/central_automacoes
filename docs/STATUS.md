@@ -9,11 +9,11 @@ Foto do "onde estou agora". Atualizado ao fim de cada sprint.
 | Campo | Valor |
 |---|---|
 | **Fase em execucao** | Fase 8 — Enriquecimento da Base |
-| **Ultima fase concluida** | Fase 7 - Sprint 7.4 (testes reais em 08/06/2026); Fase 7 encerrada |
+| **Ultima fase concluida** | Fase 2 - Sprint 2.2 validado em campo (16/06/2026); Fase 2 encerrada |
 | **Sprint atual** | Sprint 8.4 — Curadoria de fontes oficiais |
-| **Ultimo sprint concluido** | Revisão humana das 199 entradas + reimport (16/06/2026): 75 mantidas, 124 excluídas |
+| **Ultimo sprint concluido** | Sprint 2.2 — relatório validacao_bopm gerado e log ao vivo OK (16/06/2026) |
 | **Proximo passo (trilha principal)** | Sprint 8.4: ingerir legislação-base e normativos PMESP de fontes brancas (URL + data de captura + proveniência) |
-| **Trilha pendente (Fase 2)** | Sprint 2.2 - relatorio em `saidas/validacao_bopm_<data>.txt` apos BO pendente real |
+| **Proxima fase** | Fase 3 — Órion (consulta de indicadores criminais) |
 
 ---
 
@@ -41,6 +41,7 @@ Foto do "onde estou agora". Atualizado ao fim de cada sprint.
 - **Decisão D-12 registrada em 09/06/2026** — `corpus_index.json` deixou de ir pelo git; fluxo atual é Drive + `.gitignore`, com backups fora do `CORPUS_PATH`.
 - **Patch 8.3 cabeça+cauda concluído em 09/06/2026** — detector I-7-PM passou a analisar cabeça de 12.000 chars + cauda de 6.000 chars; 15 novas entradas promovidas para `MODELO_PRECEDENTE`; planilha caiu de 214 para 199 linhas; SHA-256 final do índice: `3adf96695bcab1b080533ef049fb2c613ada822e1400d250ad3f0128045059e7`.
 - **Triagem Assistida das 199 concluída em 09/06/2026** — Planilha de sugestões `saidas/triagem_assistida_199.csv` gerada a partir da leitura do texto completo do índice; 10 lotes non-JD e 5 lotes JD processados de forma consistente, com JD ordenado por último, atenção redobrada no grupo JD, e justificativas curtas citando trechos/sinais concretos.
+- **Fase 2 - Sprint 2.2 concluído em 16/06/2026** — validado em campo com BO pendente real; relatório `saidas/validacao_bopm_<data>.txt` gerado corretamente; log ao vivo funcionando. Fase 2 encerrada.
 - **Revisão humana e reimport concluídos em 16/06/2026** — 199 entradas revisadas com auxílio de IA agêntica: 75 mantidas com natureza correta, 124 excluídas do índice. Reimportador estendido para suportar `natureza_correta=EXCLUIR` (remove entrada do índice). Corpus final: 605 entradas classificadas com `classificacao_origem=humana` ou `alta`. Pasta `saidas/` limpa de artefatos obsoletos.
 
 ---
@@ -89,6 +90,11 @@ Escopo imediato:
 **Fase 8 - Sprint 8.4 - atual:**
 - Revisão humana das 199 entradas concluída em 16/06/2026; corpus limpo e reimportado.
 - Próximo passo: levantar lacunas de fontes oficiais e iniciar curadoria do Sprint 8.4.
+
+**Fase 2 - encerrada em 16/06/2026.**
+
+**Fase 3 - Órion - pendente:**
+- Ainda não iniciada. Próxima fase após Sprint 8.4.
 
 **Fase 2 - Sprint 2.2 - atual:**
 - Aguardando BO pendente real no SIOPM para validacao em campo.

@@ -55,10 +55,11 @@ Como ler: as fases são o mapa geral. Cada fase é quebrada em sprints com taref
 | Sprint | Escopo | Critério de aceite |
 |---|---|---|
 | 2.1 | Criar `automacoes/validar_bopm/` com contrato `manifesto.py` + `executar.py`. Fluxo: login SIOPM → filtro → detecta pendentes → abre cada BOPM → seleciona "Outros" → clica "Validar BOPM" → clica "Confirmar". | Botão "Validar BOPM" aparece no painel; executa com log ao vivo; seletores mapeados na primeira execução real. |
-| 2.2 | Saída: relatório em `saidas/validacao_bopm_<data>.txt` com resultado por BOPM. | Arquivo gerado corretamente; log ao vivo durante execução. |
+| 2.2 | Saída: relatório em `saidas/validacao_bopm_<data>.txt` com resultado por BOPM. | Arquivo gerado corretamente; log ao vivo durante execução. ✅ 16/06/2026 |
 
 **Itens da fase:**
 - [x] 1.1 · Validar BOPMs pendentes no SIOPM Web (Sprint 2.1 ✅ validado em campo 06/06/2026)
+- [x] Sprint 2.2 ✅ validado em campo 16/06/2026 — relatório gerado corretamente, log ao vivo OK. Fase 2 encerrada.
 
 ---
 
@@ -263,5 +264,7 @@ Entregáveis:
 **09/06/2026** — Fase 8 · Sprints 8.2 e 8.3 concluídos: metadados aditivos aplicados a 729 entradas; 36 entradas promovidas para `MODELO_PRECEDENTE`; planilha de revisão em 214 linhas. D-12 registrada reconciliando o fluxo real do `corpus_index.json`: índice e artefatos derivados sincronizam pelo Drive, não pelo git. Próximo passo é o patch cabeça+cauda do detector I-7-PM antes da revisão manual.
 
 **09/06/2026** — Patch 8.3 cabeça+cauda concluído: detector I-7-PM corrigido para analisar cabeça de 12.000 caracteres + cauda de 6.000 caracteres, sem baixar a régua. Foram promovidas mais 15 entradas para `MODELO_PRECEDENTE`; planilha de revisão caiu para 199 linhas; índice final sincronizado no Drive com SHA-256 `3adf96695bcab1b080533ef049fb2c613ada822e1400d250ad3f0128045059e7`.
+
+**16/06/2026** — Fase 2 · Sprint 2.2 validado em campo: relatório `saidas/validacao_bopm_<data>.txt` gerado corretamente com log ao vivo. Fase 2 encerrada.
 
 **16/06/2026** — Fase 8 · Revisão humana e reimport concluídos: triagem assistida das 199 entradas revisada com auxílio de IA agêntica (Codex); 75 entradas mantidas com natureza correta, 124 excluídas do índice. Reimportador (`classificar_corpus.py`) estendido para suportar `natureza_correta=EXCLUIR`, removendo a entrada do índice em vez de atualizar. Corpus final com 605 entradas classificadas. Pasta `saidas/` limpa de artefatos obsoletos. Próximo passo: Sprint 8.4 — curadoria de fontes oficiais.
