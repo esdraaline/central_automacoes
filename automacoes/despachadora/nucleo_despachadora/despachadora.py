@@ -133,6 +133,14 @@ EXPRESSOES_CAUTELOSAS = [
     "recomenda-se verificar",
     "submeter à análise superior",
     "não localizado no contexto recuperado",
+    "possível",
+    "suposta",
+    "consta",
+    "relatado",
+    "a verificar",
+    "eventual",
+    "ponto de apuração",
+    "submeter à análise",
 ]
 
 TERMOS_JURIDICOS_PADRAO_PROIBIDOS = [
@@ -238,6 +246,14 @@ Em runtime, a skill só "vê" os trechos que o despachadora.py recuperar do índ
 
 - Trava contra transposição temática (Flagrante/Algemas/Transporte): O modelo não pode transportar subitem, artigo ou referência normativa de um cenário para outro por semelhança temática. Exemplo: uma referência interna relacionada a flagrante, condução ou rotina específica (como o subitem 6.3.2.1) NÃO pode ser aplicada automaticamente a caso de algemas, espera em delegacia, transporte de preso ou acidente de trânsito, salvo se o trecho recuperado do corpus trouxer literalmente aquela referência e ela se aplicar ao fato narrado.
 - Trava contra o erro do Art. 210 CPM: Se o expediente envolver possível lesão corporal, acidente de trânsito, dano, transgressão disciplinar, crime militar ou responsabilidade funcional, o modelo não pode citar artigo penal específico apenas por conhecimento geral. Se o artigo específico não estiver no contexto recuperado, deve escrever: [VERIFICAR: artigo penal específico não localizado no contexto recuperado] e não inventar nem presumir o enquadramento.
+
+── FONTES AUTÔNOMAS DO CORPUS_MANUAL ───────────────────────
+
+Quando uma fonte autônoma do corpus_manual (ex.: Sumula_Vinculante_11_Algemas.md, Sumula_473_Autotutela.md, Competencia_IPM.md, etc.) estiver presente no CONTEXTO NORMATIVO e for diretamente pertinente ao ponto jurídico analisado, cite-a expressamente no Bloco 2 (Análise Jurídica) como [FUNDAMENTO] [FONTE: corpus_manual/NomeDoArquivo.md] ANTES de rebaixar o tema para [VERIFICAR]. Fontes autônomas são transcrições literais de norma ou jurisprudência oficial e constituem lastro documental válido. Não ignore uma fonte autônoma presente no contexto.
+
+── DADOS IDENTIFICADORES — NUNCA INVENTAR ──────────────────
+
+Nunca invente RE (Registro Estatístico), matrícula, placa de viatura, número de portaria, número de BOPM, data, nome de pessoa ou qualquer dado identificador que não conste expressamente no expediente recebido. Se o dado não foi informado, use placeholder: [RE não informado], [placa não informada], [data não informada], [nome não informado]. Inventar dados identificadores é falha grave.
 
 ──────────────────────────────────────────────────────
 BLOCO 3 — FLUXO OBRIGATÓRIO DE PROCESSAMENTO
@@ -775,7 +791,33 @@ BLOCO 10 — ENDEREÇOS INSTITUCIONAIS
 """
 
 
-# ── Validador pós-Gemini (Sprint 8.4-quater) ─────────────────────────────────
+# ── Validador pós-Gemini (Sprint 8.4-quater, ajustado Sprint 8.6-b) ──────────
+
+_PREFIXOS_CABECALHO = (
+    "assunto:", "referência:", "ref.:", "interessado:",
+    "do ", "ao ", "à ",
+    "encaminhamento:", "despacho:", "portaria:", "ofício:",
+    "ementa:", "do cmt", "ao sr.", "à sra.",
+)
+
+
+def _eh_cabecalho_protocolar(paragrafo: str) -> bool:
+    """Detecta se o parágrafo é um cabeçalho protocolar administrativo.
+    Cabeçalhos são linhas curtas de endereçamento/assunto do documento,
+    não parágrafos argumentativos.
+    Sprint 8.6-b.
+    """
+    linhas = [l.strip() for l in paragrafo.strip().splitlines() if l.strip()]
+    if not linhas:
+        return False
+    # Verificar se a primeira linha começa com prefixo de cabeçalho
+    primeira = linhas[0].lower()
+    if any(primeira.startswith(p) for p in _PREFIXOS_CABECALHO):
+        # Cabeçalhos típicos são curtos (< 200 chars no total)
+        if len(paragrafo) < 200:
+            return True
+    return False
+
 
 def _extrair_paragrafos(texto: str) -> list:
     """Divide o texto em parágrafos (por linha vazia ou bullet)."""
@@ -942,10 +984,19 @@ def validar_saida_despachadora(
                     break  # Um alerta/violação por parágrafo basta
 
     # ── Regra D: Termos jurídicos sensíveis — rebaixamento ──
+    # Sprint 8.6-b: cabeçalhos protocolares geram alerta, não bloqueio
     for para in paragrafos:
         para_lower = para.lower()
         for termo in TERMOS_JURIDICOS_SENSIVEIS:
             if termo.lower() in para_lower:
+                # Caso 0: Cabeçalho protocolar — alerta, não bloqueio (Sprint 8.6-b)
+                if _eh_cabecalho_protocolar(para):
+                    alertas.append(
+                        f"[Regra D] Termo sensível \"{termo}\" em cabeçalho protocolar — "
+                        f"verificar se é apenas campo administrativo."
+                    )
+                    continue  # Permitido com alerta
+
                 # Caso 1: Lastreado — [FUNDAMENTO] + [FONTE:] + presente no contexto
                 if (_paragrafo_tem_fundamento_com_fonte(para)
                         and termo.lower() in ctx_norm_lower):
@@ -969,11 +1020,30 @@ def validar_saida_despachadora(
                 break  # Um bloqueio por parágrafo basta
 
     # ── Regra E: [PADRÃO] não pode mascarar fundamento jurídico ──
+    # Sprint 8.6-b: tolerar [PADRÃO] factual/cauteloso com termo jurídico
     for para in paragrafos:
         if "[PADRÃO]" in para:
             para_lower = para.lower()
             for termo_jur in TERMOS_JURIDICOS_PADRAO_PROIBIDOS:
                 if termo_jur.lower() in para_lower:
+                    # Sprint 8.6-b: se o parágrafo contém expressão cautelosa,
+                    # é descritivo/factual — gerar alerta, não bloqueio
+                    if _paragrafo_tem_expressao_cautelosa(para):
+                        trecho = para[:120].replace("\n", " ")
+                        alertas.append(
+                            f"[Regra E] [PADRÃO] com termo jurídico "
+                            f'"{termo_jur}" em contexto cauteloso: "{trecho}..." — '
+                            f"verificar se é apenas descrição factual."
+                        )
+                        break
+                    # Sprint 8.6-b: cabeçalho protocolar — alerta, não bloqueio
+                    if _eh_cabecalho_protocolar(para):
+                        trecho = para[:120].replace("\n", " ")
+                        alertas.append(
+                            f"[Regra E] [PADRÃO] com termo jurídico "
+                            f'"{termo_jur}" em cabeçalho protocolar: "{trecho}..."'
+                        )
+                        break
                     tem_conclusao = any(
                         cf.lower() in para_lower for cf in TERMOS_CONCLUSAO_FORTE
                     )
@@ -1029,6 +1099,12 @@ def validar_saida_despachadora(
                             alertas.append(
                                 f"[Regra G] Termo \"{termo}\" no Bloco {bloco_num} "
                                 f"(não no Bloco 2) — presente como sugestão/verificação."
+                            )
+                        elif _eh_cabecalho_protocolar(p):
+                            # Sprint 8.6-b: cabeçalho protocolar — alerta, não bloqueio
+                            alertas.append(
+                                f"[Regra G] Termo \"{termo}\" no Bloco {bloco_num} "
+                                f"em cabeçalho protocolar (não no Bloco 2) — verificar."
                             )
                         else:
                             trecho = p[:120].replace("\n", " ")
