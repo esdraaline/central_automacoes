@@ -110,6 +110,28 @@ def incremental_key(section: str, arquivo: str) -> str:
     return f"{section}/{arquivo}" if section else arquivo
 
 
+def parse_frontmatter(text: str) -> tuple[dict, str]:
+    metadata = {}
+    content = text
+    # Normalize line endings
+    normalized = text.replace('\r\n', '\n')
+    if normalized.startswith('---\n'):
+        parts = normalized.split('---\n', 2)
+        if len(parts) >= 3:
+            frontmatter_text = parts[1]
+            content = parts[2]
+            for line in frontmatter_text.split('\n'):
+                line = line.strip()
+                if not line or ':' not in line:
+                    continue
+                k, v = line.split(':', 1)
+                k = k.strip()
+                v = v.strip().strip('"').strip("'")
+                metadata[k] = v
+    return metadata, content
+
+
+
 # ── Extratores ────────────────────────────────────────────────────────────────
 
 def extract_pdf(path: Path):
@@ -404,6 +426,13 @@ def main():
 
     # ── Coletar todos os arquivos do corpus ───────────────────────────────────
     all_files = collect_files(_SKILL_ROOT)
+    
+    # Coletar arquivos de corpus_manual
+    corpus_manual_dir = _DESP_DIR / "corpus_manual"
+    if corpus_manual_dir.is_dir():
+        for fp in sorted(corpus_manual_dir.glob("*.md")):
+            all_files.append(("corpus_manual", fp))
+            
     print(f"Arquivos encontrados no corpus: {len(all_files)}")
 
     # ── Separar novos vs já indexados ─────────────────────────────────────────
@@ -411,11 +440,19 @@ def main():
     doc_batch  = []
 
     for section, fpath in all_files:
-        section_root = _SKILL_ROOT / section if section else _SKILL_ROOT
-        rel = to_posix(fpath.relative_to(section_root))
+        if section == "corpus_manual":
+            rel = fpath.name
+        else:
+            section_root = _SKILL_ROOT / section if section else _SKILL_ROOT
+            rel = to_posix(fpath.relative_to(section_root))
+            
         key = incremental_key(section, rel)
         if key in existing:
-            continue
+            if section == "corpus_manual":
+                # Remove from existing so the new version overwrites it
+                del existing[key]
+            else:
+                continue
         to_process.append((section, fpath, rel))
         if fpath.suffix.lower() in (".doc", ".rtf"):
             doc_batch.append(fpath)
@@ -454,6 +491,19 @@ def main():
             "texto"   : texto,
             "error"   : error,
         }
+        
+        if section == "corpus_manual" and ext == ".md" and not error:
+            metadata, clean_text = parse_frontmatter(texto)
+            entry["texto"] = clean_text
+            entry["natureza"] = metadata.get("natureza", "JURISPRUDENCIA")
+            entry["classificacao_origem"] = "humana"
+            entry["classificacao_confianca"] = "alta"
+            entry["vigencia"] = "nao_avaliado"
+            entry["hierarquia"] = None
+            entry["especie"] = None
+            entry["fonte"] = metadata.get("fonte_origem")
+            entry["classificacao_sinais"] = f"manual_frontmatter; titulo={metadata.get('titulo')}"
+            
         new_entries.append(entry)
         sec_key = section or "root"
         section_counts[sec_key] = section_counts.get(sec_key, 0) + 1
