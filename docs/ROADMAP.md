@@ -192,8 +192,8 @@ automacoes/despachadora/
 | 8.4-campo | Teste de campo com POPs: Validar a Despachadora em campo pós-sprint 8.4 e 8.4-bis com expedientes reais cobrindo POPs. | ✅ 17/06/2026 — 3 expedientes rodados, validados e homologados. |
 | 8.4-ter | Recuperação Híbrida: partição estrita de pools por natureza, flat boost de pistas dos modelos, busca literal complementar na query e controle moderado de Notebooklm. | ✅ 17/06/2026 — Lógica de busca híbrida e partição de pools implementada em despachadora.py; validado localmente nos 3 casos. |
 | 8.4-quater | Validador pós-Gemini: função determinística `validar_saida_despachadora()` com 7 regras (A–G), 4 níveis de fonte, bloqueio de conclusão jurídica sem fonte, MASTER_SYSTEM_PROMPT atualizado com `[SUGESTÃO IA]` e remoção de `Bloco 4.1`. | ✅ 17/06/2026 — 14/14 cenários simulados passaram; aceito para avanço operacional; validação ampliada futura pendente. |
-| 8.5 | Curadoria do corpus e melhoria de cobertura normativa: Súmula 473, SV nº 11, competência IPM/Sindicância/autotutela, revisão de classificação de docs fáticos. | Planejado — próximo passo na trilha Despachadora. |
-| 8.6 | IA buscadora assistida: localizar e sugerir fontes oficiais para confirmação humana antes de qualquer Ingestão. | Nenhuma Ingestão direta por IA; humano confirma no portão de verificação. |
+| 8.5 | Curadoria do corpus e melhoria de cobertura normativa: Súmula 473, SV nº 11, competência IPM/Sindicância/autotutela, revisão de classificação de docs fáticos, e segmentação de PDF. | Concluído em 17/06/2026. |
+| 8.6 | Próximos testes e saneamento (Teste manual, OCR em lote, push/deploy, monitoramento de bloqueios). | Planejado — próximas opções. |
 
 
 > **Nota de numeração (16/06/2026):** O `PROMPT_FASE8.md` original numerava "Curadoria de fontes" como Sprint 8.3 e "IA buscadora" como Sprint 8.4. O Patch cabeça+cauda e a Revisão humana foram intercalados entre os sprints, deslocando a numeração para 8.4 e 8.5 respectivamente. O conteúdo é o mesmo; só a numeração interna divergiu. Ver D-13 para o EXCLUIR introduzido na Revisão humana.
@@ -308,3 +308,18 @@ Entregáveis:
 **17/06/2026** — Sprint 8.4-ter · Recuperação Híbrida concluída: Implementada a partição estrita de pools por natureza, flat boost de pistas normativas de modelos, busca literal complementar na query e controle de score para Notebooklm no recuperador da Despachadora. Validação local executada com sucesso nos 3 cenários de teste.
 
 **17/06/2026** — Sprint 8.4-quater · Validador Pós-Gemini concluído: Função `validar_saida_despachadora()` com 7 regras determinísticas (A–G) implementada em `despachadora.py`. Separa 4 níveis de fonte: `[FUNDAMENTO]+[FONTE:]`, `[PADRÃO]+[FONTE-MODELO:]`, `[SUGESTÃO IA]`, `[VERIFICAR]`. MASTER_SYSTEM_PROMPT atualizado com tier `[SUGESTÃO IA]` e remoção de `Bloco 4.1`. 14/14 cenários simulados passaram. Versão operacional estabilizada e aceita para avanço por decisão do usuário, com validação ampliada futura pendente.
+
+**17/06/2026** — Sprint 8.5 · Curadoria e Cobertura de Fontes Críticas: Criação de 5 arquivos de fontes oficiais autônomas limpas em `corpus_manual/`. Evolução do indexador oficial (`indexar_corpus.py`) para parsear frontmatter de qualquer markdown e do classificador (`classificar_corpus.py`) para aceitar a natureza `DOUTRINA`.
+
+**17/06/2026** — Sprint 8.5 · Segmentação e Exclusão do PDF Bruto: Segmentação de `orientações direito militar.pdf` (1,15M chars, 481 págs) em 15 arquivos Markdown literals sob `Normas/Orientacoes_Direito_Militar_Segmentos/`. PDF original bruto marcado para exclusão no manifesto. Reindexação oficial concluída com total de 731 chunks (0 chunks para o PDF original).
+
+**17/06/2026** — Sprint 8.5 · Ajuste de Recuperação do Caso 2: Implementada calibração condicional (boost de +3.5 no score base) para expediente contendo `"acidente"` e `"viatura"`. Ajuste testado e homologado com rankings priorizando normas de acidente com viatura.
+
+**17/06/2026** — Sprint 8.5 concluída localmente. Fechamento documental executado.
+
+### Sprint 8.6 — Opções Planejadas
+- [ ] **8.6-a** — Teste manual real no painel com corpus novo
+- [ ] **8.6-b** — OCR por lote dos 51 PDFs imagem
+- [ ] **8.6-c** — Revisão de push/deploy
+- [ ] **8.6-d** — Monitoramento de bloqueios do validador pós-Gemini
+

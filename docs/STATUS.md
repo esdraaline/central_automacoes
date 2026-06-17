@@ -8,18 +8,19 @@ Foto do "onde estou agora". Atualizado ao fim de cada sprint.
 
 | Campo | Valor |
 |---|---|
-| **Fase em execucao** | Fase 8 concluída; próxima fase em planejamento |
-| **Ultima fase concluida** | Fase 8 — Enriquecimento da Base (17/06/2026) |
-| **Sprint atual** | Sprint 8.4-quater concluído — versão operacional estabilizada e aceita para avanço |
-| **Ultimo sprint concluido** | Sprint 8.4-quater — Recuperação Híbrida + Validador Pós-Gemini (17/06/2026) |
-| **Status** | Aceito para avanço operacional por decisão do usuário. Teste de campo ampliado pendente para ciclo futuro; não bloqueia avanço. |
-| **Proximo passo (trilha principal)** | Sprint 8.5 — Curadoria do corpus e melhoria de cobertura normativa |
+| **Fase em execucao** | Fase 8 concluída; Fase 3 Órion em planejamento |
+| **Ultima fase concluida** | Fase 8 — Enriquecimento da Base e Curadoria do Corpus (17/06/2026) |
+| **Sprint atual** | Sprint 8.5 concluída localmente — Checkpoint técnico estabilizado |
+| **Ultimo sprint concluido** | Sprint 8.5 — Curadoria, Fontes Autônomas e Segmentação de PDF (17/06/2026) |
+| **Status** | Sprint 8.5 concluída localmente. Status: tecnicamente estabilizada para teste manual/push futuro. Não declarar homologação plena jurídica. |
+| **Proximo passo (trilha principal)** | Sprint 8.6-a — Teste manual real no painel com corpus novo |
 | **Proxima fase** | Fase 3 — Órion (consulta de indicadores criminais) |
 
 ---
 
 ## Ja feito
 
+- **Sprint 8.5 — Curadoria, Fontes Autônomas e Segmentação (CONCLUÍDO em 17/06/2026)** — Corpus totalmente curado com manifesto ativo (`curadoria_corpus.json`). Criadas 5 fontes oficiais autônomas limpas para fundamentos críticos. PDF `orientações direito militar.pdf` (1,15M chars, 481 págs) segmentado literalmente em 15 arquivos Markdown sob `Normas/Orientacoes_Direito_Militar_Segmentos/`, e o PDF bruto original foi excluído da indexação. Ajustada a calibração de score e o ranking do Caso 2 (acidente com viatura) para priorizar POP de acidente, NIs vigentes e fontes autônomas específicas. Teste de compilação sem erros. Commit local dcd4eb3 e 0554bcf gerados.
 - **Sprint 8.4-quater — Validador Pós-Gemini (CONCLUÍDO em 17/06/2026)** — Validador determinístico pós-resposta com 4 níveis de fonte (`[FUNDAMENTO]`, `[PADRÃO]`/`[FONTE-MODELO]`, `[SUGESTÃO IA]`, `[VERIFICAR]`). Impede que conhecimento acumulado do Gemini seja entregue como fundamento jurídico definitivo sem fonte documental. 7 regras (A–G) implementadas, 14/14 cenários simulados passaram. Aceito para avanço operacional; validação ampliada futura pendente.
 - **Sprint 8.4-ter — Recuperação Híbrida (CONCLUÍDO em 17/06/2026)** — Implementada a partição estrita dos pools de contexto Fundamento (`NORMA`, `PROCEDIMENTAL`, `DOUTRINA`, `JURISPRUDENCIA`) e Modelos (`MODELO_DE_REDACAO`, `MODELO_PRECEDENTE`, `PRECEDENTE`). Implementados a busca literal complementar da query, o boost flat fixo de pistas normativas extraídas de modelos e o controle de score de PDFs compilados do Notebooklm. Validação local concluída nos 3 casos operacionais com sucesso.
 - **Sprint 8.4-bis & 8.4-campo — Prompt Hardening & Validação em Campo (CONCLUÍDO em 17/06/2026)** — Patch aplicado no `MASTER_SYSTEM_PROMPT` homologado e validado manualmente com os 3 expedientes sugeridos (Algemas, Transporte de Preso, Abordagem de Veículo). Relatório final em `docs/RELATORIO_CAMPO_8_4.md`.
@@ -106,15 +107,22 @@ Itens sugeridos:
 - Validação ampliada de campo pendente para ciclo futuro; não bloqueia avanço.
 - O índice de corpus do Drive foi sincronizado (SHA-256 `a31b54687e62fe0be12ad9a3aec00a8e1c807c2fba864f951a359108665f7384`).
 
-**Fase 8 - Sprint 8.5 — em aberto/planejado:**
-- Curadoria do corpus e melhoria de cobertura normativa (Súmula 473, SV nº 11, competência IPM/Sindicância/autotutela).
+**Fase 8 - Sprint 8.5 — concluído localmente (17/06/2026):**
+- Curadoria do corpus, criação de fontes autônomas oficiais e segmentação de PDF grande concluídas.
 - IA buscadora assistida (localizar e sugerir fontes operacionais no portal da ALESP/PMESP) pendente para o futuro se necessário.
 
 **Dívida técnica — Despachadora:**
 - PDF escaneado como entrada retorna erro `pdf_imagem_sem_ocr`. Workaround: colar texto no painel. Sprint 7.5 registrado no ROADMAP para OCR automático no input.
 - Slogan institucional (linha 447 de `despachadora.py`): permaneceu com o rótulo `[FUNDAMENTO]`, devendo ser readequado para `[PADRÃO]` em sprints futuros de saneamento.
 - Escala vigente (Categoria B): o system prompt usa placeholders e deve ser alimentado com a escala real de 2026 quando publicada.
-- Poluição de Contexto: a pasta `Notebooklm` contém os arquivos originais unsegmentados do Drive que concorrem no retrieval com os novos POPs segmentados. É recomendável o saneamento (remoção ou exclusão do índice).
+- Poluição de Contexto: a pasta `Notebooklm` contém os arquivos originais unsegmentados do Drive que concorrem no retrieval com os novos POPs segmentados. A exclusão de `orientações direito militar.pdf` foi resolvida nesta sprint; os demais compilados brutos gigantes de POPs, Vademecum e Doutrinas PM já foram excluídos e segmentados anteriormente.
+
+**Pendências da Sprint 8.5:**
+- 51 PDFs imagem para OCR.
+- Teste manual real no painel com o novo corpus.
+- Decisão sobre push/deploy.
+- Monitoramento de eventuais bloqueios do validador pós-Gemini.
+- Eventual ajuste de novos falsos positivos.
 
 **Fase 3 - Órion - pendente:**
 - Ainda não iniciada. Próxima fase após Fase 8.

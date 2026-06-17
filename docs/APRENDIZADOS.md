@@ -190,3 +190,30 @@ Auditoria dos prompts finais mostrou que expressões jurídicas sensíveis como 
 - **Modelo recuperado** → `[PADRÃO]` + `[FONTE-MODELO:]`
 - **Conhecimento do Gemini** → `[SUGESTÃO IA]` ou `[VERIFICAR]`
 - **Conclusão jurídica definitiva sem fonte** → bloqueada pelo validador
+
+---
+
+## 17/06/2026 — Despachadora · Curadoria do Corpus, Fontes Autônomas e Segmentação (Sprint 8.5)
+
+### Contexto
+Saneamento e curadoria da base de conhecimento da Despachadora para evitar desvios no pool normativo (documentos fáticos marcados como norma) e preencher lacunas de fundamentos críticos (algemas, autotutela, competência de IPM/Sindicância e acidentes de viaturas).
+
+### Soluções e Aprendizados
+
+1. **Curadoria do Corpus Reduz Contaminação:**
+   * A curadoria proativa com manifesto ativo (`curadoria_corpus.json`) para excluir do índice arquivos pessoais transitórios (como holerites, escalas de serviço e defesas prévias) e precedentes fáticos isolados remove ruídos e limpa o pool de fundamentos, prevenindo falsos positivos de alta pontuação.
+
+2. **Fontes Autônomas Resolvem Lacunas Críticas Melhor que Compilados:**
+   * Em vez de depender que o LLM extraia regras detalhadas de PDF consolidados gigantescos, criar pequenas fontes oficiais autônomas (`corpus_manual/`) com transcrição literal da regra exata (ex: Súmula Vinculante 11, Súmula 473, regras do CPPM de competência) garante que o recuperador local selecione a norma correta em Rank 1 com altíssimo score.
+
+3. **Segmentação de Fonte Gigante Deve Preservar Literalidade:**
+   * A segmentação de arquivos grandes (como `orientações direito militar.pdf`) em partes de 20k a 150k caracteres deve ser puramente literal. Não se deve resumir, parafrasear ou inventar texto, pois a despachadora e o LLM exigem o texto original cru para auditabilidade de proveniência.
+
+4. **Boost de Domínio Deve Ser Cirúrgico e Condicionado:**
+   * Ao ajustar rankings para casos específicos (como acidente com viatura no Caso 2), a aplicação de boost de score deve ser **estritamente condicional** e direcionada apenas a arquivos chaves (ex: ativada apenas se as keywords `"acidente"` e `"viatura"` estiverem presentes simultaneamente), para evitar efeitos colaterais e falsos positivos em outros casos.
+
+5. **Expressões de Busca Literal Devem Ficar Separadas do Texto Oficial:**
+   * Ao criar fontes autônomas, os termos de busca auxiliares não devem ser misturados com as citações e textos oficiais literais da norma, garantindo integridade e evitando confusão conceitual durante a geração da resposta pela IA.
+
+6. **Doutrinas e Modelos Nunca Devem Virar Normas:**
+   * Textos acadêmicos, jurisprudências ou modelos da casa devem ser classificados rigorosamente como `DOUTRINA`, `JURISPRUDENCIA` ou `MODELO_PRECEDENTE`, e nunca como `NORMA` ou `PROCEDIMENTAL` (reservados exclusivamente para a legislação oficial e POPs vigentes). Isso impede que interpretações opinativas passem por regras vinculantes absolutas no validador.
