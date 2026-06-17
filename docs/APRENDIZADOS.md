@@ -167,3 +167,26 @@ A divisão teórica da Despachadora entre `CONTEXTO NORMATIVO` (normas/POPs) e `
 3. **Accent-Insensitivity em Busca Literal Complementar:**
    * *Problema:* Buscas literais rígidas no corpus para termos digitados pelo operador (ex: `sumula`) falhavam se no corpus a palavra estivesse grafada com acentuação (`súmula`).
    * *Solução:* Normalizar as buscas e utilizar regexes tolerantes a variações de acentuação (ex. `s[uú]mula`) para garantir match de termos de alta relevância jurídica.
+
+---
+
+## 17/06/2026 — Despachadora · Validador Pós-Gemini (Sprint 8.4-quater)
+
+### Contexto
+Auditoria dos prompts finais mostrou que expressões jurídicas sensíveis como `peculato-desvio`, `frutos da árvore envenenada`, `Súmula 473` e `padece de vício insanável de competência` não estavam no prompt montado para o Gemini — vinham do conhecimento acumulado do modelo. Isso não é inútil, mas não é fonte documental auditável.
+
+### Aprendizados
+
+1. **Modelo validado é fonte de redação, não fonte normativa.** Um despacho anterior pode orientar estrutura, tom e encaminhamento, mas não pode sustentar sozinho competência legal, prazo, nulidade ou capitulação penal.
+
+2. **Conhecimento próprio do Gemini é útil como hipótese.** Pode servir como alerta, sugestão de diligência, ponto de atenção ou orientação para pesquisa normativa posterior. Deve ser marcado como `[SUGESTÃO IA]` ou `[VERIFICAR]`, nunca como `[FUNDAMENTO]`.
+
+3. **Fundamento jurídico assinável precisa de fonte documental recuperada.** Toda afirmação rotulada `[FUNDAMENTO]` deve trazer `[FONTE: <section/arquivo recuperado>]` que sustente diretamente a afirmação. Se a fonte não foi recuperada, não é fundamento — é hipótese.
+
+4. **Validador pós-Gemini impede conclusão jurídica definitiva sem fonte.** A função `validar_saida_despachadora()` aplica 7 regras determinísticas (A–G) antes de devolver a resposta ao usuário. Bloqueia termos proibidos absolutos, fundamento sem fonte, modelo mascarando norma, termo sensível conclusivo sem lastro e fundamento novo no Texto Pronto que não apareceu na Análise Jurídica.
+
+### Regra de ouro implementada
+- **Norma recuperada** → `[FUNDAMENTO]` + `[FONTE:]`
+- **Modelo recuperado** → `[PADRÃO]` + `[FONTE-MODELO:]`
+- **Conhecimento do Gemini** → `[SUGESTÃO IA]` ou `[VERIFICAR]`
+- **Conclusão jurídica definitiva sem fonte** → bloqueada pelo validador

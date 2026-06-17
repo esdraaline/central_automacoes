@@ -1,6 +1,6 @@
 # Status Atual
 Foto do "onde estou agora". Atualizado ao fim de cada sprint.
-**Ultima atualizacao: 17/06/2026**
+**Ultima atualizacao: 17/06/2026 (12h23)**
 
 ---
 
@@ -10,15 +10,17 @@ Foto do "onde estou agora". Atualizado ao fim de cada sprint.
 |---|---|
 | **Fase em execucao** | Fase 8 concluída; próxima fase em planejamento |
 | **Ultima fase concluida** | Fase 8 — Enriquecimento da Base (17/06/2026) |
-| **Sprint atual** | Pós-sprint 8.4-ter (Recuperação Híbrida) concluído e validado localmente; pronto para congelamento |
-| **Ultimo sprint concluido** | Sprint 8.4-ter — Recuperação Híbrida (17/06/2026) |
-| **Proximo passo (trilha principal)** | Iniciar Fase 3 — Órion (consulta de indicadores criminais) |
+| **Sprint atual** | Sprint 8.4-quater concluído — versão operacional estabilizada e aceita para avanço |
+| **Ultimo sprint concluido** | Sprint 8.4-quater — Recuperação Híbrida + Validador Pós-Gemini (17/06/2026) |
+| **Status** | Aceito para avanço operacional por decisão do usuário. Teste de campo ampliado pendente para ciclo futuro; não bloqueia avanço. |
+| **Proximo passo (trilha principal)** | Sprint 8.5 — Curadoria do corpus e melhoria de cobertura normativa |
 | **Proxima fase** | Fase 3 — Órion (consulta de indicadores criminais) |
 
 ---
 
 ## Ja feito
 
+- **Sprint 8.4-quater — Validador Pós-Gemini (CONCLUÍDO em 17/06/2026)** — Validador determinístico pós-resposta com 4 níveis de fonte (`[FUNDAMENTO]`, `[PADRÃO]`/`[FONTE-MODELO]`, `[SUGESTÃO IA]`, `[VERIFICAR]`). Impede que conhecimento acumulado do Gemini seja entregue como fundamento jurídico definitivo sem fonte documental. 7 regras (A–G) implementadas, 14/14 cenários simulados passaram. Aceito para avanço operacional; validação ampliada futura pendente.
 - **Sprint 8.4-ter — Recuperação Híbrida (CONCLUÍDO em 17/06/2026)** — Implementada a partição estrita dos pools de contexto Fundamento (`NORMA`, `PROCEDIMENTAL`, `DOUTRINA`, `JURISPRUDENCIA`) e Modelos (`MODELO_DE_REDACAO`, `MODELO_PRECEDENTE`, `PRECEDENTE`). Implementados a busca literal complementar da query, o boost flat fixo de pistas normativas extraídas de modelos e o controle de score de PDFs compilados do Notebooklm. Validação local concluída nos 3 casos operacionais com sucesso.
 - **Sprint 8.4-bis & 8.4-campo — Prompt Hardening & Validação em Campo (CONCLUÍDO em 17/06/2026)** — Patch aplicado no `MASTER_SYSTEM_PROMPT` homologado e validado manualmente com os 3 expedientes sugeridos (Algemas, Transporte de Preso, Abordagem de Veículo). Relatório final em `docs/RELATORIO_CAMPO_8_4.md`.
 - Scaffold, migracao do BOPM, decisoes A/B/C
@@ -80,13 +82,16 @@ Teste end-to-end:
 
 ## Proximo passo
 
+**Trilha Despachadora:** Sprint 8.5 — Curadoria do corpus e melhoria de cobertura normativa.
+
+Itens sugeridos:
+- Inserir Súmula 473 de forma autônoma no corpus.
+- Inserir Súmula Vinculante nº 11 de forma autônoma no corpus.
+- Revisar classificação de documentos fáticos marcados como NORMA.
+- Separar precedentes internos de fundamentos normativos.
+- Melhorar fontes de competência de IPM, Sindicância e autotutela.
+
 **Trilha principal:** Fase 3 — Órion (consulta de indicadores criminais).
-
-Escopo imediato:
-
-- Login no Órion via Playwright (Edge, não-headless) usando credenciais seguras centralizadas em `nucleo/segredos`.
-- Desenvolvimento da consulta automática de indicadores por município/período e extração correta de dados.
-- Escrita de relatórios em `saidas/orion_<municipio>_<data>.txt`.
 
 ---
 
@@ -96,11 +101,13 @@ Escopo imediato:
 - Revisão humana das 199 entradas concluída em 16/06/2026.
 - Segmentações de Vademecum, Doutrinas e POPs concluídas em 16/06/2026.
 
-**Fase 8 - Concluída:**
-- Prompt Hardening (8.4-bis), Validação em campo (8.4-campo) e Recuperação Híbrida (8.4-ter) concluídos e integrados.
+**Fase 8 - Concluída (até 8.4-quater):**
+- Prompt Hardening (8.4-bis), Validação em campo (8.4-campo), Recuperação Híbrida (8.4-ter) e Validador Pós-Gemini (8.4-quater) concluídos e integrados.
+- Validação ampliada de campo pendente para ciclo futuro; não bloqueia avanço.
 - O índice de corpus do Drive foi sincronizado (SHA-256 `a31b54687e62fe0be12ad9a3aec00a8e1c807c2fba864f951a359108665f7384`).
 
 **Fase 8 - Sprint 8.5 — em aberto/planejado:**
+- Curadoria do corpus e melhoria de cobertura normativa (Súmula 473, SV nº 11, competência IPM/Sindicância/autotutela).
 - IA buscadora assistida (localizar e sugerir fontes operacionais no portal da ALESP/PMESP) pendente para o futuro se necessário.
 
 **Dívida técnica — Despachadora:**

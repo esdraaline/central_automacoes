@@ -68,6 +68,92 @@ STOPWORDS_PT = {
     "ainda", "aquele", "aquela", "neste", "nesta", "nesse", "nessa",
 }
 
+# ── Constantes do validador pós-Gemini (Sprint 8.4-quater) ───────────────────
+
+TERMOS_PROIBIDOS_ABSOLUTOS = [
+    "Bloco 4.1",
+    "MASTER_SYSTEM_PROMPT",
+    "prompt interno",
+    "Regra de aplicação",
+    "matriz interna",
+    "regra fática",
+    "seção interna do prompt",
+]
+
+TERMOS_JURIDICOS_SENSIVEIS = [
+    "peculato",
+    "peculato-desvio",
+    "frutos da árvore envenenada",
+    "Súmula 473",
+    "autotutela",
+    "vício insanável",
+    "nulidade absoluta",
+    "caducidade",
+    "prescrição",
+    "prazo decadencial",
+    "não detém competência",
+    "incompetência da autoridade",
+    "competência originária",
+    "atrai a necessidade de IPM",
+    "é imperiosa a instauração",
+    "atende plenamente ao requisito",
+    "legitimando o emprego de algemas",
+    "fundado receio de fuga",
+]
+
+TERMOS_CONCLUSAO_FORTE = [
+    "configura",
+    "legitima",
+    "legitimando",
+    "preenche os requisitos",
+    "atende plenamente",
+    "é imperiosa",
+    "deve ser instaurado",
+    "padece de vício",
+    "é nulo",
+    "é regular",
+    "homologo plenamente",
+    "supre a necessidade",
+    "dispensa a instauração",
+    "resta comprovado",
+    "está plenamente justificado",
+]
+
+EXPRESSOES_CAUTELOSAS = [
+    "[VERIFICAR",
+    "[SUGESTÃO",
+    "[SUGESTÃO IA",
+    "avaliar",
+    "verificar",
+    "a confirmar",
+    "sem prejuízo de confirmação",
+    "em tese",
+    "pode demandar",
+    "pode indicar",
+    "recomenda-se verificar",
+    "submeter à análise superior",
+    "não localizado no contexto recuperado",
+]
+
+TERMOS_JURIDICOS_PADRAO_PROIBIDOS = [
+    "competência",
+    "IPM",
+    "Sindicância",
+    "nulidade",
+    "autotutela",
+    "crime militar",
+    "artigo",
+    "súmula",
+    "prazo legal",
+    "prescrição",
+    "decadência",
+    "vício",
+    "autoridade instauradora",
+    "CPM",
+    "CPPM",
+    "CTB",
+]
+
 # ── MASTER SYSTEM PROMPT v1.2 ─────────────────────────────────────────────────
 # ATENÇÃO: valor UFESP/prazo normativo contidos no prompt — revisar anualmente ou na publicação de nova norma
 
@@ -123,7 +209,11 @@ Nunca as confunda:
 
 [SUGESTÃO] — Melhoria textual, providência recomendada, ou antecipação proativa do assessor (próximo ato, prazo, competência, documento complementar, precedente, reforço argumentativo). Sempre apresentada como sugestão; a decisão é do Comandante. Nunca apresentada como obrigação normativa.
 
+[SUGESTÃO IA] — Hipótese, alerta, ponto de atenção ou raciocínio auxiliar gerado pelo conhecimento acumulado do modelo, SEM fonte documental recuperada no contexto. Pode ser útil como orientação para pesquisa normativa posterior, sugestão de diligência ou ponto de atenção. Nunca pode ser apresentado como [FUNDAMENTO]. Formato: [SUGESTÃO IA] <hipótese ou alerta>. Quando houver fundamento normativo desconhecido, combinar com [VERIFICAR].
+
 [VERIFICAR] — Tudo que dependa de conferência humana, dado ausente, documento não localizado ou fundamento sem lastro.
+
+Conhecimento próprio do modelo não é fonte documental. Pode ser usado apenas como [SUGESTÃO IA] ou [VERIFICAR], nunca como [FUNDAMENTO].
 
 Inovar em [PADRÃO] e [SUGESTÃO] é a função da skill. Inventar em [FUNDAMENTO] é falha grave. Na dúvida sobre a procedência de algo, rebaixe o tier (de FUNDAMENTO para SUGESTÃO ou VERIFICAR), nunca eleve.
 
@@ -134,7 +224,7 @@ Em runtime, a skill só "vê" os trechos que o despachadora.py recuperar do índ
 - O rótulo de tier [FUNDAMENTO] deve OBRIGATORIAMENTE trazer a fonte do contexto correspondente no formato [FONTE: <section/arquivo recuperado>].
 - Se o trecho não estiver no contexto recuperado em runtime, NÃO use [FUNDAMENTO] nem cite a fonte; use [VERIFICAR: fundamento normativo específico não localizado no contexto recuperado].
 - A fonte precisa sustentar diretamente a afirmação feita. Exemplo: não se pode citar Súmula Vinculante nº 11 e usar como fonte apenas Constituição Federal, art. 1º, III, ou citar norma interna genérica sem trecho recuperado específico. Se a fonte recuperada sustentar apenas princípio geral, a frase deve ser limitada ao princípio geral. Se a fonte específica da súmula/artigo/norma não aparecer, deve usar [VERIFICAR].
-- Fontes válidas em [FONTE:] só podem ser arquivos/sections recuperados do corpus em runtime, ou trechos efetivamente inseridos em CONTEXTO NORMATIVO ou MODELOS DE REDAÇÃO. Não são fontes válidas: "Bloco 4.1", "Regra de aplicação", "MASTER_SYSTEM_PROMPT", "prompt", "matriz interna", "regra fática" ou qualquer seção interna do prompt. Se a informação vier apenas do prompt (como o Bloco 4.1) e não do corpus recuperado, use [PADRÃO] (se forma/estilo) ou [VERIFICAR] (se fundamento jurídico/competência).
+- Fontes válidas em [FONTE:] só podem ser arquivos/sections recuperados do corpus em runtime, ou trechos efetivamente inseridos em CONTEXTO NORMATIVO ou MODELOS DE REDAÇÃO. Não são fontes válidas: referência interna não citável, "Regra de aplicação", "MASTER_SYSTEM_PROMPT", "prompt", "matriz interna", "regra fática" ou qualquer seção interna do prompt. Se a informação vier apenas do prompt (como referência interna não citável) e não do corpus recuperado, use [PADRÃO] (se forma/estilo) ou [VERIFICAR] (se fundamento jurídico/competência).
 - Nunca produzir: [FUNDAMENTO] [VERIFICAR: ...] ou qualquer combinação de múltiplos tiers em sequência. Se houver dúvida ou ausência de lastro, o tier deve ser apenas: [VERIFICAR: ...] sem [FUNDAMENTO] antes.
 - Atenção: não usar [PADRÃO] para afirmação que envolva competência legal, nulidade, autoridade instauradora, poder disciplinar, polícia judiciária militar, prazo legal, artigo, súmula, decreto, lei, ou enquadramento penal ou disciplinar. Esses casos devem ser: [FUNDAMENTO] com [FONTE:] real e compatível; ou [VERIFICAR] se a fonte não foi localizada. O rótulo [PADRÃO] fica restrito a forma de redação, estrutura de documento, estilo, encaminhamento administrativo usual e dados institucionais não normativos.
 - O Texto Pronto não pode inserir fundamento jurídico novo que não tenha aparecido validamente na Análise Jurídica (Bloco 2). Se o Bloco 2 marcou [VERIFICAR] para um tema, o Texto Pronto deve usar linguagem cautelosa (ex.: "submeto à análise superior quanto ao fundamento aplicável", "sem prejuízo de confirmação normativa" ou "conforme fundamento a ser confirmado"), sendo proibido escrever afirmações como "nos termos da norma interna", "atendendo perfeitamente à Súmula...", "com amparo legal em..." ou "prazo legal de...", a menos que esse fundamento tenha sido validado no Bloco 2 com [FONTE:] real e compatível.
@@ -226,7 +316,7 @@ BLOCO 4 — MATRIZ NORMATIVA DE COMPETÊNCIA
 [REGRA DE APLICAÇÃO DE REFERÊNCIAS HARDCODED]
 As referências normativas específicas (subitem, artigo, número) listadas abaixo nas regras fáticas deste bloco são parâmetros operacionais fixos desta subunidade, fornecidos pelo Comandante, e só podem ser citadas quando o expediente em análise corresponder EXATAMENTE ao cenário fático descrito na regra correspondente (ex.: o subitem 6.3.2.1 só se aplica a flagrante por PM, nunca a outros temas como uso de algemas, condução, transporte de preso, ou qualquer cenário correlato mas distinto). Se o expediente for tematicamente parecido mas não corresponder ao cenário exato da regra, NÃO cite a referência — declare lacuna e use [VERIFICAR].
 
-── 4.1 HIERARQUIA DE PROCEDIMENTOS DISCIPLINARES ───────
+── HIERARQUIA DE PROCEDIMENTOS DISCIPLINARES ───────
 
 [PADRÃO] IP (Investigação Preliminar)
   Instaurado por: Cmt de Cia — de ofício.
@@ -685,6 +775,300 @@ BLOCO 10 — ENDEREÇOS INSTITUCIONAIS
 """
 
 
+# ── Validador pós-Gemini (Sprint 8.4-quater) ─────────────────────────────────
+
+def _extrair_paragrafos(texto: str) -> list:
+    """Divide o texto em parágrafos (por linha vazia ou bullet)."""
+    blocos = re.split(r"\n\s*\n", texto)
+    return [b.strip() for b in blocos if b.strip()]
+
+
+def _extrair_blocos_numerados(resposta: str) -> dict:
+    """
+    Heurística simples para separar os blocos da resposta.
+    Retorna dict com chaves possíveis: '2', '4', '6' (se encontrados).
+    """
+    blocos = {}
+    # Padrões para detectar cabeçalhos de bloco
+    marcadores = [
+        ("2", re.compile(r"\*\*2\.\s*AN[AÁ]LISE JUR[IÍ]DICA\*\*", re.IGNORECASE)),
+        ("4", re.compile(r"\*\*4\.\s*TEXTO PRONTO\*\*", re.IGNORECASE)),
+        ("6", re.compile(r"\*\*6\.\s*ASSESSORIA", re.IGNORECASE)),
+    ]
+    # Qualquer cabeçalho de bloco (para delimitar fim do anterior)
+    qualquer_bloco = re.compile(r"\*\*\d+\.\s+[A-ZÁÉÍÓÚÀÂÊÔÃÕÇ]", re.IGNORECASE)
+
+    posicoes = []
+    for num, pat in marcadores:
+        m = pat.search(resposta)
+        if m:
+            posicoes.append((m.start(), num))
+    posicoes.sort()
+
+    # Encontrar todas as posições de início de qualquer bloco
+    todos_inicios = [m.start() for m in qualquer_bloco.finditer(resposta)]
+
+    for i, (pos, num) in enumerate(posicoes):
+        # Encontrar próximo início de bloco após este
+        fim = len(resposta)
+        for inicio_pos in todos_inicios:
+            if inicio_pos > pos + 10:  # pular o próprio match
+                fim = inicio_pos
+                break
+        blocos[num] = resposta[pos:fim]
+
+    return blocos
+
+
+def _paragrafo_tem_expressao_cautelosa(paragrafo: str) -> bool:
+    """Verifica se o parágrafo contém expressão cautelosa."""
+    p_lower = paragrafo.lower()
+    for expr in EXPRESSOES_CAUTELOSAS:
+        if expr.lower() in p_lower:
+            return True
+    return False
+
+
+def _paragrafo_tem_fundamento_com_fonte(paragrafo: str) -> bool:
+    """Verifica se o parágrafo contém [FUNDAMENTO] com [FONTE:] (não FONTE-MODELO)."""
+    if "[FUNDAMENTO]" not in paragrafo:
+        return False
+    if "[FONTE:" not in paragrafo:
+        return False
+    # Verificar que não é apenas FONTE-MODELO
+    fontes = re.findall(r"\[FONTE(?:-MODELO)?:", paragrafo)
+    return any(f == "[FONTE:" for f in fontes)
+
+
+def _montar_resposta_bloqueada(violacoes: list) -> str:
+    """Monta resposta substitutiva para violações graves."""
+    linhas = ["⚠️ VALIDAÇÃO BLOQUEOU A RESPOSTA DA DESPACHADORA", ""]
+    for v in violacoes:
+        linhas.append(f"• {v}")
+    linhas.append("")
+    linhas.append("Orientação: corrija o corpus ou ajuste o prompt para incluir as fontes ")
+    linhas.append("normativas necessárias. Termos sem lastro documental devem ser usados ")
+    linhas.append("como [SUGESTÃO IA] ou [VERIFICAR], nunca como [FUNDAMENTO].")
+    return "\n".join(linhas)
+
+
+def _montar_alerta(alertas: list, resposta: str) -> str:
+    """Prefixa alertas não-bloqueantes no topo da resposta."""
+    linhas = ["⚠️ ALERTA DE VALIDAÇÃO: revisar fundamentos destacados antes de assinar.", ""]
+    for a in alertas:
+        linhas.append(f"• {a}")
+    linhas.append("")
+    linhas.append("─" * 60)
+    linhas.append("")
+    linhas.append(resposta)
+    return "\n".join(linhas)
+
+
+def validar_saida_despachadora(
+    resposta: str,
+    contexto_normativo: str,
+    modelos_redacao: str,
+) -> tuple:
+    """
+    Valida a saída do Gemini antes de entregar ao usuário.
+    Sprint 8.4-quater — Validador pós-resposta com níveis de fonte.
+
+    Args:
+        resposta: texto completo da resposta do Gemini
+        contexto_normativo: texto concatenado dos chunks normativos recuperados
+        modelos_redacao: texto concatenado dos modelos de redação recuperados
+
+    Returns:
+        (bloqueada, violacoes_graves, alertas)
+        - bloqueada: True se a resposta deve ser substituída
+        - violacoes_graves: lista de strings com regras violadas (bloqueantes)
+        - alertas: lista de strings com avisos (não-bloqueantes)
+    """
+    violacoes = []
+    alertas = []
+    resp_lower = resposta.lower()
+    ctx_norm_lower = contexto_normativo.lower()
+    paragrafos = _extrair_paragrafos(resposta)
+
+    # ── Regra A: Termos proibidos absolutos ──
+    for termo in TERMOS_PROIBIDOS_ABSOLUTOS:
+        if termo.lower() in resp_lower:
+            violacoes.append(
+                f"[Regra A] Termo proibido absoluto encontrado na resposta: "
+                f'"{termo}". Referências internas do prompt nunca devem aparecer na saída.'
+            )
+
+    # ── Regra B: [FUNDAMENTO] exige [FONTE:] normativa ──
+    for para in paragrafos:
+        if "[FUNDAMENTO]" in para:
+            if "[FONTE:" not in para:
+                trecho = para[:120].replace("\n", " ")
+                violacoes.append(
+                    f"[Regra B] [FUNDAMENTO] sem [FONTE:] encontrado: "
+                    f'"{trecho}..."'
+                )
+            elif "[FONTE-MODELO:" in para:
+                # Verificar se a ÚNICA fonte é FONTE-MODELO
+                fontes_normativas = re.findall(r"\[FONTE:(?!MODELO)", para)
+                if not fontes_normativas:
+                    trecho = para[:120].replace("\n", " ")
+                    violacoes.append(
+                        f"[Regra B] [FUNDAMENTO] sustentado apenas por [FONTE-MODELO:]: "
+                        f'"{trecho}..."'
+                    )
+
+    # ── Regra C: [FONTE-MODELO:] não pode sustentar afirmações jurídicas ──
+    for para in paragrafos:
+        if "[FONTE-MODELO:" in para:
+            para_lower = para.lower()
+            for termo_jur in TERMOS_JURIDICOS_PADRAO_PROIBIDOS:
+                if termo_jur.lower() in para_lower:
+                    # Verificar se é apenas forma administrativa
+                    tem_conclusao = any(
+                        cf.lower() in para_lower for cf in TERMOS_CONCLUSAO_FORTE
+                    )
+                    if tem_conclusao:
+                        trecho = para[:120].replace("\n", " ")
+                        violacoes.append(
+                            f"[Regra C] [FONTE-MODELO:] sustentando afirmação jurídica "
+                            f'sobre "{termo_jur}": "{trecho}..."'
+                        )
+                    else:
+                        trecho = para[:120].replace("\n", " ")
+                        alertas.append(
+                            f"[Regra C] [FONTE-MODELO:] em parágrafo com termo jurídico "
+                            f'"{termo_jur}": "{trecho}..." — verificar se é apenas forma.'
+                        )
+                    break  # Um alerta/violação por parágrafo basta
+
+    # ── Regra D: Termos jurídicos sensíveis — rebaixamento ──
+    for para in paragrafos:
+        para_lower = para.lower()
+        for termo in TERMOS_JURIDICOS_SENSIVEIS:
+            if termo.lower() in para_lower:
+                # Caso 1: Lastreado — [FUNDAMENTO] + [FONTE:] + presente no contexto
+                if (_paragrafo_tem_fundamento_com_fonte(para)
+                        and termo.lower() in ctx_norm_lower):
+                    continue  # Permitido
+
+                # Caso 2: Cauteloso — com expressão de cautela
+                if _paragrafo_tem_expressao_cautelosa(para):
+                    alertas.append(
+                        f"[Regra D] Termo sensível \"{termo}\" usado com cautela — "
+                        f"verificar antes de assinar."
+                    )
+                    continue  # Permitido com alerta
+
+                # Caso 3: Conclusivo — afirmação categórica sem marcadores
+                trecho = para[:120].replace("\n", " ")
+                violacoes.append(
+                    f"[Regra D] Termo sensível \"{termo}\" como conclusão definitiva "
+                    f"sem fonte documental: \"{trecho}...\" — "
+                    f"Use como [SUGESTÃO IA] ou [VERIFICAR], ou inclua fonte normativa."
+                )
+                break  # Um bloqueio por parágrafo basta
+
+    # ── Regra E: [PADRÃO] não pode mascarar fundamento jurídico ──
+    for para in paragrafos:
+        if "[PADRÃO]" in para:
+            para_lower = para.lower()
+            for termo_jur in TERMOS_JURIDICOS_PADRAO_PROIBIDOS:
+                if termo_jur.lower() in para_lower:
+                    tem_conclusao = any(
+                        cf.lower() in para_lower for cf in TERMOS_CONCLUSAO_FORTE
+                    )
+                    if tem_conclusao:
+                        trecho = para[:120].replace("\n", " ")
+                        violacoes.append(
+                            f"[Regra E] [PADRÃO] mascarando fundamento jurídico "
+                            f'sobre "{termo_jur}": "{trecho}..."'
+                        )
+                    else:
+                        trecho = para[:120].replace("\n", " ")
+                        alertas.append(
+                            f"[Regra E] [PADRÃO] em parágrafo com termo jurídico "
+                            f'"{termo_jur}": "{trecho}..." — verificar se é apenas forma.'
+                        )
+                    break  # Um alerta/violação por parágrafo basta
+
+    # ── Regra F: [VERIFICAR] seguido de conclusão forte ──
+    for para in paragrafos:
+        if "[VERIFICAR" in para:
+            para_lower = para.lower()
+            for expr_forte in TERMOS_CONCLUSAO_FORTE:
+                if expr_forte.lower() in para_lower:
+                    trecho = para[:150].replace("\n", " ")
+                    violacoes.append(
+                        f"[Regra F] [VERIFICAR] seguido de conclusão forte "
+                        f'"{expr_forte}": "{trecho}..."'
+                    )
+                    break  # Um bloqueio por parágrafo basta
+
+    # ── Regra G: Fundamento novo no Texto Pronto ou Assessoria ──
+    blocos = _extrair_blocos_numerados(resposta)
+    bloco2 = blocos.get("2", "")
+    bloco4 = blocos.get("4", "")
+    bloco6 = blocos.get("6", "")
+
+    if bloco2 and (bloco4 or bloco6):
+        bloco2_lower = bloco2.lower()
+        for bloco_num, bloco_txt in [("4", bloco4), ("6", bloco6)]:
+            if not bloco_txt:
+                continue
+            for termo in TERMOS_JURIDICOS_SENSIVEIS:
+                t_lower = termo.lower()
+                if t_lower in bloco_txt.lower() and t_lower not in bloco2_lower:
+                    # Termo novo apareceu no bloco 4 ou 6 sem estar no bloco 2
+                    # Verificar se está como sugestão/verificar
+                    para_com_termo = [
+                        p for p in _extrair_paragrafos(bloco_txt)
+                        if t_lower in p.lower()
+                    ]
+                    for p in para_com_termo:
+                        if _paragrafo_tem_expressao_cautelosa(p):
+                            alertas.append(
+                                f"[Regra G] Termo \"{termo}\" no Bloco {bloco_num} "
+                                f"(não no Bloco 2) — presente como sugestão/verificação."
+                            )
+                        else:
+                            trecho = p[:120].replace("\n", " ")
+                            violacoes.append(
+                                f"[Regra G] Fundamento novo no Bloco {bloco_num}: "
+                                f'"{termo}" como conclusão definitiva, sem ter '
+                                f'aparecido como [FUNDAMENTO]+[FONTE:] no Bloco 2: '
+                                f'"{trecho}..."'
+                            )
+
+    bloqueada = len(violacoes) > 0
+    return bloqueada, violacoes, alertas
+
+
+def _aplicar_validacao(resposta: str, pool_f: list, pool_m: list, keywords: set) -> str:
+    """
+    Aplica o validador pós-Gemini à resposta.
+    Constrói contexto_normativo e modelos_redacao a partir dos pools.
+    Retorna a resposta validada (bloqueada ou com alertas).
+    """
+    ctx_normativo = "\n".join(
+        _extract_window(e.get("texto") or "", keywords)
+        for e in pool_f
+    )
+    ctx_modelos = "\n".join(
+        _extract_window(e.get("texto") or "", keywords)
+        for e in pool_m
+    )
+
+    bloqueada, violacoes, alertas = validar_saida_despachadora(
+        resposta, ctx_normativo, ctx_modelos
+    )
+
+    if bloqueada:
+        return _montar_resposta_bloqueada(violacoes)
+    elif alertas:
+        return _montar_alerta(alertas, resposta)
+    return resposta
+
+
 # ── Funções de recuperação ────────────────────────────────────────────────────
 
 def extract_keywords(text: str) -> set:
@@ -1034,7 +1418,10 @@ def processar(ctx) -> str:
     ctx.log.info(f"Chamando {MODELO_GEMINI}...")
 
     resp = _chamar_gemini(client, MODELO_GEMINI, user_prompt, MASTER_SYSTEM_PROMPT, ctx.log.warning)
-    return resp.text
+
+    # Sprint 8.4-quater: Validação pós-Gemini
+    resultado = _aplicar_validacao(resp.text, pool_f, pool_m, keywords)
+    return resultado
 
 
 # ── CLI (uso standalone — mantido para testes sem painel) ────────────────────
@@ -1133,6 +1520,9 @@ def main():
         sys.exit(1)
 
     resultado = resp.text
+
+    # Sprint 8.4-quater: Validação pós-Gemini
+    resultado = _aplicar_validacao(resultado, pool_f, pool_m, keywords)
 
     separator = "═" * 62
     print(f"\n{separator}")
