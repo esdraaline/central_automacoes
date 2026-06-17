@@ -131,6 +131,70 @@
     {
       "padrao_arquivo": "Notebooklm/Supervisor Regional/POPs.pdf",
       "motivo": "Fonte original gigante já segmentada e indexada no corpus"
+    },
+    {
+      "padrao_arquivo": "Defesa Pr",
+      "motivo": "documento fático/peça defensiva de caso concreto; não é norma nem modelo seguro de fundamentação"
+    },
+    {
+      "padrao_arquivo": "Defesa Previa",
+      "motivo": "documento fático/peça defensiva de caso concreto; não é norma nem modelo seguro de fundamentação"
+    },
+    {
+      "padrao_arquivo": "Defesa Prvia",
+      "motivo": "documento fático/peça defensiva de caso concreto; não é norma nem modelo seguro de fundamentação"
+    },
+    {
+      "padrao_arquivo": "ESCALA DE OFICIAL SUPERVISOR REGIONAL",
+      "motivo": "escala transitória/mensal; não é fonte normativa estável para a Despachadora"
+    },
+    {
+      "padrao_arquivo": "ESCALA DE SUPERVISOR REGIONAL",
+      "motivo": "escala transitória/mensal; não é fonte normativa estável para a Despachadora"
+    },
+    {
+      "padrao_arquivo": "ESCALA DE OFICIAL SUPERIOR DE SOBREAVISO",
+      "motivo": "escala transitória/mensal; não é fonte normativa estável para a Despachadora"
+    },
+    {
+      "padrao_arquivo": "Escala mensal",
+      "motivo": "escala transitória/mensal; não é fonte normativa estável para a Despachadora"
+    },
+    {
+      "padrao_arquivo": "Escala Geral",
+      "motivo": "escala transitória/mensal; não é fonte normativa estável para a Despachadora"
+    },
+    {
+      "padrao_arquivo": "Escala_Geral",
+      "motivo": "escala transitória/mensal; não é fonte normativa estável para a Despachadora"
+    },
+    {
+      "padrao_arquivo": "Escala dos Tenentes",
+      "motivo": "escala transitória/mensal; não é fonte normativa estável para a Despachadora"
+    },
+    {
+      "padrao_arquivo": "Escala FINAL",
+      "motivo": "escala transitória/mensal; não é fonte normativa estável para a Despachadora"
+    },
+    {
+      "padrao_arquivo": "Escala DEFINITIVA",
+      "motivo": "escala transitória/mensal; não é fonte normativa estável para a Despachadora"
+    },
+    {
+      "padrao_arquivo": "ESCALA DE OFICIAIS",
+      "motivo": "escala transitória/mensal; não é fonte normativa estável para a Despachadora"
+    },
+    {
+      "padrao_arquivo": "Escala Elei",
+      "motivo": "escala transitória/mensal; não é fonte normativa estável para a Despachadora"
+    },
+    {
+      "padrao_arquivo": "Escala GERAL",
+      "motivo": "escala transitória/mensal; não é fonte normativa estável para a Despachadora"
+    },
+    {
+      "padrao_arquivo": "2022/Elei",
+      "motivo": "escala transitória/mensal; não é fonte normativa estável para a Despachadora"
     }
   ],
   "reclassificar": [
