@@ -1100,6 +1100,12 @@ def score_entry(entry: dict, keywords: set) -> float:
     if entry.get("section") == "Notebooklm":
         score *= 0.7
         
+    # --- DOMAIN BOOST (Sprint 8.5-d.1) ---
+    if "acidente" in keywords and "viatura" in keywords:
+        fn_lower = (entry.get("arquivo") or "").lower()
+        if any(x in fn_lower for x in ["acidente_viatura_providencias", "processo-3.01.00", "acidente de trânsito vtr", "ni_002_02_17"]):
+            score += 3.5
+        
     return score
 
 
