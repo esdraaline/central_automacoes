@@ -187,25 +187,23 @@ automacoes/despachadora/
 | 8.3 | Segunda passada de classificação: adicionar `MODELO_PRECEDENTE` e promover apenas baixas com estrutura I-7-PM inequívoca, sem tocar altas existentes. | ✅ 09/06/2026 — D-11 registrada; 36 entradas promovidas para `MODELO_PRECEDENTE`; planilha caiu de 250 para 214 linhas; 39 quase promovidas listadas; altas `MODELO_DE_REDACAO`/`PRECEDENTE` preservadas. |
 | Patch 8.3 | Cabeça+cauda: corrigir detector I-7-PM para analisar cabeça de 12k + cauda de 6k chars. | ✅ 09/06/2026 — 15 novas promoções; planilha caiu para 199 linhas. |
 | Revisão 8.3 | Revisão humana assistida das 199 entradas NAO_CLASSIFICADO restantes. | ✅ 16/06/2026 — 75 mantidas, 124 excluídas; reimportador estendido com suporte a EXCLUIR; corpus em 605 entradas. |
-| 8.4 | Curadoria de fontes oficiais: ingestão manual e curada de legislação-base e normativos PMESP de fontes brancas, com URL, data de captura e proveniência. | Em andamento. Segmentações do Vademecum, Doutrinas PM e POPs concluídas em 16/06/2026; corpus com 674 entradas; SHA-256 final `a31b54687e62fe0be12ad9a3aec00a8e1c807c2fba864f951a359108665f7384`. ← **ATUAL** |
-| 8.5 | IA buscadora assistida: localizar e sugerir fontes oficiais para confirmação humana antes de qualquer ingestão. | Nenhuma ingestão direta por IA; humano confirma no portão de verificação. |
+| 8.4 | Curadoria de fontes oficiais: Ingestão manual e curada de legislação-base e normativos PMESP de fontes brancas, com URL, data de captura e proveniência. | Segmentações do Vademecum, Doutrinas PM e POPs concluídas em 16/06/2026; corpus com 674 entradas; SHA-256 final `a31b54687e62fe0be12ad9a3aec00a8e1c807c2fba864f951a359108665f7384`. |
+| 8.4-bis | Prompt Hardening: endurecer disciplina de proveniência no MASTER_SYSTEM_PROMPT para evitar vazamentos e readequar rótulos e placeholders vencidos. | Em validação — patch aplicado no MASTER_SYSTEM_PROMPT; aguardando teste manual no painel com 3 cenários antes de homologar. |
+| 8.4-campo | Teste de campo com POPs: Validar a Despachadora em campo pós-sprint 8.4 e 8.4-bis com expedientes reais cobrindo POPs. | Em validação — simulação executada com 3 expedientes; aguardando teste manual no painel. |
+| 8.5 | IA buscadora assistida: localizar e sugerir fontes oficiais para confirmação humana antes de qualquer Ingestão. | Nenhuma Ingestão direta por IA; humano confirma no portão de verificação. |
+
 
 > **Nota de numeração (16/06/2026):** O `PROMPT_FASE8.md` original numerava "Curadoria de fontes" como Sprint 8.3 e "IA buscadora" como Sprint 8.4. O Patch cabeça+cauda e a Revisão humana foram intercalados entre os sprints, deslocando a numeração para 8.4 e 8.5 respectivamente. O conteúdo é o mesmo; só a numeração interna divergiu. Ver D-13 para o EXCLUIR introduzido na Revisão humana.
 
-### Sprint 8.4 — Curadoria de Fontes Oficiais ← ATUAL
+### Sprint 8.4 — Curadoria de Fontes Oficiais & 8.4-campo — Validação em campo
 
 **Regra:** Nenhuma ingestão por IA. Humano localiza, confere vigência e autoriza. A IA apenas indexa o que o humano trouxer.
 
 **Problema real do 8.4:** A Despachadora tem dois pools de recuperação — Fundamento (top 12 normas por densidade) e Modelo de redação (top 8 da casa). O corpus é forte em modelos da casa mas fraco em fundamento normativo: normas presentes como PDF escaneado sem texto limpo ou citadas em outros docs mas não indexadas diretamente. Resultado: Bloco 2 (Análise Jurídica) cita `[VERIFICAR]` onde deveria citar artigo de lei com confiança.
 
-**Passo 0 — Teste de campo (fazer antes de qualquer ingestão)**
-Rodar 3 expedientes reais recentes pelo painel (tipos diferentes: parte, ofício, despacho de sindicância ou IPM). Para cada um anotar:
-- Quantos `[VERIFICAR]` no Bloco 2 (Análise Jurídica)?
-- O fundamento citado foi rastreável `[FONTE: section/arquivo]` ou genérico?
-- Algum artigo de lei citado sem fonte?
-Essa anotação transforma o 8.4 de "ingestão genérica" em "ingestão cirúrgica".
+**Passo 0 — Teste de campo (CONCLUÍDO em 17/06/2026)**
+Rodamos 3 expedientes reais (Algemas, Transporte de Preso, Abordagem de Veículo) com a Despachadora. Os resultados foram documentados em `docs/RELATORIO_CAMPO_8_4.md`. A análise confirmou a ausência de `[FONTE:]` no output (por limitação do prompt) e o funcionamento da trava anti-vazamento (Categoria A). Foi identificada concorrência de busca pelo compilado de POPs de `Notebooklm/` que afetou a precisão do retrieval dos segmentos novos.
 
-Após Vademecum, Doutrinas PM e POPs, este passo volta a ser prioritário antes de abrir nova fonte grande, especialmente com expediente real sobre uso de força, transporte de presos ou algemas.
 
 **Passo 1 — Quick wins (reclassificar sem ingestão nova)**
 Entradas já no corpus com texto mas `NAO_CLASSIFICADO` — reimportar com natureza correta:
@@ -299,3 +297,7 @@ Entregáveis:
 **16/06/2026** — Sprint 8.4 · Segmentação das Doutrinas PM concluída: `Doutrinas pm_compressed (1).pdf` de 1.643 páginas segmentado em 31 arquivos temáticos em `Normas/Doutrinas_PM_Segmentos/`; corpus passou de 611 para 642 entradas; todos os segmentos ficaram `NORMA`, `classificacao_origem=humana`, `error=None`, entre 20k e 150k chars; prova de aditividade passou; índice final copiado para o Drive; SHA-256 final `0c7f59568d53d6d7708f1f720a36d718f8b51933e79d0b90fe4799896691f149`. Relatório em `docs/SEGMENTACAO_DOUTRINAS_PM.md`.
 
 **16/06/2026** — Sprint 8.4 · Segmentação dos POPs concluída: `POPs.pdf` segmentado em 32 arquivos em `Normas/POPs_Segmentos/`; corpus passou de 642 para 674 entradas; 30 segmentos ficaram `PROCEDIMENTAL + humana` e 2 com fundamento jurídico embutido (`Transporte/Guarda de Presos` e `Uso de Algemas`) ficaram `NORMA + humana`; todos com `error=None`, entre 20k e 150k chars; prova de aditividade passou; índice final copiado para o Drive; SHA-256 final `a31b54687e62fe0be12ad9a3aec00a8e1c807c2fba864f951a359108665f7384`. Relatório em `docs/SEGMENTACAO_POPS.md`. Próximo passo recomendado: teste de campo da Despachadora com expediente real envolvendo POPs antes da próxima segmentação grande.
+
+**16/06/2026** — Sprint 8.4-bis · Prompt Hardening em validação: Aplicado patch no `MASTER_SYSTEM_PROMPT` para conter vazamentos (Categoria A), placeholders de escala (Categoria B) e readequar rótulos (Categoria C); aguardando teste manual no painel.
+
+**17/06/2026** — Sprint 8.4-campo · Validação em campo em andamento: Simulação com 3 expedientes operacionais (Algemas, Transporte de Preso, Abordagem de Veículo) com o índice de 674 entradas (hash `a31b5468...`). Trava anti-vazamento funcionou, confirmada ausência de `[FONTE:]` por limitação do prompt; aguardando execução manual do teste no painel.

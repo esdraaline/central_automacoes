@@ -130,3 +130,20 @@ nenhuma alteração no código.
 Quando `pdf_imagem_sem_ocr` for detectado no input, a Despachadora roda OCR
 (pdf2image + pytesseract, lang=por, 300 DPI) no arquivo avulso e prossegue com
 o texto extraído. Não exige nova dependência — já estão instaladas para o corpus.
+
+---
+
+## 16/06/2026 — Despachadora · Prompt Hardening (Sprint 8.4-bis — Patch aplicado / hipótese de correção / aguardando validação em campo)
+
+### Contexto
+Algumas execuções reais da Despachadora apresentavam citações normativas erradas (como referenciar o subitem `6.3.2.1` sob o caso de algemas). O diagnóstico revelou que o `MASTER_SYSTEM_PROMPT` possuía 19 referências normativas e fáticas específicas escritas de forma rígida (hardcoded) no prompt do sistema (ex: subitem de flagrante, valores UFESP antigos, escalas de ronda Nov/Dez 2025). O modelo de linguagem as incorporava por associação temática mesmo quando ausentes do corpus recuperado.
+
+### Soluções aplicadas
+1. **Regra de Aplicação Inviolável (Categoria A):** Adicionada instrução explícita anti-vazamento imediatamente antes dos blocos de regras fáticas do prompt de sistema, proibindo o modelo de citar referências hardcoded caso o expediente não corresponda exatamente ao cenário da regra (completando a Regra Inviolável de "nada de fundamento inventado").
+2. **Eliminação de Dados Temporais Vencidos (Categoria B):** Substituição das menções à escala `Nov/Dez 2025` por placeholders explícitos de pendência no prompt, instruindo o operador a preenchê-la ou atualizá-la anualmente/publicação.
+3. **Readequação de Metadados e Rótulos (Categoria C):** Alteração de rótulos de `[FUNDAMENTO]` para `[PADRÃO]` em blocos estáticos (endereços da 5ª Cia, códigos de subunidades), pois representam regras de formatação tipográfica/organizacional, e não fundamentos dinâmicos oriundos do corpus. Inserção de comentários de manutenção no código Python para alertar revisões de UFESP/prazos.
+
+### Regra para manutenção futura
+* **Nunca inserir exemplos ou regras com artigos/subitens específicos diretamente no system prompt sem bloqueá-los com regras de aplicabilidade rígidas**, sob o risco do LLM aplicá-los incorretamente por associação conceitual de palavras.
+* **Dados dinâmicos e temporais (escalas, valores anuais de UFESP) pertencem ao corpus**, não ao prompt do sistema. Quando precisarem habitar o prompt, devem vir acompanhados de comentários Python claros exigindo auditoria anual.
+

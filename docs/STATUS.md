@@ -1,6 +1,6 @@
 # Status Atual
 Foto do "onde estou agora". Atualizado ao fim de cada sprint.
-**Ultima atualizacao: 16/06/2026**
+**Ultima atualizacao: 17/06/2026**
 
 ---
 
@@ -10,15 +10,17 @@ Foto do "onde estou agora". Atualizado ao fim de cada sprint.
 |---|---|
 | **Fase em execucao** | Fase 8 — Enriquecimento da Base |
 | **Ultima fase concluida** | Fase 2 - Sprint 2.2 validado em campo (16/06/2026); Fase 2 encerrada |
-| **Sprint atual** | Sprint 8.4 — Curadoria de fontes oficiais |
-| **Ultimo sprint concluido** | Sprint 8.4 — segmentação dos POPs concluída e índice sincronizado no Drive (16/06/2026) |
-| **Proximo passo (trilha principal)** | Sprint 8.4: testar a Despachadora em expediente real com tema coberto pelos POPs antes da proxima segmentacao grande |
+| **Sprint atual** | Sprint 8.4-bis — Prompt Hardening da Despachadora, aguardando teste manual no painel |
+| **Ultimo sprint concluido** | Sprint 8.4 — Segmentação dos POPs (16/06/2026) |
+| **Proximo passo (trilha principal)** | Rodar teste manual no painel com os 3 expedientes de validação |
 | **Proxima fase** | Fase 3 — Órion (consulta de indicadores criminais) |
 
 ---
 
 ## Ja feito
 
+- **Sprint 8.4-campo — Validação em campo — aguardando teste manual** — Executados 3 expedientes operacionais (Algemas, Transporte de Preso, Abordagem de Veículo) com índice de 674 entradas (hash `a31b5468...`) em simulação; aguardando validação manual no painel. Relatório preliminar em `docs/RELATORIO_CAMPO_8_4.md`.
+- **Sprint 8.4-bis — Prompt Hardening — aguardando teste manual** — Patch aplicado no `MASTER_SYSTEM_PROMPT` para conter vazamentos (Categoria A), placeholders de escala (Categoria B) e readequar rótulos (Categoria C); aguardando homologação após teste manual.
 - Scaffold, migracao do BOPM, decisoes A/B/C
 - **Fase 0 - Sprint 1 concluida** - `nucleo/` criado (segredos, log, vpn, browser), credenciais migradas para `segredos.env`, BOPM testado pela linha de comando
 - **Fase 0 - Sprint 2 concluida** - Contrato (`manifesto.py` + `executar.py`), `painel.py` com customtkinter; botao "Baixar BOPMs" roda o BOPM com log ao vivo na janela
@@ -94,26 +96,25 @@ Escopo imediato:
 
 ## Bloqueios / pendencias
 
-**Fase 8 - Sprint 8.4 - atual:**
-- Revisão humana das 199 entradas concluída em 16/06/2026; corpus limpo e reimportado.
-- Segmentação do Vademecum concluída em 16/06/2026; índice final sincronizado no Drive com SHA-256 `12c29eec5983347e6b20e973c140030bb905c1ec728a5c8fc5b23d45e83f0705`.
-- Segmentação das Doutrinas PM concluída em 16/06/2026; índice final sincronizado no Drive com SHA-256 `0c7f59568d53d6d7708f1f720a36d718f8b51933e79d0b90fe4799896691f149`.
-- Segmentação dos POPs concluída em 16/06/2026; índice final sincronizado no Drive com 674 entradas e SHA-256 `a31b54687e62fe0be12ad9a3aec00a8e1c807c2fba864f951a359108665f7384`.
-- Próximo passo: teste de campo da Despachadora com expediente real envolvendo POPs antes de abrir nova segmentação grande.
+**Fase 8 - Sprint 8.4 — concluído:**
+- Revisão humana das 199 entradas concluída em 16/06/2026.
+- Segmentações de Vademecum, Doutrinas e POPs concluídas em 16/06/2026.
+
+**Fase 8 - Sprint 8.4-bis & 8.4-campo — em validação:**
+- Prompt Hardening da Despachadora concluído, aguardando teste manual no painel.
+- Validação em campo com os 3 expedientes operacionais (Algemas, Transporte de Preso, Abordagem de Veículo) aguardando execução manual.
+
+**Fase 8 - Sprint 8.5 — planejado:**
+- IA buscadora assistida (localizar e sugerir fontes operacionais) pendente de início.
 
 **Dívida técnica — Despachadora:**
-- PDF escaneado como entrada retorna erro `pdf_imagem_sem_ocr`. Workaround: colar texto no painel.
-- Sprint 7.5 registrado no ROADMAP para OCR automático no input.
-
-**Fase 2 - encerrada em 16/06/2026.**
+- PDF escaneado como entrada retorna erro `pdf_imagem_sem_ocr`. Workaround: colar texto no painel. Sprint 7.5 registrado no ROADMAP para OCR automático no input.
+- Slogan institucional (linha 447 de `despachadora.py`): permaneceu com o rótulo `[FUNDAMENTO]`, devendo ser readequado para `[PADRÃO]` em sprints futuros de saneamento.
+- Escala vigente (Categoria B): o system prompt usa placeholders e deve ser alimentado com a escala real de 2026 quando publicada.
+- Poluição de Contexto: a pasta `Notebooklm` contém os arquivos originais unsegmentados do Drive que concorrem no retrieval com os novos POPs segmentados. É recomendável o saneamento (remoção ou exclusão do índice).
 
 **Fase 3 - Órion - pendente:**
-- Ainda não iniciada. Próxima fase após Sprint 8.4.
-
-**Fase 2 - Sprint 2.2 - atual:**
-- Aguardando BO pendente real no SIOPM para validacao em campo.
-- Validar fix double-Retornar com BO pendente real.
-- Gerar relatorio `saidas/validacao_bopm_<data>.txt`.
+- Ainda não iniciada. Próxima fase após Fase 8.
 
 ---
 
