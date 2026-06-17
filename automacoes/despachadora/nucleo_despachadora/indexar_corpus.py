@@ -448,7 +448,7 @@ def main():
             
         key = incremental_key(section, rel)
         if key in existing:
-            if section == "corpus_manual":
+            if section == "corpus_manual" or "Segmentos" in rel:
                 # Remove from existing so the new version overwrites it
                 del existing[key]
             else:
@@ -492,17 +492,19 @@ def main():
             "error"   : error,
         }
         
-        if section == "corpus_manual" and ext == ".md" and not error:
+        if ext == ".md" and not error:
             metadata, clean_text = parse_frontmatter(texto)
-            entry["texto"] = clean_text
-            entry["natureza"] = metadata.get("natureza", "JURISPRUDENCIA")
-            entry["classificacao_origem"] = "humana"
-            entry["classificacao_confianca"] = "alta"
-            entry["vigencia"] = "nao_avaliado"
-            entry["hierarquia"] = None
-            entry["especie"] = None
-            entry["fonte"] = metadata.get("fonte_origem")
-            entry["classificacao_sinais"] = f"manual_frontmatter; titulo={metadata.get('titulo')}"
+            if metadata:
+                entry["texto"] = clean_text
+                default_nature = "JURISPRUDENCIA" if section == "corpus_manual" else "DOUTRINA"
+                entry["natureza"] = metadata.get("natureza", default_nature)
+                entry["classificacao_origem"] = "humana"
+                entry["classificacao_confianca"] = "alta"
+                entry["vigencia"] = "nao_avaliado"
+                entry["hierarquia"] = None
+                entry["especie"] = None
+                entry["fonte"] = metadata.get("fonte_origem")
+                entry["classificacao_sinais"] = f"manual_frontmatter; titulo={metadata.get('titulo')}"
             
         new_entries.append(entry)
         sec_key = section or "root"

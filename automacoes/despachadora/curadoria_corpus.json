@@ -195,6 +195,10 @@
     {
       "padrao_arquivo": "2022/Elei",
       "motivo": "escala transitória/mensal; não é fonte normativa estável para a Despachadora"
+    },
+    {
+      "padrao_arquivo": "Notebooklm/Supervisor Regional/orientações direito militar.pdf",
+      "motivo": "PDF original bruto excluído após segmentação literal de suas seções em DOUTRINA"
     }
   ],
   "reclassificar": [
@@ -274,11 +278,5 @@
       "motivo": "Modelo de croqui cadavérico"
     }
   ],
-  "rebaixar": [
-    {
-      "padrao_arquivo": "Notebooklm/Supervisor Regional/orientações direito militar.pdf",
-      "natureza_nova": "OUTRO",
-      "motivo": "Compilado de orientações amplo e ainda não segmentado"
-    }
-  ]
+  "rebaixar": []
 }
