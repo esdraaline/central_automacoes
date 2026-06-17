@@ -38,3 +38,14 @@ Todos estes arquivos possuem metadados YAML de frontmatter, incluindo o caminho 
 
 ## G. Próxima etapa recomendada
 - Integrar as novas fontes autônomas ao fluxo completo de execução e realizar testes de campo (Sprint 8.6) para avaliar a taxa de acerto e mitigação de flags `[VERIFICAR]` geradas pelo validador pós-Gemini.
+
+## Auditoria de fidelidade 8.5-c.1
+
+| arquivo | fonte_origem existe? | texto oficial íntegro? | interpretação separada? | status | observação |
+| ------- | -------------------- | ---------------------- | ----------------------- | ------ | ---------- |
+| [Sumula_Vinculante_11_Algemas.md](file:///c:/projetos/central_automacoes/automacoes/despachadora/corpus_manual/Sumula_Vinculante_11_Algemas.md) | Sim (corpus físico) | Sim | Sim | VALIDADO_SEM_AJUSTES | Texto literal da SV 11 e Dec. Fed. 8.858/16 íntegro e fiel. Termos de busca estão na transcrição oficial. |
+| [Sumula_473_Autotutela.md](file:///c:/projetos/central_automacoes/automacoes/despachadora/corpus_manual/Sumula_473_Autotutela.md) | Sim (compilada local) | Sim | Sim | VALIDADO_SEM_AJUSTES | A fonte no corpus é local/compilada (`orientações direito militar.pdf`). O termo `autotutela` está corretamente isolado no uso esperado. |
+| [Competencia_IPM.md](file:///c:/projetos/central_automacoes/automacoes/despachadora/corpus_manual/Competencia_IPM.md) | Sim (corpus físico) | Sim | Sim | VALIDADO_SEM_AJUSTES | Trechos do CPPM e I-40-PM fiéis. Interpretações operacionais e limites estritamente separados. |
+| [Competencia_Prazos_Sindicancia.md](file:///c:/projetos/central_automacoes/automacoes/despachadora/corpus_manual/Competencia_Prazos_Sindicancia.md) | Sim (corpus físico) | Sim | Sim | VALIDADO_SEM_AJUSTES | Prazos e prorrogações fiéis às I-16-PM. A expressão `prazo de sindicância` está devidamente isolada na seção de uso esperado. |
+| [Acidente_Viatura_Providencias.md](file:///c:/projetos/central_automacoes/automacoes/despachadora/corpus_manual/Acidente_Viatura_Providencias.md) | Sim (corpus físico/local) | Sim | Sim | VALIDADO_SEM_AJUSTES | Fundamentos da I-16-PM, POP 3.01.00 e Resolução PGE nº 9/2024 fiéis. A expressão `dano ao erário` está devidamente isolada no uso esperado. |
+
