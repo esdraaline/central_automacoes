@@ -133,6 +133,12 @@ Em runtime, a skill só "vê" os trechos que o despachadora.py recuperar do índ
 
 - O rótulo de tier [FUNDAMENTO] deve OBRIGATORIAMENTE trazer a fonte do contexto correspondente no formato [FONTE: <section/arquivo recuperado>].
 - Se o trecho não estiver no contexto recuperado em runtime, NÃO use [FUNDAMENTO] nem cite a fonte; use [VERIFICAR: fundamento normativo específico não localizado no contexto recuperado].
+- A fonte precisa sustentar diretamente a afirmação feita. Exemplo: não se pode citar Súmula Vinculante nº 11 e usar como fonte apenas Constituição Federal, art. 1º, III, ou citar norma interna genérica sem trecho recuperado específico. Se a fonte recuperada sustentar apenas princípio geral, a frase deve ser limitada ao princípio geral. Se a fonte específica da súmula/artigo/norma não aparecer, deve usar [VERIFICAR].
+- Fontes válidas em [FONTE:] só podem ser arquivos/sections recuperados do corpus em runtime, ou trechos efetivamente inseridos em CONTEXTO NORMATIVO ou MODELOS DE REDAÇÃO. Não são fontes válidas: "Bloco 4.1", "Regra de aplicação", "MASTER_SYSTEM_PROMPT", "prompt", "matriz interna", "regra fática" ou qualquer seção interna do prompt. Se a informação vier apenas do prompt (como o Bloco 4.1) e não do corpus recuperado, use [PADRÃO] (se forma/estilo) ou [VERIFICAR] (se fundamento jurídico/competência).
+- Nunca produzir: [FUNDAMENTO] [VERIFICAR: ...] ou qualquer combinação de múltiplos tiers em sequência. Se houver dúvida ou ausência de lastro, o tier deve ser apenas: [VERIFICAR: ...] sem [FUNDAMENTO] antes.
+- Atenção: não usar [PADRÃO] para afirmação que envolva competência legal, nulidade, autoridade instauradora, poder disciplinar, polícia judiciária militar, prazo legal, artigo, súmula, decreto, lei, ou enquadramento penal ou disciplinar. Esses casos devem ser: [FUNDAMENTO] com [FONTE:] real e compatível; ou [VERIFICAR] se a fonte não foi localizada. O rótulo [PADRÃO] fica restrito a forma de redação, estrutura de documento, estilo, encaminhamento administrativo usual e dados institucionais não normativos.
+- O Texto Pronto não pode inserir fundamento jurídico novo que não tenha aparecido validamente na Análise Jurídica (Bloco 2). Se o Bloco 2 marcou [VERIFICAR] para um tema, o Texto Pronto deve usar linguagem cautelosa (ex.: "submeto à análise superior quanto ao fundamento aplicável", "sem prejuízo de confirmação normativa" ou "conforme fundamento a ser confirmado"), sendo proibido escrever afirmações como "nos termos da norma interna", "atendendo perfeitamente à Súmula...", "com amparo legal em..." ou "prazo legal de...", a menos que esse fundamento tenha sido validado no Bloco 2 com [FONTE:] real e compatível.
+- Citar "[FONTE: Vademecum.pdf / Código de Processo Penal]" é genérico demais se a frase citar artigos específicos. Para artigo, súmula, subitem, prazo ou norma numerada, a fonte precisa apontar para trecho recuperado que contenha literalmente esse número. Se a fonte genérica não comprova o fundamento específico, deve-se usar [VERIFICAR: fonte genérica não comprova o fundamento específico].
 - PROIBIDO citar nome de arquivo, número de Parte/Ofício/SIS/documento ou ano de modelo como prova de origem se não vier do contexto.
 - PROIBIDAS as expressões "confirmado pelo corpus", "confirmado pelo Cmt", "confirmado pelo Comandante" ou equivalentes. Não afirme verificação que não foi feita.
 - Conteúdo que se acredita existir mas não se pode ver: rotule [VERIFICAR: confirmar contra modelo do corpus] — nunca como confirmado.
@@ -703,7 +709,14 @@ def score_entry(entry: dict, keywords: set) -> float:
     count = sum(texto_lower.count(kw) for kw in keywords)
     if count == 0:
         return 0.0
-    return count / (len(texto) ** 0.5)
+    
+    score = count / (len(texto) ** 0.5)
+    
+    # Tarefa 5 — Controle moderado de PDFs compilados / Notebooklm
+    if entry.get("section") == "Notebooklm":
+        score *= 0.7
+        
+    return score
 
 
 def source_key(entry: dict) -> str:
@@ -712,25 +725,100 @@ def source_key(entry: dict) -> str:
     return f"{section}/{arquivo}" if section else arquivo
 
 
-def recover_chunks(corpus: list, keywords: set) -> list:
+def recover_chunks(corpus: list, keywords: set, query_text: str = "") -> list:
     """
     Retorna lista de dicts enriquecidos com 'score' e 'source_key'.
-    Dois pools:
-      - FUNDAMENTO: todas as seções, top POOL_FUNDAMENTO_N.
-      - MODELO: exceto Notebooklm, top POOL_MODELO_N.
-    União com dedup por source_key; descarta score 0.
+    Dois pools separados estritamente por natureza:
+      - FUNDAMENTO (pool_f): apenas NORMA, PROCEDIMENTAL, DOUTRINA, JURISPRUDENCIA.
+      - MODELO (pool_m): apenas MODELO_DE_REDACAO, MODELO_PRECEDENTE, PRECEDENTE (excluindo Notebooklm).
+    Passo 1: Pontuação base + Busca Literal Complementar de termos fortes da query.
+    Passo 2: Pistas normativas extraídas de modelos validados para reforçar normas do corpus (boost flat).
     """
+    # ── Passo 1: Busca literal complementar da query ──
+    literal_targets = []
+    if query_text:
+        query_lower = query_text.lower()
+        # Captura Súmulas (accent-insensitive)
+        sumulas = re.findall(r"(s[uú]mula vinculante\s*(?:n[oºªª]\.?\s*)?\d+|s[uú]mula\s*\d+)", query_lower)
+        # Captura Artigos
+        artigos = re.findall(r"(art\.\s*\d+|artigo\s*\d+|art\s*\d+)", query_lower)
+        # Captura Normas/POPs específicas
+        normas = re.findall(r"(i-\d+-pm|rdpm|pop\s*\d+[\.\d+]*)", query_lower)
+        # Termos fortes adicionais
+        key_terms = []
+        for term in ["autotutela", "nulidade", "sindicância", "algemas", "receio de fuga", "justificativa por escrito"]:
+            if term in query_lower:
+                key_terms.append(term)
+        literal_targets = sumulas + artigos + normas + key_terms
+
     scored = []
     for entry in corpus:
         s = score_entry(entry, keywords)
-        if s > 0:
-            scored.append({**entry, "_score": s, "_key": source_key(entry)})
+        
+        # Boost por correspondência literal com termos da query (cumulativo por termo distinto)
+        boost = 0.0
+        if literal_targets:
+            entry_text_lower = (entry.get("texto") or "").lower()
+            for target in set(literal_targets):  # evita double-boosting para termos duplicados
+                pattern = re.escape(target).replace(r'\ ', r'\s*')
+                if re.search(pattern, entry_text_lower):
+                    boost += 5.0  # Boost para promover termos literais fortes
+        
+        total_score = s + boost
+        if total_score > 0:
+            scored.append({**entry, "_score": total_score, "_key": source_key(entry)})
 
-    pool_f = sorted(scored, key=lambda x: x["_score"], reverse=True)[:POOL_FUNDAMENTO_N]
+    # ── Passo 2: Extração de pistas dos modelos ──
+    # Primeiro isolamos os modelos para identificar quais estão no topo do ranking
+    models_scored = [
+        e for e in scored
+        if e.get("natureza") in ("MODELO_DE_REDACAO", "MODELO_PRECEDENTE", "PRECEDENTE")
+        and e.get("section", "") != "Notebooklm"
+    ]
+    top_models = sorted(models_scored, key=lambda x: x["_score"], reverse=True)[:POOL_MODELO_N]
 
-    no_notebook = [e for e in scored if e.get("section", "") != "Notebooklm"]
-    pool_m = sorted(no_notebook, key=lambda x: x["_score"], reverse=True)[:POOL_MODELO_N]
+    model_pistas = []
+    for model in top_models:
+        model_text = (model.get("texto") or "").lower()
+        m_sumulas = re.findall(r"(s[uú]mula vinculante\s*(?:n[oºªª]\.?\s*)?\d+|s[uú]mula\s*\d+)", model_text)
+        m_artigos = re.findall(r"(art\.\s*\d+|artigo\s*\d+|art\s*\d+)", model_text)
+        m_normas = re.findall(r"(i-\d+-pm|rdpm|pop\s*\d+[\.\d+]*)", model_text)
+        model_pistas.extend(m_sumulas + m_artigos + m_normas)
+    
+    # Dedup pistas
+    model_pistas = list(set(model_pistas))
 
+    # Boost das pistas dos modelos nas normas do corpus (boost FLAT fixo para evitar runaway scores em arquivos gigantes)
+    if model_pistas:
+        for entry in scored:
+            if entry.get("natureza") in ("NORMA", "PROCEDIMENTAL", "DOUTRINA", "JURISPRUDENCIA"):
+                entry_text_lower = (entry.get("texto") or "").lower()
+                matched_any = False
+                for pista in model_pistas:
+                    pattern = re.escape(pista).replace(r'\ ', r'\s*')
+                    if re.search(pattern, entry_text_lower):
+                        matched_any = True
+                        break
+                if matched_any:
+                    entry["_score"] += 3.0  # Boost flat fixo de 3.0 se contiver alguma pista das recolhidas dos modelos
+
+    # ── Passo 3: Partição estrita dos pools ──
+    # Pool Normativo
+    norms_scored = [
+        e for e in scored
+        if e.get("natureza") in ("NORMA", "PROCEDIMENTAL", "DOUTRINA", "JURISPRUDENCIA")
+    ]
+    pool_f = sorted(norms_scored, key=lambda x: x["_score"], reverse=True)[:POOL_FUNDAMENTO_N]
+
+    # Pool de Modelos (re-avaliado com scores finais)
+    models_scored = [
+        e for e in scored
+        if e.get("natureza") in ("MODELO_DE_REDACAO", "MODELO_PRECEDENTE", "PRECEDENTE")
+        and e.get("section", "") != "Notebooklm"
+    ]
+    pool_m = sorted(models_scored, key=lambda x: x["_score"], reverse=True)[:POOL_MODELO_N]
+
+    # União dedup por chave
     seen = set()
     merged = []
     for entry in pool_f + pool_m:
@@ -928,7 +1016,7 @@ def processar(ctx) -> str:
     keywords = extract_keywords(all_input_text)
     ctx.log.info(f"Palavras-chave extraídas: {len(keywords)}")
 
-    merged, pool_f, pool_m = recover_chunks(corpus, keywords)
+    merged, pool_f, pool_m = recover_chunks(corpus, keywords, all_input_text)
     empty_recovery = len(merged) == 0
 
     if empty_recovery:
@@ -1014,7 +1102,7 @@ def main():
     keywords = extract_keywords(all_input_text)
     print(f"Palavras-chave extraídas: {len(keywords)}", flush=True)
 
-    merged, pool_f, pool_m = recover_chunks(corpus, keywords)
+    merged, pool_f, pool_m = recover_chunks(corpus, keywords, all_input_text)
     empty_recovery = len(merged) == 0
 
     if empty_recovery:

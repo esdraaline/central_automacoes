@@ -188,8 +188,9 @@ automacoes/despachadora/
 | Patch 8.3 | Cabeça+cauda: corrigir detector I-7-PM para analisar cabeça de 12k + cauda de 6k chars. | ✅ 09/06/2026 — 15 novas promoções; planilha caiu para 199 linhas. |
 | Revisão 8.3 | Revisão humana assistida das 199 entradas NAO_CLASSIFICADO restantes. | ✅ 16/06/2026 — 75 mantidas, 124 excluídas; reimportador estendido com suporte a EXCLUIR; corpus em 605 entradas. |
 | 8.4 | Curadoria de fontes oficiais: Ingestão manual e curada de legislação-base e normativos PMESP de fontes brancas, com URL, data de captura e proveniência. | Segmentações do Vademecum, Doutrinas PM e POPs concluídas em 16/06/2026; corpus com 674 entradas; SHA-256 final `a31b54687e62fe0be12ad9a3aec00a8e1c807c2fba864f951a359108665f7384`. |
-| 8.4-bis | Prompt Hardening: endurecer disciplina de proveniência no MASTER_SYSTEM_PROMPT para evitar vazamentos e readequar rótulos e placeholders vencidos. | Em validação — patch aplicado no MASTER_SYSTEM_PROMPT; aguardando teste manual no painel com 3 cenários antes de homologar. |
-| 8.4-campo | Teste de campo com POPs: Validar a Despachadora em campo pós-sprint 8.4 e 8.4-bis com expedientes reais cobrindo POPs. | Em validação — simulação executada com 3 expedientes; aguardando teste manual no painel. |
+| 8.4-bis | Prompt Hardening: endurecer disciplina de proveniência no MASTER_SYSTEM_PROMPT para evitar vazamentos e readequar rótulos e placeholders vencidos. | ✅ 17/06/2026 — Prompt hardening validado pelo teste manual e homologado. |
+| 8.4-campo | Teste de campo com POPs: Validar a Despachadora em campo pós-sprint 8.4 e 8.4-bis com expedientes reais cobrindo POPs. | ✅ 17/06/2026 — 3 expedientes rodados, validados e homologados. |
+| 8.4-ter | Recuperação Híbrida: partição estrita de pools por natureza, flat boost de pistas dos modelos, busca literal complementar na query e controle moderado de Notebooklm. | ✅ 17/06/2026 — Lógica de busca híbrida e partição de pools implementada em despachadora.py; validado localmente nos 3 casos. |
 | 8.5 | IA buscadora assistida: localizar e sugerir fontes oficiais para confirmação humana antes de qualquer Ingestão. | Nenhuma Ingestão direta por IA; humano confirma no portão de verificação. |
 
 
@@ -298,6 +299,8 @@ Entregáveis:
 
 **16/06/2026** — Sprint 8.4 · Segmentação dos POPs concluída: `POPs.pdf` segmentado em 32 arquivos em `Normas/POPs_Segmentos/`; corpus passou de 642 para 674 entradas; 30 segmentos ficaram `PROCEDIMENTAL + humana` e 2 com fundamento jurídico embutido (`Transporte/Guarda de Presos` e `Uso de Algemas`) ficaram `NORMA + humana`; todos com `error=None`, entre 20k e 150k chars; prova de aditividade passou; índice final copiado para o Drive; SHA-256 final `a31b54687e62fe0be12ad9a3aec00a8e1c807c2fba864f951a359108665f7384`. Relatório em `docs/SEGMENTACAO_POPS.md`. Próximo passo recomendado: teste de campo da Despachadora com expediente real envolvendo POPs antes da próxima segmentação grande.
 
-**16/06/2026** — Sprint 8.4-bis · Prompt Hardening em validação: Aplicado patch no `MASTER_SYSTEM_PROMPT` para conter vazamentos (Categoria A), placeholders de escala (Categoria B) e readequar rótulos (Categoria C); aguardando teste manual no painel.
+**16/06/2026** — Sprint 8.4-bis · Prompt Hardening em validação: Aplicado patch no `MASTER_SYSTEM_PROMPT` para conter vazamentos (Categoria A), placeholders de escala (Categoria B) e readequar rótulos (Categoria C).
 
-**17/06/2026** — Sprint 8.4-campo · Validação em campo em andamento: Simulação com 3 expedientes operacionais (Algemas, Transporte de Preso, Abordagem de Veículo) com o índice de 674 entradas (hash `a31b5468...`). Trava anti-vazamento funcionou, confirmada ausência de `[FONTE:]` por limitação do prompt; aguardando execução manual do teste no painel.
+**17/06/2026** — Sprint 8.4-campo · Validação em campo concluída: Testes manuais do prompt executados com sucesso no painel para os 3 cenários operacionais. Trava anti-vazamento e rotulação de proveniência validadas e homologadas.
+
+**17/06/2026** — Sprint 8.4-ter · Recuperação Híbrida concluída: Implementada a partição estrita de pools por natureza, flat boost de pistas normativas de modelos, busca literal complementar na query e controle de score para Notebooklm no recuperador da Despachadora. Validação local executada com sucesso nos 3 cenários de teste.

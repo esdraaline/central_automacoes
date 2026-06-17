@@ -147,3 +147,23 @@ Algumas execuções reais da Despachadora apresentavam citações normativas err
 * **Nunca inserir exemplos ou regras com artigos/subitens específicos diretamente no system prompt sem bloqueá-los com regras de aplicabilidade rígidas**, sob o risco do LLM aplicá-los incorretamente por associação conceitual de palavras.
 * **Dados dinâmicos e temporais (escalas, valores anuais de UFESP) pertencem ao corpus**, não ao prompt do sistema. Quando precisarem habitar o prompt, devem vir acompanhados de comentários Python claros exigindo auditoria anual.
 
+
+---
+
+## 17/06/2026 — Despachadora · Recuperação Híbrida (Sprint 8.4-ter)
+
+### Contexto
+A divisão teórica da Despachadora entre `CONTEXTO NORMATIVO` (normas/POPs) e `MODELOS DE REDAÇÃO` (precedentes) estava esvaziada em runtime porque ambos os pools eram calculados sem restrição de natureza e o primeiro pool engolia todos os matches não-Notebooklm. Além disso, arquivos compilados grandes do Notebooklm dominavam por acúmulo de termos e modelos validados concorriam diretamente com normas no pool normativo.
+
+### Soluções aplicadas e Aprendizados
+
+1. **Evitar Acúmulo Runaway de Busca em Chunks Gigantes (Flat Boost):**
+   * *Problema:* Ao extrair referências operacionais de modelos e buscar no corpus, um boost cumulativo (`boost += 3.0` por pista encontrada) fazia com que arquivos consolidados (como manuais ou constituições contendo centenas de números) acumulassem pontuações gigantescas (ex. +600.0), expulsando POPs específicos limpos da lista.
+   * *Solução:* O boost derivado de pistas de modelos deve ser **flat/único** (`entry["_score"] += 3.0` uma única vez se contiver qualquer uma das pistas, em vez de acumular por pista distinta). Isso garante que o metadado de relevância funcione sem criar distorções matemáticas.
+
+2. **Separação Rígida por Metadado `natureza`:**
+   * *Acerto:* Separar estritamente o `pool_f` (restrito a `NORMA`, `PROCEDIMENTAL`, `DOUTRINA`, `JURISPRUDENCIA`) e `pool_m` (restrito a `MODELO_DE_REDACAO`, `MODELO_PRECEDENTE`, `PRECEDENTE`) garantiu a preservação da seção "MODELOS DE REDAÇÃO" no prompt enviado ao LLM, fornecendo ao mesmo tempo a base operacional e o exemplo estrutural sem sobreposição.
+
+3. **Accent-Insensitivity em Busca Literal Complementar:**
+   * *Problema:* Buscas literais rígidas no corpus para termos digitados pelo operador (ex: `sumula`) falhavam se no corpus a palavra estivesse grafada com acentuação (`súmula`).
+   * *Solução:* Normalizar as buscas e utilizar regexes tolerantes a variações de acentuação (ex. `s[uú]mula`) para garantir match de termos de alta relevância jurídica.

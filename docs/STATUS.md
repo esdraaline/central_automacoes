@@ -8,19 +8,19 @@ Foto do "onde estou agora". Atualizado ao fim de cada sprint.
 
 | Campo | Valor |
 |---|---|
-| **Fase em execucao** | Fase 8 — Enriquecimento da Base |
-| **Ultima fase concluida** | Fase 2 - Sprint 2.2 validado em campo (16/06/2026); Fase 2 encerrada |
-| **Sprint atual** | Sprint 8.4-bis — Prompt Hardening da Despachadora, aguardando teste manual no painel |
-| **Ultimo sprint concluido** | Sprint 8.4 — Segmentação dos POPs (16/06/2026) |
-| **Proximo passo (trilha principal)** | Rodar teste manual no painel com os 3 expedientes de validação |
+| **Fase em execucao** | Fase 8 concluída; próxima fase em planejamento |
+| **Ultima fase concluida** | Fase 8 — Enriquecimento da Base (17/06/2026) |
+| **Sprint atual** | Pós-sprint 8.4-ter (Recuperação Híbrida) concluído e validado localmente; pronto para congelamento |
+| **Ultimo sprint concluido** | Sprint 8.4-ter — Recuperação Híbrida (17/06/2026) |
+| **Proximo passo (trilha principal)** | Iniciar Fase 3 — Órion (consulta de indicadores criminais) |
 | **Proxima fase** | Fase 3 — Órion (consulta de indicadores criminais) |
 
 ---
 
 ## Ja feito
 
-- **Sprint 8.4-campo — Validação em campo — aguardando teste manual** — Executados 3 expedientes operacionais (Algemas, Transporte de Preso, Abordagem de Veículo) com índice de 674 entradas (hash `a31b5468...`) em simulação; aguardando validação manual no painel. Relatório preliminar em `docs/RELATORIO_CAMPO_8_4.md`.
-- **Sprint 8.4-bis — Prompt Hardening — aguardando teste manual** — Patch aplicado no `MASTER_SYSTEM_PROMPT` para conter vazamentos (Categoria A), placeholders de escala (Categoria B) e readequar rótulos (Categoria C); aguardando homologação após teste manual.
+- **Sprint 8.4-ter — Recuperação Híbrida (CONCLUÍDO em 17/06/2026)** — Implementada a partição estrita dos pools de contexto Fundamento (`NORMA`, `PROCEDIMENTAL`, `DOUTRINA`, `JURISPRUDENCIA`) e Modelos (`MODELO_DE_REDACAO`, `MODELO_PRECEDENTE`, `PRECEDENTE`). Implementados a busca literal complementar da query, o boost flat fixo de pistas normativas extraídas de modelos e o controle de score de PDFs compilados do Notebooklm. Validação local concluída nos 3 casos operacionais com sucesso.
+- **Sprint 8.4-bis & 8.4-campo — Prompt Hardening & Validação em Campo (CONCLUÍDO em 17/06/2026)** — Patch aplicado no `MASTER_SYSTEM_PROMPT` homologado e validado manualmente com os 3 expedientes sugeridos (Algemas, Transporte de Preso, Abordagem de Veículo). Relatório final em `docs/RELATORIO_CAMPO_8_4.md`.
 - Scaffold, migracao do BOPM, decisoes A/B/C
 - **Fase 0 - Sprint 1 concluida** - `nucleo/` criado (segredos, log, vpn, browser), credenciais migradas para `segredos.env`, BOPM testado pela linha de comando
 - **Fase 0 - Sprint 2 concluida** - Contrato (`manifesto.py` + `executar.py`), `painel.py` com customtkinter; botao "Baixar BOPMs" roda o BOPM com log ao vivo na janela
@@ -80,17 +80,13 @@ Teste end-to-end:
 
 ## Proximo passo
 
-**Trilha principal:** Sprint 8.4 — Curadoria de fontes oficiais.
+**Trilha principal:** Fase 3 — Órion (consulta de indicadores criminais).
 
 Escopo imediato:
 
-- Identificar lacunas de fundamento no corpus (legislação-base, normativos PMESP não indexados).
-- Continuar ingerindo documentos de fontes brancas com URL, data de captura e proveniência rastreável.
-- Segmentação do Vademecum concluída e documentada em `docs/SEGMENTACAO_VADEMECUM.md`.
-- Segmentação das Doutrinas PM concluída e documentada em `docs/SEGMENTACAO_DOUTRINAS_PM.md`.
-- Segmentação dos POPs concluída e documentada em `docs/SEGMENTACAO_POPS.md`.
-- Antes da próxima fonte grande, rodar expediente real sobre uso de força, transporte de presos ou algemas pela Despachadora para validar recuperação em campo.
-- Nenhuma ingestão direta por IA — humano confirma no portão de verificação antes de reimportar.
+- Login no Órion via Playwright (Edge, não-headless) usando credenciais seguras centralizadas em `nucleo/segredos`.
+- Desenvolvimento da consulta automática de indicadores por município/período e extração correta de dados.
+- Escrita de relatórios em `saidas/orion_<municipio>_<data>.txt`.
 
 ---
 
@@ -100,12 +96,12 @@ Escopo imediato:
 - Revisão humana das 199 entradas concluída em 16/06/2026.
 - Segmentações de Vademecum, Doutrinas e POPs concluídas em 16/06/2026.
 
-**Fase 8 - Sprint 8.4-bis & 8.4-campo — em validação:**
-- Prompt Hardening da Despachadora concluído, aguardando teste manual no painel.
-- Validação em campo com os 3 expedientes operacionais (Algemas, Transporte de Preso, Abordagem de Veículo) aguardando execução manual.
+**Fase 8 - Concluída:**
+- Prompt Hardening (8.4-bis), Validação em campo (8.4-campo) e Recuperação Híbrida (8.4-ter) concluídos e integrados.
+- O índice de corpus do Drive foi sincronizado (SHA-256 `a31b54687e62fe0be12ad9a3aec00a8e1c807c2fba864f951a359108665f7384`).
 
-**Fase 8 - Sprint 8.5 — planejado:**
-- IA buscadora assistida (localizar e sugerir fontes operacionais) pendente de início.
+**Fase 8 - Sprint 8.5 — em aberto/planejado:**
+- IA buscadora assistida (localizar e sugerir fontes operacionais no portal da ALESP/PMESP) pendente para o futuro se necessário.
 
 **Dívida técnica — Despachadora:**
 - PDF escaneado como entrada retorna erro `pdf_imagem_sem_ocr`. Workaround: colar texto no painel. Sprint 7.5 registrado no ROADMAP para OCR automático no input.
