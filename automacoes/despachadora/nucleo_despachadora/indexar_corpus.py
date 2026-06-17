@@ -46,6 +46,12 @@ import json
 import sys
 from pathlib import Path
 
+# Forçar UTF-8 no stdout/stderr
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+if hasattr(sys.stderr, "reconfigure"):
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+
 # Garante que nucleo/ seja importável mesmo rodando standalone
 _NUCLEO_DESP = Path(__file__).resolve().parent          # nucleo_despachadora/
 _DESP_DIR    = _NUCLEO_DESP.parent                      # automacoes/despachadora/
@@ -290,6 +296,94 @@ def collect_files(root: Path) -> list:
     return result
 
 
+def aplicar_curadoria(entries: list[dict], curadoria_path: Path) -> tuple[list[dict], dict]:
+    """
+    Aplica as regras do manifesto de curadoria (exclusão, reclassificação, rebaixamento)
+    sobre os chunks de documentos.
+    Retorna a lista filtrada/modificada de chunks e um dicionário com estatísticas.
+    """
+    stats = {
+        "excluidos_chunks": 0, "excluidos_arquivos": set(),
+        "reclassificados_chunks": 0, "reclassificados_arquivos": set(),
+        "rebaixados_chunks": 0, "rebaixados_arquivos": set()
+    }
+    
+    if not curadoria_path.exists():
+        print(f"\nAviso: Manifesto de curadoria não localizado em {curadoria_path.name}. Nenhuma curadoria aplicada.")
+        return entries, stats
+
+    try:
+        rules = json.loads(curadoria_path.read_text(encoding="utf-8"))
+    except Exception as e:
+        print(f"\nErro ao ler manifesto de curadoria: {e}. Nenhuma curadoria aplicada.")
+        return entries, stats
+
+    excluir_rules = rules.get("excluir_do_indice", [])
+    reclassificar_rules = rules.get("reclassificar", [])
+    rebaixar_rules = rules.get("rebaixar", [])
+
+    def matches_rule(entry: dict, rule: dict) -> bool:
+        pattern = rule.get("padrao_arquivo", "").replace("\\", "/")
+        section = entry.get("section") or ""
+        arquivo = (entry.get("arquivo") or "").replace("\\", "/")
+        full_rel = f"{section}/{arquivo}" if section else arquivo
+        
+        # Check prefix/substring
+        if pattern in full_rel:
+            return True
+        # Check base name
+        if pattern in os.path.basename(arquivo):
+            return True
+        return False
+
+    filtered_entries = []
+    
+    for entry in entries:
+        section = entry.get("section") or ""
+        arquivo = entry.get("arquivo") or ""
+        file_key = f"{section}/{arquivo}" if section else arquivo
+        
+        # 1. Verificar exclusão
+        is_excluido = False
+        for rule in excluir_rules:
+            if matches_rule(entry, rule):
+                stats["excluidos_chunks"] += 1
+                stats["excluidos_arquivos"].add(file_key)
+                is_excluido = True
+                break
+                
+        if is_excluido:
+            continue
+
+        # 2. Verificar reclassificação
+        is_reclassificado = False
+        for rule in reclassificar_rules:
+            if matches_rule(entry, rule):
+                natureza_nova = rule.get("natureza_nova")
+                if entry.get("natureza") != natureza_nova:
+                    entry["natureza"] = natureza_nova
+                    stats["reclassificados_chunks"] += 1
+                    stats["reclassificados_arquivos"].add(file_key)
+                    is_reclassificado = True
+                break
+
+        # 3. Verificar rebaixamento
+        is_rebaixado = False
+        for rule in rebaixar_rules:
+            if matches_rule(entry, rule):
+                natureza_nova = rule.get("natureza_nova", "OUTRO")
+                if entry.get("natureza") != natureza_nova:
+                    entry["natureza"] = natureza_nova
+                    stats["rebaixados_chunks"] += 1
+                    stats["rebaixados_arquivos"].add(file_key)
+                    is_rebaixado = True
+                break
+
+        filtered_entries.append(entry)
+
+    return filtered_entries, stats
+
+
 # ── Main ──────────────────────────────────────────────────────────────────────
 
 def main():
@@ -373,6 +467,11 @@ def main():
 
     # ── Merge e salvar ────────────────────────────────────────────────────────
     all_entries = list(existing.values()) + new_entries
+
+    # Aplicar curadoria
+    curadoria_file = _DESP_DIR / "curadoria_corpus.json"
+    all_entries, cur_stats = aplicar_curadoria(all_entries, curadoria_file)
+
     _OUTPUT_FILE.write_text(
         json.dumps(all_entries, ensure_ascii=False, indent=2),
         encoding="utf-8",
@@ -383,9 +482,15 @@ def main():
 
     print("\n" + "═" * 62)
     print("RESUMO FINAL")
-    print(f"  Total no índice         : {len(all_entries)}")
-    print(f"  Novos nesta execução    : {len(new_entries)}")
-    print(f"  Pulados (já indexados)  : {skipped}")
+    print(f"  Total no índice (pós-curadoria) : {len(all_entries)}")
+    print(f"  Novos nesta execução            : {len(new_entries)}")
+    print(f"  Pulados (já indexados)          : {skipped}")
+
+    if cur_stats.get("excluidos_chunks", 0) > 0 or cur_stats.get("reclassificados_chunks", 0) > 0 or cur_stats.get("rebaixados_chunks", 0) > 0:
+        print("\n  Curadoria aplicada:")
+        print(f"    Chunks Excluídos              : {cur_stats['excluidos_chunks']} (de {len(cur_stats['excluidos_arquivos'])} arquivos)")
+        print(f"    Chunks Reclassificados        : {cur_stats['reclassificados_chunks']} (de {len(cur_stats['reclassificados_arquivos'])} arquivos)")
+        print(f"    Chunks Rebaixados             : {cur_stats['rebaixados_chunks']} (de {len(cur_stats['rebaixados_arquivos'])} arquivos)")
 
     if section_counts:
         print("\n  Novos por seção:")

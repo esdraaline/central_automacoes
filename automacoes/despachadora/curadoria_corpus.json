@@ -1,0 +1,220 @@
+{
+  "excluir_do_indice": [
+    {
+      "padrao_arquivo": "P1/Anos anteriores/2021/Ofícios apresentação 3 cia/",
+      "motivo": "Ofícios simples de apresentação sem valor normativo ou de modelo"
+    },
+    {
+      "padrao_arquivo": "P1/Conseg/Oficios Convites Conseg/",
+      "motivo": "Ofícios de convites para reuniões do Conseg de baixo valor modelo e sem valor normativo"
+    },
+    {
+      "padrao_arquivo": "P1/Holerites",
+      "motivo": "Holerite pessoal (deve ser excluído do corpus)"
+    },
+    {
+      "padrao_arquivo": "P1/Holerites Bonus DEJEM",
+      "motivo": "Holerite pessoal (deve ser excluído do corpus)"
+    },
+    {
+      "padrao_arquivo": "P4/endereços de ip",
+      "motivo": "Controle técnico de IPs/rede (sem relevância jurídica)"
+    },
+    {
+      "padrao_arquivo": "holerite",
+      "motivo": "Arquivos pessoais contendo holerites ou demonstrativos"
+    },
+    {
+      "padrao_arquivo": "demonstrativo de pagamento",
+      "motivo": "Arquivos pessoais contendo holerites ou demonstrativos"
+    },
+    {
+      "padrao_arquivo": "contracheque",
+      "motivo": "Arquivos pessoais contendo holerites ou demonstrativos"
+    },
+    {
+      "padrao_arquivo": ".jpg",
+      "motivo": "Arquivo de imagem - sem valor normativo ou textual"
+    },
+    {
+      "padrao_arquivo": ".jpeg",
+      "motivo": "Arquivo de imagem - sem valor normativo ou textual"
+    },
+    {
+      "padrao_arquivo": ".png",
+      "motivo": "Arquivo de imagem - sem valor normativo ou textual"
+    },
+    {
+      "padrao_arquivo": ".gif",
+      "motivo": "Arquivo de imagem - sem valor normativo ou textual"
+    },
+    {
+      "padrao_arquivo": ".pfx",
+      "motivo": "Certificado digital - arquivo de controle/segurança"
+    },
+    {
+      "padrao_arquivo": ".cer",
+      "motivo": "Certificado digital - arquivo de controle/segurança"
+    },
+    {
+      "padrao_arquivo": ".rar",
+      "motivo": "Compactado rar - não suportado"
+    },
+    {
+      "padrao_arquivo": "Supervisor Regional.zip",
+      "motivo": "Cópia compactada cujos arquivos já estão descompactados na mesma pasta"
+    },
+    {
+      "padrao_arquivo": "BOPC Flagrante Roubo Araçatuba Bilac.pdf",
+      "motivo": "Documento fático de caso específico"
+    },
+    {
+      "padrao_arquivo": "Oitiva como testemunha",
+      "motivo": "Documento fático de depoimento de caso específico"
+    },
+    {
+      "padrao_arquivo": "croqui",
+      "motivo": "Esquema gráfico de local de crime - fático"
+    },
+    {
+      "padrao_arquivo": "Croqui",
+      "motivo": "Esquema gráfico de local de crime - fático"
+    },
+    {
+      "padrao_arquivo": "bo202307031314758",
+      "motivo": "Boletim de ocorrência de caso fático específico"
+    },
+    {
+      "padrao_arquivo": "bo2024-12-27",
+      "motivo": "Boletim de ocorrência de caso fático específico"
+    },
+    {
+      "padrao_arquivo": "Despacho arquivamento de Manifestação Preliminar.docx",
+      "motivo": "Documento de caso fático específico de arquivamento"
+    },
+    {
+      "padrao_arquivo": "Parte Dano vtr",
+      "motivo": "Relato de dano a viatura específico de caso"
+    },
+    {
+      "padrao_arquivo": "Despacho Dano VTR",
+      "motivo": "Despacho de dano a viatura específico de caso"
+    },
+    {
+      "padrao_arquivo": "Inquirição Cb PM",
+      "motivo": "Oitiva fática de caso específico"
+    },
+    {
+      "padrao_arquivo": "Inquirição Sd PM",
+      "motivo": "Oitiva fática de caso específico"
+    },
+    {
+      "padrao_arquivo": "Termo de Declaração Cb PM",
+      "motivo": "Oitiva fática de caso específico"
+    },
+    {
+      "padrao_arquivo": "Oficio Convite",
+      "motivo": "Ofício simples de comunicação"
+    },
+    {
+      "padrao_arquivo": "Ofício Convite",
+      "motivo": "Ofício simples de comunicação"
+    },
+    {
+      "padrao_arquivo": "Notebooklm/Supervisor Regional/Vademecum.pdf",
+      "motivo": "Fonte original gigante já segmentada e indexada no corpus"
+    },
+    {
+      "padrao_arquivo": "Notebooklm/Supervisor Regional/Doutrinas pm_compressed (1).pdf",
+      "motivo": "Fonte original gigante já segmentada e indexada no corpus"
+    },
+    {
+      "padrao_arquivo": "Notebooklm/Supervisor Regional/POPs.pdf",
+      "motivo": "Fonte original gigante já segmentada e indexada no corpus"
+    }
+  ],
+  "reclassificar": [
+    {
+      "padrao_arquivo": "Relatório Sindicancia PT .40 -  19FEV18.docx",
+      "natureza_nova": "MODELO_PRECEDENTE",
+      "motivo": "Modelo estruturado de sindicância"
+    },
+    {
+      "padrao_arquivo": "Relatório IPM 028-12-20.docx",
+      "natureza_nova": "MODELO_PRECEDENTE",
+      "motivo": "Modelo estruturado de relatório de IPM"
+    },
+    {
+      "padrao_arquivo": "PORTARIA IPM 12BAEP-1-12-22.doc",
+      "natureza_nova": "MODELO_PRECEDENTE",
+      "motivo": "Modelo estruturado de portaria de IPM"
+    },
+    {
+      "padrao_arquivo": "Port IPM 12BAEP-1-12-22 e anexos.pdf",
+      "natureza_nova": "MODELO_PRECEDENTE",
+      "motivo": "Modelo estruturado de IPM real"
+    },
+    {
+      "padrao_arquivo": "RELATORIO CD N 2BPMI-001-12-22",
+      "natureza_nova": "PRECEDENTE",
+      "motivo": "Relatório de CD real para precedente estrutural"
+    },
+    {
+      "padrao_arquivo": "RELATORIO CD N 2BPMI-001-12-23",
+      "natureza_nova": "PRECEDENTE",
+      "motivo": "Relatório de CD real para precedente estrutural"
+    },
+    {
+      "padrao_arquivo": "Relatório IP 2BPMI 050-12.5-24.doc",
+      "natureza_nova": "PRECEDENTE",
+      "motivo": "Relatório de IP real para precedente"
+    },
+    {
+      "padrao_arquivo": "RELATÓRIO IPM 009-12-24.docx",
+      "natureza_nova": "MODELO_PRECEDENTE",
+      "motivo": "Modelo de IPM real anterior"
+    },
+    {
+      "padrao_arquivo": "RELATÓRIO SINDICANCIA 009-12-14 161700JUL24.docx",
+      "natureza_nova": "MODELO_PRECEDENTE",
+      "motivo": "Modelo estrutural de sindicância anterior"
+    },
+    {
+      "padrao_arquivo": "Riog Mdip 2bpmi 003-12-24 25ago24.docx.doc",
+      "natureza_nova": "MODELO_PRECEDENTE",
+      "motivo": "Modelo de RIOG anterior"
+    },
+    {
+      "padrao_arquivo": "Relatório Ronda do Oficial  Supervisor Regional 23ago25 -  Modelo.pdf",
+      "natureza_nova": "MODELO_PRECEDENTE",
+      "motivo": "Modelo estrutural de relatório de ronda"
+    },
+    {
+      "padrao_arquivo": "Modelo de Auto de Prisão em Flagrante Delito.doc",
+      "natureza_nova": "MODELO_PRECEDENTE",
+      "motivo": "Modelo de APFD"
+    },
+    {
+      "padrao_arquivo": "Modelos Relativos ao Crime de Deserção.doc",
+      "natureza_nova": "MODELO_PRECEDENTE",
+      "motivo": "Modelos de deserção militar"
+    },
+    {
+      "padrao_arquivo": "MODELO DE RIOG PARA PPJM.doc",
+      "natureza_nova": "MODELO_PRECEDENTE",
+      "motivo": "Modelo de RIOG"
+    },
+    {
+      "padrao_arquivo": "Modelo - CROQUI CADAVÉRICO",
+      "natureza_nova": "MODELO_DE_REDACAO",
+      "motivo": "Modelo de croqui cadavérico"
+    }
+  ],
+  "rebaixar": [
+    {
+      "padrao_arquivo": "Notebooklm/Supervisor Regional/orientações direito militar.pdf",
+      "natureza_nova": "OUTRO",
+      "motivo": "Compilado de orientações amplo e ainda não segmentado"
+    }
+  ]
+}
