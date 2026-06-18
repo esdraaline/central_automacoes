@@ -251,6 +251,37 @@ Em runtime, a skill só "vê" os trechos que o despachadora.py recuperar do índ
 
 Quando uma fonte autônoma do corpus_manual (ex.: Sumula_Vinculante_11_Algemas.md, Sumula_473_Autotutela.md, Competencia_IPM.md, etc.) estiver presente no CONTEXTO NORMATIVO e for diretamente pertinente ao ponto jurídico analisado, cite-a expressamente no Bloco 2 (Análise Jurídica) como [FUNDAMENTO] [FONTE: corpus_manual/NomeDoArquivo.md] ANTES de rebaixar o tema para [VERIFICAR]. Fontes autônomas são transcrições literais de norma ou jurisprudência oficial e constituem lastro documental válido. Não ignore uma fonte autônoma presente no contexto.
 
+EXEMPLO OBRIGATÓRIO — FONTES AUTÔNOMAS DO CORPUS_MANUAL
+
+Quando o CONTEXTO NORMATIVO trouxer uma fonte do tipo corpus_manual e ela for pertinente ao ponto analisado, use obrigatoriamente o formato:
+
+[FUNDAMENTO] A Súmula Vinculante nº 11 admite o uso de algemas apenas nas hipóteses nela previstas, exigindo justificativa por escrito. [FONTE: corpus_manual/Sumula_Vinculante_11_Algemas.md]
+
+[FUNDAMENTO] A Súmula 473 admite que a Administração anule seus próprios atos quando eivados de vícios que os tornam ilegais, ressalvada a apreciação judicial. [FONTE: corpus_manual/Sumula_473_Autotutela.md]
+
+Nunca escreva apenas:
+[FUNDAMENTO] De acordo com a jurisprudência consolidada...
+
+Nunca escreva:
+[PADRÃO] De acordo com o princípio da autotutela...
+
+Nunca combine:
+[VERIFICAR] ... configura ...
+[VERIFICAR] ... legitima ...
+[VERIFICAR] ... torna nulo ...
+
+Se a fonte estiver no CONTEXTO NORMATIVO, cite a fonte.
+Se a fonte não estiver no CONTEXTO NORMATIVO, use [VERIFICAR] sem conclusão forte.
+
+── TRATAMENTO DE NULIDADE E VÍCIO ──────────────────────────
+
+Termos como nulidade, nulidade absoluta, vício insanável, incompetência da autoridade, autotutela e anulação de ato administrativo só podem aparecer como conclusão se houver [FUNDAMENTO] + [FONTE:] no mesmo parágrafo ou se forem marcados como [VERIFICAR] sem conclusão forte.
+
+Se a fonte disponível for apenas Súmula 473, não transforme automaticamente o caso em "nulidade absoluta" ou "vício insanável". Use formulação cautelosa:
+- há indicativo de possível vício de competência;
+- recomenda-se remessa para apreciação pela autoridade competente;
+- eventual invalidação deve ser avaliada pela autoridade competente.
+
 ── DADOS IDENTIFICADORES — NUNCA INVENTAR ──────────────────
 
 Nunca invente RE (Registro Estatístico), matrícula, placa de viatura, número de portaria, número de BOPM, data, nome de pessoa ou qualquer dado identificador que não conste expressamente no expediente recebido. Se o dado não foi informado, use placeholder: [RE não informado], [placa não informada], [data não informada], [nome não informado]. Inventar dados identificadores é falha grave.
@@ -1465,11 +1496,45 @@ def build_user_prompt(
         parts.append(text if text.strip() else "[Texto não extraído]")
 
     if pool_f:
-        parts.append("\n\nCONTEXTO NORMATIVO (corpus 5ª Cia):")
+        autonomas = []
+        demais = []
         for entry in pool_f:
-            fonte = entry["_key"]
-            texto = _extract_window(entry.get("texto") or "", keywords)
-            parts.append(f"\n[FONTE: {fonte}]\n{texto}")
+            if entry["_key"].startswith("corpus_manual/"):
+                autonomas.append(entry)
+            else:
+                demais.append(entry)
+        
+        ordem_prioridade = {
+            "corpus_manual/Sumula_473_Autotutela.md": 1,
+            "corpus_manual/Competencia_IPM.md": 2,
+            "corpus_manual/Competencia_Prazos_Sindicancia.md": 3,
+        }
+        autonomas.sort(key=lambda x: (ordem_prioridade.get(x["_key"], 99), x["_key"]))
+        autonomas = autonomas[:5]
+        
+        if autonomas:
+            parts.append("\n\nFONTES AUTÔNOMAS PRIORITÁRIAS:")
+            for entry in autonomas:
+                fonte = entry["_key"]
+                natureza = entry.get("natureza", "NORMA")
+                filename = fonte.split("/")[-1]
+                gatilhos = _MAPA_FONTES_AUTONOMAS.get(filename, [])
+                uso = f"quando tratar de {', '.join(gatilhos)}" if gatilhos else "quando pertinente ao caso"
+                texto = _extract_window(entry.get("texto") or "", keywords)
+                parts.append(
+                    f"\n[FONTE AUTÔNOMA PRIORITÁRIA]\n"
+                    f"Arquivo: {fonte}\n"
+                    f"Natureza: {natureza}\n"
+                    f"Uso: {uso}\n"
+                    f"Trecho:\n{texto}"
+                )
+                
+        if demais:
+            parts.append("\n\nDEMAIS FONTES NORMATIVAS / PROCEDIMENTAIS:")
+            for entry in demais:
+                fonte = entry["_key"]
+                texto = _extract_window(entry.get("texto") or "", keywords)
+                parts.append(f"\n[FONTE: {fonte}]\n{texto}")
 
     f_keys = {e["_key"] for e in pool_f}
     modelos = [e for e in pool_m if e["_key"] not in f_keys]
