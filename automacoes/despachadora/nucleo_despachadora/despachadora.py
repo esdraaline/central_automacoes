@@ -902,6 +902,18 @@ def _paragrafo_tem_expressao_cautelosa(paragrafo: str) -> bool:
     return False
 
 
+def _tem_conclusao_forte(texto: str) -> tuple[bool, str]:
+    """
+    Verifica se o texto contém expressão de conclusão forte (substring match).
+    Retorna (True, termo_encontrado) ou (False, "").
+    """
+    t_lower = texto.lower()
+    for expr in TERMOS_CONCLUSAO_FORTE:
+        if expr.lower() in t_lower:
+            return True, expr
+    return False, ""
+
+
 def _paragrafo_tem_fundamento_com_fonte(paragrafo: str) -> bool:
     """Verifica se o parágrafo contém [FUNDAMENTO] com [FONTE:] (não FONTE-MODELO)."""
     if "[FUNDAMENTO]" not in paragrafo:
@@ -1135,15 +1147,14 @@ def validar_saida_despachadora(
     # ── Regra F: [VERIFICAR] seguido de conclusão forte ──
     for para in paragrafos:
         if "[VERIFICAR" in para:
-            para_lower = para.lower()
-            for expr_forte in TERMOS_CONCLUSAO_FORTE:
-                if expr_forte.lower() in para_lower:
-                    trecho = para[:150].replace("\n", " ")
-                    violacoes.append(
-                        f"[Regra F] [VERIFICAR] seguido de conclusão forte "
-                        f'"{expr_forte}": "{trecho}..."'
-                    )
-                    break  # Um bloqueio por parágrafo basta
+            tem_forte, expr_forte = _tem_conclusao_forte(para)
+            if tem_forte:
+                trecho = para[:150].replace("\n", " ")
+                violacoes.append(
+                    f"[Regra F] [VERIFICAR] seguido de conclusão forte "
+                    f'"{expr_forte}": "{trecho}..."'
+                )
+                break  # Um bloqueio por parágrafo basta
 
     # ── Regra G: Fundamento novo no Texto Pronto ou Assessoria ──
     blocos = _extrair_blocos_numerados(resposta)
@@ -1210,11 +1221,7 @@ def normalizar_resposta_antes_validador(texto: str) -> tuple[str, list[str]]:
         "competência originária"
     ]
     
-    termos_n4 = [
-        "configura", "legitima", "torna nulo", "é nulo", "é incompetente",
-        "não detém competência", "deve ser declarado nulo"
-    ]
-    
+
     termos_sv11 = [
         "fundado receio de fuga", "resistência", "perigo à integridade física",
         "justificativa por escrito", "uso de algemas"
@@ -1361,17 +1368,11 @@ def normalizar_resposta_antes_validador(texto: str) -> tuple[str, list[str]]:
         orig_para = para
         para_lower = para.lower()
         
-        # Regra N4 — [VERIFICAR] com conclusão forte no mesmo parágrafo lógico
-        if "[VERIFICAR" in para and any(t in para_lower for t in termos_n4):
-            for t in termos_n4:
-                para = re.sub(
-                    r'(?i)\b' + re.escape(t) + r'\b',
-                    '[VERIFICAR: conclusão forte isolada neutralizada]',
-                    para
-                )
-            if para != orig_para:
-                ajustes.append("Regra N4: [VERIFICAR] seguido de conclusão forte neutralizado.")
-                orig_para = para
+        if "[VERIFICAR" in para and "[VERIFICAR: termo jurídico sensível sem fonte. Requer análise da autoridade competente]" not in para:
+            tem_forte, expr_forte = _tem_conclusao_forte(para)
+            if tem_forte:
+                para = "[VERIFICAR: fundamento não localizado para emitir declaração jurídica de mérito. Requer análise técnica por autoridade competente.]"
+                ajustes.append(f"Regra N4: Parágrafo lógico inteiro neutralizado por conter [VERIFICAR] e conclusão forte '{expr_forte}'.")
         
         # Tarefa 7 — Limitar Texto Pronto em IPM/competência
         # Identificar se é bloco 4 (tem indicativos de ofício/parte no parágrafo ou no contexto geral)
