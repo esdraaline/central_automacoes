@@ -1150,11 +1150,147 @@ def validar_saida_despachadora(
     return bloqueada, violacoes, alertas
 
 
+def normalizar_resposta_antes_validador(texto: str) -> tuple[str, list[str]]:
+    """
+    Aplica saneamento determinístico em padrões previsíveis de má formatação
+    do Gemini antes da validação final.
+
+    Não cria fundamento novo.
+    Não inventa fonte.
+    Não remove bloqueios críticos.
+    Retorna texto normalizado e lista de ajustes aplicados.
+    """
+    import re
+    ajustes = []
+    
+    termos_n1 = [
+        "autotutela", "vício insanável", "nulidade absoluta", "nulidade",
+        "prazo decadencial", "não detém competência", "incompetência da autoridade",
+        "crime militar", "configura crime", "competência para instaurar",
+        "competência originária"
+    ]
+    
+    termos_n4 = [
+        "configura", "legitima", "torna nulo", "é nulo", "é incompetente",
+        "não detém competência", "deve ser declarado nulo"
+    ]
+    
+    linhas = texto.split('\n')
+    novo_texto = []
+    
+    for p in linhas:
+        orig_p = p
+        has_fonte = "[FONTE:" in p
+        has_fonte_autotutela = "Sumula_473_Autotutela.md" in p
+        
+        p_lower = p.lower()
+        
+        # Regra N1 — [PADRÃO] com termo jurídico sensível
+        if "[PADRÃO]" in p and not has_fonte:
+            if any(t in p_lower for t in termos_n1):
+                p = re.sub(
+                    r'\[PADRÃO\]',
+                    '[VERIFICAR: termo jurídico sensível sem fonte. Requer análise da autoridade competente]',
+                    p
+                )
+                if p != orig_p:
+                    ajustes.append("Regra N1: [PADRÃO] com termo jurídico sensível convertido para [VERIFICAR].")
+        
+        orig_p2 = p
+        p_lower = p.lower()
+        
+        # Regra N2 — autotutela sem fonte
+        if "autotutela" in p_lower and not has_fonte_autotutela and not has_fonte:
+            p = re.sub(
+                r'(?i)\bautotutela\b',
+                '[VERIFICAR: confirmar fundamento de autotutela na fonte aplicável antes de assinar]',
+                p
+            )
+            if p != orig_p2:
+                ajustes.append("Regra N2: Termo 'autotutela' sem fonte rebaixado para [VERIFICAR].")
+                orig_p2 = p
+                
+        p_lower = p.lower()
+        
+        # Regra N3 — nulidade absoluta / vício insanável
+        if ("nulidade absoluta" in p_lower or "vício insanável" in p_lower) and not has_fonte:
+            p = re.sub(
+                r'(?i)(nulidade absoluta|vício insanável)',
+                '[VERIFICAR: não declarar nulidade absoluta ou vício insanável sem fonte específica e decisão da autoridade competente]',
+                p
+            )
+            if p != orig_p2:
+                ajustes.append("Regra N3: Nulidade/vício mitigados.")
+                orig_p2 = p
+                
+        p_lower = p.lower()
+        
+        # Regra N4 — [VERIFICAR] com conclusão forte
+        if "[VERIFICAR" in p and any(t in p_lower for t in termos_n4):
+            for t in termos_n4:
+                # Remove conclusão forte que aparece junto com VERIFICAR
+                p = re.sub(
+                    r'(?i)\b' + re.escape(t) + r'\b',
+                    '[VERIFICAR: conclusão forte isolada neutralizada]',
+                    p
+                )
+            if p != orig_p2:
+                ajustes.append("Regra N4: [VERIFICAR] seguido de conclusão forte neutralizado.")
+                orig_p2 = p
+                
+        p_lower = p.lower()
+        
+        # Regra N5 — Fundamento novo no Texto Pronto
+        if "incompetência da autoridade instauradora" in p_lower and "remessa" not in p_lower and not has_fonte:
+            p = re.sub(
+                r'(?i)incompetência da autoridade instauradora',
+                'necessidade de análise da competência pela autoridade superior',
+                p
+            )
+            if p != orig_p2:
+                ajustes.append("Regra N5: Termo sensível no texto pronto suavizado.")
+                orig_p2 = p
+                
+        if "não detém competência" in p_lower and not has_fonte:
+            p = re.sub(
+                r'(?i)não detém competência',
+                'submete-se a análise de competência',
+                p
+            )
+            if p != orig_p2:
+                ajustes.append("Regra N5: Termo sobre competência suavizado.")
+                orig_p2 = p
+                
+        if "competência originária" in p_lower and not has_fonte:
+            p = re.sub(
+                r'(?i)competência originária',
+                'competência instauradora',
+                p
+            )
+            if p != orig_p2:
+                ajustes.append("Regra N5: Termo sobre competência suavizado.")
+                orig_p2 = p
+                
+        if "prazo decadencial" in p_lower and not has_fonte:
+            p = re.sub(
+                r'(?i)prazo decadencial',
+                'prazo',
+                p
+            )
+            if p != orig_p2:
+                ajustes.append("Regra N5: Termo 'prazo decadencial' sem fonte removido.")
+                orig_p2 = p
+
+        novo_texto.append(p)
+        
+    # Remove duplicatas mantendo ordem
+    ajustes_unicos = list(dict.fromkeys(ajustes))
+    return '\n'.join(novo_texto), ajustes_unicos
+
+
 def _aplicar_validacao(resposta: str, pool_f: list, pool_m: list, keywords: set) -> str:
     """
-    Aplica o validador pós-Gemini à resposta.
-    Constrói contexto_normativo e modelos_redacao a partir dos pools.
-    Retorna a resposta validada (bloqueada ou com alertas).
+    Aplica o normalizador e depois o validador pós-Gemini à resposta.
     """
     ctx_normativo = "\n".join(
         _extract_window(e.get("texto") or "", keywords)
@@ -1165,15 +1301,27 @@ def _aplicar_validacao(resposta: str, pool_f: list, pool_m: list, keywords: set)
         for e in pool_m
     )
 
+    resposta_normalizada, ajustes = normalizar_resposta_antes_validador(resposta)
+
     bloqueada, violacoes, alertas = validar_saida_despachadora(
-        resposta, ctx_normativo, ctx_modelos
+        resposta_normalizada, ctx_normativo, ctx_modelos
     )
 
     if bloqueada:
         return _montar_resposta_bloqueada(violacoes)
     elif alertas:
-        return _montar_alerta(alertas, resposta)
-    return resposta
+        res = _montar_alerta(alertas, resposta_normalizada)
+        if ajustes:
+            res += "\n\n[AJUSTES DE SEGURANÇA APLICADOS PELO NORMALIZADOR]\n"
+            res += "\n".join(f"- {a}" for a in ajustes)
+        return res
+        
+    if ajustes:
+        # Se não há alertas mas houve ajustes, exibimos os ajustes como alertas informativos
+        resposta_normalizada += "\n\n[AJUSTES DE SEGURANÇA APLICADOS PELO NORMALIZADOR]\n"
+        resposta_normalizada += "\n".join(f"- {a}" for a in ajustes)
+
+    return resposta_normalizada
 
 
 # ── Funções de recuperação ────────────────────────────────────────────────────
