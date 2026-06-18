@@ -1147,6 +1147,131 @@ def _aplicar_validacao(resposta: str, pool_f: list, pool_m: list, keywords: set)
 
 # ── Funções de recuperação ────────────────────────────────────────────────────
 
+# ── Priorização de fontes autônomas (Sprint 8.6-d) ───────────────────────────
+#
+# Mapa: arquivo_autônomo → lista de termos-gatilho temáticos.
+# Uma fonte só recebe boost quando UM OU MAIS gatilhos estiverem no
+# texto do expediente (query_text.lower()). Nunca boost genérico.
+#
+_MAPA_FONTES_AUTONOMAS = {
+    # Algemas / Súmula Vinculante 11
+    # Gatilhos específicos: apenas algemas ou resistência/fuga no contexto de preso.
+    "Sumula_Vinculante_11_Algemas.md": [
+        "algema", "algemas", "uso de algemas",
+        "receio de fuga", "justificativa por escrito",
+        "compartimento de presos",
+    ],
+    # Autotutela / Súmula 473
+    # Gatilhos específicos: invalidação, nulidade ou autotutela explicitamente;
+    # 'portaria' sozinho é genérico demais e também aparece em acidentes.
+    "Sumula_473_Autotutela.md": [
+        "autotutela", "anular", "revogar", "invalidação", "invalidar",
+        "nulidade", "vício", "incompetência", "anulação",
+    ],
+    # Competência IPM
+    # Gatilhos específicos: mencionar IPM/inquérito ou autoridade instauradora
+    # explicitamente. 'encarregado' removido: aparece em expedientes de acidente.
+    # 'competência' sozinho é genérico; 'portaria' sozinho idem.
+    "Competencia_IPM.md": [
+        "ipm", "inquérito policial militar",
+        "autoridade instauradora", "instauradora",
+        "incompetência da autoridade",
+        "instauração de ipm",
+    ],
+    # Competência e prazos de Sindicância
+    "Competencia_Prazos_Sindicancia.md": [
+        "sindicância", "prazo de sindicância", "instauração de sindicância",
+        "prorrogação", "competência para instaurar", "instaurar sindicância",
+    ],
+    # Acidente com viatura (já coberto pelo domain boost 8.5-d.1, mas listado
+    # para garantir inclusão se o boost não bastar)
+    "Acidente_Viatura_Providencias.md": [
+        "acidente", "colisão", "vítima civil",
+        "dano ao erário", "ressarcimento",
+    ],
+}
+
+# Boost adicional aplicado a fontes autônomas diretamente pertinentes.
+# Valor calibrado para compensar o gap observado (~4 pontos) sem
+# ultrapassar artificialmente as fontes normativas principais.
+_BOOST_AUTONOMA_PERTINENTE = 5.0
+
+# Número máximo de fontes autônomas incluídas por inclusão garantida
+_MAX_INCLUSAO_GARANTIDA = 3
+
+
+def _boost_fontes_autonomas(scored: list, query_text: str) -> None:
+    """Aplica boost adicional a fontes autônomas do corpus_manual quando
+    há pertinência temática direta com o expediente (query_text).
+    Modifica a lista 'scored' in-place (apenas o campo '_score').
+    Sprint 8.6-d.
+    """
+    if not query_text:
+        return
+    q_lower = query_text.lower()
+    for entry in scored:
+        if entry.get("section") != "corpus_manual":
+            continue
+        arq = entry.get("arquivo", "")
+        gatilhos = _MAPA_FONTES_AUTONOMAS.get(arq, [])
+        if not gatilhos:
+            continue
+        # Verificar se pelo menos um gatilho está no texto do expediente
+        pertinente = any(g in q_lower for g in gatilhos)
+        if pertinente:
+            entry["_score"] += _BOOST_AUTONOMA_PERTINENTE
+
+
+def _incluir_autonomas_garantidas(
+    pool_f: list,
+    scored_normas: list,
+    query_text: str,
+    max_incluir: int = _MAX_INCLUSAO_GARANTIDA,
+) -> list:
+    """Garante que fontes autônomas pertinentes estejam no pool_f.
+    Se uma fonte autônoma pertinente não está no pool_f, insere-a
+    removendo o último item de menor score não-autônomo.
+    Opera sobre uma cópia do pool_f; retorna a lista final.
+    Sprint 8.6-d.
+    """
+    if not query_text:
+        return pool_f
+    q_lower = query_text.lower()
+
+    pool_keys = {e["_key"] for e in pool_f}
+    incluidas = 0
+    resultado = list(pool_f)
+
+    # Candidatas pertinentes fora do pool, ordenadas por score desc
+    candidatas = [
+        e for e in scored_normas
+        if e["_key"] not in pool_keys
+        and e.get("section") == "corpus_manual"
+        and any(g in q_lower for g in _MAPA_FONTES_AUTONOMAS.get(e.get("arquivo", ""), []))
+    ]
+    candidatas.sort(key=lambda x: x["_score"], reverse=True)
+
+    for cand in candidatas:
+        if incluidas >= max_incluir:
+            break
+        # Encontrar o item de menor score não-autônomo no pool atual
+        nao_autonomos = [
+            (i, e) for i, e in enumerate(resultado)
+            if e.get("section") != "corpus_manual"
+        ]
+        if not nao_autonomos:
+            break  # Pool cheio de autônomas — não remover
+        # Remover o menor entre os não-autônomos
+        idx_menor = min(nao_autonomos, key=lambda x: x[1]["_score"])[0]
+        resultado.pop(idx_menor)
+        # Inserir candidata e re-ordenar
+        resultado.append(cand)
+        resultado.sort(key=lambda x: x["_score"], reverse=True)
+        pool_keys.add(cand["_key"])
+        incluidas += 1
+
+    return resultado
+
 def extract_keywords(text: str) -> set:
     """Tokens minúsculos, sem pontuação, len > 3, sem stopwords PT."""
     tokens = re.sub(r"[^\w\s]", " ", text.lower()).split()
@@ -1181,7 +1306,7 @@ def score_entry(entry: dict, keywords: set) -> float:
         fn_lower = (entry.get("arquivo") or "").lower()
         if any(x in fn_lower for x in ["acidente_viatura_providencias", "processo-3.01.00", "acidente de trânsito vtr", "ni_002_02_17"]):
             score += 3.5
-        
+
     return score
 
 
@@ -1268,13 +1393,23 @@ def recover_chunks(corpus: list, keywords: set, query_text: str = "") -> list:
                 if matched_any:
                     entry["_score"] += 3.0  # Boost flat fixo de 3.0 se contiver alguma pista das recolhidas dos modelos
 
-    # ── Passo 3: Partição estrita dos pools ──
+    # ── Passo 3: Boost de fontes autônomas pertinentes (Sprint 8.6-d) ──
+    # Aplica boost adicional antes de partir os pools, garantindo que
+    # fontes corpus_manual diretamente pertinentes subam no ranking.
+    _boost_fontes_autonomas(scored, query_text)
+
+    # ── Passo 4: Partição estrita dos pools ──
     # Pool Normativo
     norms_scored = [
         e for e in scored
         if e.get("natureza") in ("NORMA", "PROCEDIMENTAL", "DOUTRINA", "JURISPRUDENCIA")
     ]
     pool_f = sorted(norms_scored, key=lambda x: x["_score"], reverse=True)[:POOL_FUNDAMENTO_N]
+
+    # ── Passo 4.5: Inclusão garantida de fontes autônomas pertinentes ──
+    # Se uma fonte autônoma relevante ficou fora do pool_f mesmo após o boost,
+    # ela é inserida substituindo o item de menor score não-autônomo.
+    pool_f = _incluir_autonomas_garantidas(pool_f, norms_scored, query_text)
 
     # Pool de Modelos (re-avaliado com scores finais)
     models_scored = [
