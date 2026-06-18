@@ -13,6 +13,13 @@ logs/*
 __pycache__/
 *.pyc
 .venv/
+.cache/
+
+# Arquivos temporários e logs
+*.log
+task-*.log
+*.tmp
+output_caso_*.txt
 
 # Artefatos locais
 *.zip
