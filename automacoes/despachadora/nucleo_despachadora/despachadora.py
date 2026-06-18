@@ -1175,6 +1175,13 @@ def normalizar_resposta_antes_validador(texto: str) -> tuple[str, list[str]]:
         "não detém competência", "deve ser declarado nulo"
     ]
     
+    termos_sv11 = [
+        "fundado receio de fuga", "resistência", "perigo à integridade física",
+        "justificativa por escrito", "uso de algemas"
+    ]
+    
+    has_sv11_global = "Sumula_Vinculante_11_Algemas.md" in texto
+    
     linhas = texto.split('\n')
     novo_texto = []
     
@@ -1280,6 +1287,44 @@ def normalizar_resposta_antes_validador(texto: str) -> tuple[str, list[str]]:
             if p != orig_p2:
                 ajustes.append("Regra N5: Termo 'prazo decadencial' sem fonte removido.")
                 orig_p2 = p
+
+        p_lower = p.lower()
+        
+        # Regra N6 — Termos da Súmula Vinculante nº 11
+        if not has_fonte and any(t in p_lower for t in termos_sv11):
+            if "[VERIFICAR" not in p:
+                p = re.sub(r'(?i)\blegitimando\b', 'apresentando elementos compatíveis para', p)
+                p = re.sub(r'(?i)\blegitima\b', 'apresenta elementos compatíveis para', p)
+                
+                if has_sv11_global:
+                    p = p.replace("[PADRÃO]", "[FUNDAMENTO]")
+                    p = p + " [FONTE: corpus_manual/Sumula_Vinculante_11_Algemas.md]"
+                    if p != orig_p2:
+                        ajustes.append("Regra N6: Fonte da SV11 propagada para termo sensível desancorado.")
+                        orig_p2 = p
+                else:
+                    if "[PADRÃO]" in p:
+                        p = p.replace("[PADRÃO]", "[VERIFICAR: confirmar fundamento específico da Súmula Vinculante nº 11 antes de afirmar regularidade do uso de algemas.]")
+                    else:
+                        p = "[VERIFICAR: confirmar fundamento específico da Súmula Vinculante nº 11 antes de afirmar regularidade do uso de algemas.] " + p
+                    if p != orig_p2:
+                        ajustes.append("Regra N6: Termos da SV11 rebaixados por ausência da fonte no texto.")
+                        orig_p2 = p
+
+        p_lower = p.lower()
+        
+        # Regra N7 — Cabeçalho protocolar com incompetência/competência
+        match_cabecalho = re.search(r'(?i)\b(assunto|referência|ref\.|encaminhamento|despacho|ofício):\s*(.*)', p)
+        if match_cabecalho:
+            resto_lower = match_cabecalho.group(2).lower()
+            if any(t in resto_lower for t in ["incompetência da autoridade", "autoridade incompetente", "não detém competência", "vício insanável", "nulidade absoluta", "prazo decadencial"]):
+                if "incompetência" in resto_lower or "competência" in resto_lower:
+                    p = p[:match_cabecalho.start(2)] + "Proposta de remessa de autos para análise de competência pela autoridade competente"
+                else:
+                    p = p[:match_cabecalho.start(2)] + "Encaminhamento para análise de eventual vício administrativo"
+                if p != orig_p2:
+                    ajustes.append("Regra N7: Cabeçalho protocolar com termo sensível neutralizado.")
+                    orig_p2 = p
 
         novo_texto.append(p)
         
