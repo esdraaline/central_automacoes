@@ -913,6 +913,34 @@ def _paragrafo_tem_fundamento_com_fonte(paragrafo: str) -> bool:
     return any(f == "[FONTE:" for f in fontes)
 
 
+def _extrair_termos_fundamentados_bloco2(texto: str) -> dict:
+    """
+    Lê o Bloco 2 - Análise Jurídica e retorna termos sensíveis que já foram
+    fundamentados com [FUNDAMENTO] + [FONTE: ...].
+    """
+    blocos = _extrair_blocos_numerados(texto)
+    bloco2 = blocos.get("2", "")
+    if not bloco2:
+        return {}
+
+    termos_fundamentados = {}
+    paragrafos = _extrair_paragrafos(bloco2)
+    
+    for para in paragrafos:
+        if _paragrafo_tem_fundamento_com_fonte(para):
+            para_lower = para.lower()
+            # Extrair a fonte do parágrafo
+            match_fonte = re.search(r"\[FONTE:\s*(.+?)\]", para)
+            fonte = match_fonte.group(1).strip() if match_fonte else "desconhecida"
+            
+            for termo in TERMOS_JURIDICOS_SENSIVEIS:
+                if termo.lower() in para_lower:
+                    # Se não for só SUGESTÃO IA etc. Mas _paragrafo_tem_fundamento_com_fonte já exige [FUNDAMENTO].
+                    termos_fundamentados[termo.lower()] = fonte
+
+    return termos_fundamentados
+
+
 def _montar_resposta_bloqueada(violacoes: list) -> str:
     """Monta resposta substitutiva para violações graves."""
     linhas = ["⚠️ VALIDAÇÃO BLOQUEOU A RESPOSTA DA DESPACHADORA", ""]
@@ -1016,10 +1044,14 @@ def validar_saida_despachadora(
 
     # ── Regra D: Termos jurídicos sensíveis — rebaixamento ──
     # Sprint 8.6-b: cabeçalhos protocolares geram alerta, não bloqueio
+    termos_fundamentados_b2 = _extrair_termos_fundamentados_bloco2(resposta)
+    alto_risco = {"peculato", "peculato-desvio", "frutos da árvore envenenada", "frutos da árvore", "nulidade absoluta", "vício insanável", "prazo decadencial"}
+
     for para in paragrafos:
         para_lower = para.lower()
         for termo in TERMOS_JURIDICOS_SENSIVEIS:
-            if termo.lower() in para_lower:
+            termo_l = termo.lower()
+            if termo_l in para_lower:
                 # Caso 0: Cabeçalho protocolar — alerta, não bloqueio (Sprint 8.6-b)
                 if _eh_cabecalho_protocolar(para):
                     alertas.append(
@@ -1030,8 +1062,16 @@ def validar_saida_despachadora(
 
                 # Caso 1: Lastreado — [FUNDAMENTO] + [FONTE:] + presente no contexto
                 if (_paragrafo_tem_fundamento_com_fonte(para)
-                        and termo.lower() in ctx_norm_lower):
+                        and termo_l in ctx_norm_lower):
                     continue  # Permitido
+
+                # Caso 1.5: Ponte Bloco 2 -> Bloco 4 (Sprint 8.7-e)
+                if termo_l in termos_fundamentados_b2 and termo_l not in alto_risco:
+                    alertas.append(
+                        f"[Regra D] Termo sensível \"{termo}\" usado sem fonte direta, "
+                        f"mas já ancorado no Bloco 2."
+                    )
+                    continue
 
                 # Caso 2: Cauteloso — com expressão de cautela
                 if _paragrafo_tem_expressao_cautelosa(para):
@@ -1045,7 +1085,7 @@ def validar_saida_despachadora(
                 trecho = para[:120].replace("\n", " ")
                 violacoes.append(
                     f"[Regra D] Termo sensível \"{termo}\" como conclusão definitiva "
-                    f"sem fonte documental: \"{trecho}...\" — "
+                    f"sem fonte documental no parágrafo: \"{trecho}...\" — "
                     f"Use como [SUGESTÃO IA] ou [VERIFICAR], ou inclua fonte normativa."
                 )
                 break  # Um bloqueio por parágrafo basta
@@ -1219,31 +1259,7 @@ def normalizar_resposta_antes_validador(texto: str) -> tuple[str, list[str]]:
                 
         p_lower = p.lower()
         
-        # Regra N3 — nulidade absoluta / vício insanável
-        if ("nulidade absoluta" in p_lower or "vício insanável" in p_lower) and not has_fonte:
-            p = re.sub(
-                r'(?i)(nulidade absoluta|vício insanável)',
-                '[VERIFICAR: não declarar nulidade absoluta ou vício insanável sem fonte específica e decisão da autoridade competente]',
-                p
-            )
-            if p != orig_p2:
-                ajustes.append("Regra N3: Nulidade/vício mitigados.")
-                orig_p2 = p
-                
-        p_lower = p.lower()
-        
-        # Regra N4 — [VERIFICAR] com conclusão forte
-        if "[VERIFICAR" in p and any(t in p_lower for t in termos_n4):
-            for t in termos_n4:
-                # Remove conclusão forte que aparece junto com VERIFICAR
-                p = re.sub(
-                    r'(?i)\b' + re.escape(t) + r'\b',
-                    '[VERIFICAR: conclusão forte isolada neutralizada]',
-                    p
-                )
-            if p != orig_p2:
-                ajustes.append("Regra N4: [VERIFICAR] seguido de conclusão forte neutralizado.")
-                orig_p2 = p
+        # Regra N3 removida a pedido da sprint 8.7-e para garantir bloqueio de nulidade absoluta/vício insanável
                 
         p_lower = p.lower()
         
@@ -1297,8 +1313,9 @@ def normalizar_resposta_antes_validador(texto: str) -> tuple[str, list[str]]:
                 p = re.sub(r'(?i)\blegitima\b', 'apresenta elementos compatíveis para', p)
                 
                 if has_sv11_global:
-                    p = p.replace("[PADRÃO]", "[FUNDAMENTO]")
-                    p = p + " [FONTE: corpus_manual/Sumula_Vinculante_11_Algemas.md]"
+                    if "[PADRÃO]" in p:
+                        p = p.replace("[PADRÃO]", "[FUNDAMENTO]")
+                        p = p + " [FONTE: corpus_manual/Sumula_Vinculante_11_Algemas.md]"
                     if p != orig_p2:
                         ajustes.append("Regra N6: Fonte da SV11 propagada para termo sensível desancorado.")
                         orig_p2 = p
@@ -1328,9 +1345,56 @@ def normalizar_resposta_antes_validador(texto: str) -> tuple[str, list[str]]:
 
         novo_texto.append(p)
         
+    texto_parcial = '\n'.join(novo_texto)
+    
+    # ── Processamento de Parágrafos (Regra N4 e Limitação IPM/Competência) ──
+    paragrafos = _extrair_paragrafos(texto_parcial)
+    texto_final_blocos = []
+    
+    # Vamos re-dividir o texto_parcial preservando a formatação (com \n\n)
+    # Mas como _extrair_paragrafos tira o espaçamento, melhor usar re.split com grupos
+    # para reconstituir o texto exatamente
+    partes = re.split(r'(\n\s*\n)', texto_parcial)
+    
+    for i in range(0, len(partes), 2):
+        para = partes[i]
+        orig_para = para
+        para_lower = para.lower()
+        
+        # Regra N4 — [VERIFICAR] com conclusão forte no mesmo parágrafo lógico
+        if "[VERIFICAR" in para and any(t in para_lower for t in termos_n4):
+            for t in termos_n4:
+                para = re.sub(
+                    r'(?i)\b' + re.escape(t) + r'\b',
+                    '[VERIFICAR: conclusão forte isolada neutralizada]',
+                    para
+                )
+            if para != orig_para:
+                ajustes.append("Regra N4: [VERIFICAR] seguido de conclusão forte neutralizado.")
+                orig_para = para
+        
+        # Tarefa 7 — Limitar Texto Pronto em IPM/competência
+        # Identificar se é bloco 4 (tem indicativos de ofício/parte no parágrafo ou no contexto geral)
+        # Se contiver termos estruturais de IPM/remessa e também termos de alto risco
+        termos_ipm = ["ipm", "portaria", "competência", "autoridade instauradora", "subunidade", "remessa", "batalhão", "companhia"]
+        termos_alto_risco = ["nulidade absoluta", "vício insanável", "autotutela", "prazo decadencial", "não detém competência", "incompetência da autoridade"]
+        
+        # Se parecer estar no texto pronto (Assunto, Referência, ou texto contendo remessa/IPM) e tiver alto risco
+        if any(t in para.lower() for t in termos_alto_risco):
+            # Conta se há menções a IPM/etc
+            if sum(1 for t in termos_ipm if t in para.lower()) >= 2:
+                # E se não tiver [FUNDAMENTO] ou [VERIFICAR] ou [PADRÃO] no parágrafo inteiro (Texto Pronto costuma ser texto limpo)
+                if not any(tag in para for tag in ["[FUNDAMENTO]", "[VERIFICAR", "[PADRÃO]", "[FONTE:"]):
+                    para = "Submeto os autos à apreciação da autoridade competente, para análise da competência administrativa, da regularidade da portaria instauradora e da providência cabível, evitando-se declaração automática de nulidade nesta minuta."
+                    ajustes.append("Regra N8: Limitação cautelosa do Texto Pronto em IPM/competência.")
+        
+        partes[i] = para
+
+    texto_final = "".join(partes)
+
     # Remove duplicatas mantendo ordem
     ajustes_unicos = list(dict.fromkeys(ajustes))
-    return '\n'.join(novo_texto), ajustes_unicos
+    return texto_final, ajustes_unicos
 
 
 def _aplicar_validacao(resposta: str, pool_f: list, pool_m: list, keywords: set) -> str:
