@@ -199,6 +199,36 @@
     {
       "padrao_arquivo": "Notebooklm/Supervisor Regional/orientações direito militar.pdf",
       "motivo": "PDF original bruto excluído após segmentação literal de suas seções em DOUTRINA"
+    },
+    {
+      "padrao_arquivo": "Arquivo/2020/Bol G 132 - 21JUL20 - Instruções IPM e Susp do PAE.pdf",
+      "motivo": "SUBSTITUIDO_POR_OCR_LOTE_1",
+      "substituido_por": "automacoes/despachadora/corpus_ocr/Bol_G_132_IPM_Susp_PAE.md"
+    },
+    {
+      "padrao_arquivo": "OS/NI_002_02_17 acidente de trânsito com viatura/NI Nº PM3-002-02-17 - Acidente Vtr.pdf",
+      "motivo": "SUBSTITUIDO_POR_OCR_LOTE_1",
+      "substituido_por": "automacoes/despachadora/corpus_ocr/NI_PM3_002_02_17.md"
+    },
+    {
+      "padrao_arquivo": "OS/ODS/Resolução CONTRAN nº 432-13.pdf",
+      "motivo": "SUBSTITUIDO_POR_OCR_LOTE_1",
+      "substituido_por": "automacoes/despachadora/corpus_ocr/Res_CONTRAN_432_13.md"
+    },
+    {
+      "padrao_arquivo": "Outros/Acidente de trânsito vtr - PAAVI/NI Nº PM3-002-02-17.pdf",
+      "motivo": "SUBSTITUIDO_POR_OCR_LOTE_1",
+      "substituido_por": "automacoes/despachadora/corpus_ocr/NI_PM3_002_02_17.md"
+    },
+    {
+      "padrao_arquivo": "Outros/Preleção/Desp Nº PM3 005 02 19 - Acesso a dados em celular.pdf",
+      "motivo": "SUBSTITUIDO_POR_OCR_LOTE_1",
+      "substituido_por": "automacoes/despachadora/corpus_ocr/Desp_PM3_005_02_19_Celular.md"
+    },
+    {
+      "padrao_arquivo": "NI PM3_004_03_13 ICC.pdf",
+      "motivo": "SUBSTITUIDO_POR_OCR_LOTE_1",
+      "substituido_por": "automacoes/despachadora/corpus_ocr/NI_PM3_004_03_13_ICC.md"
     }
   ],
   "reclassificar": [
