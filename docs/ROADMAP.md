@@ -325,10 +325,10 @@ Entregáveis:
 
 
 
-## Atualização OCR (Sprint 8.9-d)
+## Atualização OCR (Sprint 8.9-e)
 - OCR operacional;
-- Lotes 1-3 concluídos;
-- 19 OCRs no corpus;
+- Lotes 1-4 concluídos;
+- 21 OCRs no corpus;
 - Índice atual com 728 chunks;
-- Recuperação OCR calibrada;
+- Recuperação OCR calibrada e OK_FORTE;
 - Próximos lotes devem continuar pequenos.

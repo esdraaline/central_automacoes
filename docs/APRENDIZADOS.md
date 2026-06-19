@@ -219,10 +219,10 @@ Saneamento e curadoria da base de conhecimento da Despachadora para evitar desvi
    * Textos acadêmicos, jurisprudências ou modelos da casa devem ser classificados rigorosamente como `DOUTRINA`, `JURISPRUDENCIA` ou `MODELO_PRECEDENTE`, e nunca como `NORMA` ou `PROCEDIMENTAL` (reservados exclusivamente para a legislação oficial e POPs vigentes). Isso impede que interpretações opinativas passem por regras vinculantes absolutas no validador.
 
 
-## Atualização OCR (Sprint 8.9-d)
+## Atualização OCR (Sprint 8.9-e)
 - OCR operacional;
-- Lotes 1-3 concluídos;
-- 19 OCRs no corpus;
+- Lotes 1-4 concluídos;
+- 21 OCRs no corpus;
 - Índice atual com 728 chunks;
 - Recuperação OCR calibrada;
 - Próximos lotes devem continuar pequenos.

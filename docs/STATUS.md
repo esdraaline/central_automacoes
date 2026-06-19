@@ -11,10 +11,10 @@ Foto do "onde estou agora". Atualizado ao fim de cada sprint.
 | **Fase em execucao** | Fase 8 concluída; Fase 3 Órion em planejamento |
 | **Ultima fase concluida** | Fase 8 — Enriquecimento da Base e Curadoria do Corpus (17/06/2026) |
 | **Sprint atual** | Sprint 8.5 concluída localmente — Checkpoint técnico estabilizado |
-| **Ultimo sprint concluido** | Sprint 8.5 — Curadoria, Fontes Autônomas e Segmentação de PDF (17/06/2026) |
-| **Status** | Sprint 8.5 concluída localmente. Status: tecnicamente estabilizada para teste manual/push futuro. Não declarar homologação plena jurídica. |
-| **Proximo passo (trilha principal)** | Sprint 8.6-a — Teste manual real no painel com corpus novo |
-| **Proxima fase** | Fase 3 — Órion (consulta de indicadores criminais) |
+| **Ultimo sprint concluido** | Sprint 8.9-e – OCR Lote 4 controlado (19/06/2026) |
+| **Status** | Sprint 8.9-e concluída localmente e push para main realizado. Lotes 1-4 integrados. |
+| **Proximo passo (trilha principal)** | Sprint 8.9-f – OCR Lote 5 controlado |
+| **Proxima fase** | Fase 3 – Órion (consulta de indicadores criminais) |
 
 ---
 
@@ -146,10 +146,10 @@ Ambos os notebooks estao sincronizados em 07/06/2026:
 Ao fim de cada sprint, atualizar: a data, **Onde estou**, **Ja feito**, **Proximo passo** e **Bloqueios**. Mantenha curto - e uma foto, nao um diario. O diario detalhado fica no ROADMAP.md (Historico).
 
 
-## Atualização OCR (Sprint 8.9-d)
+## Atualização OCR (Sprint 8.9-e)
 - OCR operacional;
-- Lotes 1-3 concluídos;
-- 19 OCRs no corpus;
-- Índice atual com 728 chunks;
-- Recuperação OCR calibrada;
-- Próximos lotes devem continuar pequenos.
+- Lotes 1-4 concluídos (2 novas normativas inseridas no Lote 4);
+- 21 OCRs no corpus;
+- Índice atual com 728 chunks (estável via curadoria e substituição);
+- Recuperação OCR calibrada e OK_FORTE;
+- Próximos lotes devem continuar pequenos e controlados.
