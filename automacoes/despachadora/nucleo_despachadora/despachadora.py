@@ -1577,14 +1577,21 @@ def score_entry(entry: dict, keywords: set) -> float:
     texto = entry.get("texto") or ""
     if len(texto) < MIN_TEXTO_CHARS:
         return 0.0
-    if not keywords:
-        return 0.0
-    texto_lower = texto.lower()
-    count = sum(texto_lower.count(kw) for kw in keywords)
-    if count == 0:
-        return 0.0
     
-    score = count / (len(texto) ** 0.5)
+    # Se extract_keywords retornar vazio, pontuamos o match literal de query_text (caso de siglas curtas)
+    # Mas como score_entry não recebe query_text, faremos a validação de palavras vazias tolerando o total_score do boost
+    
+    if not keywords:
+        s = 0.0
+    else:
+        texto_lower = texto.lower()
+        count = sum(texto_lower.count(kw) for kw in keywords)
+        if count == 0:
+            s = 0.0
+        else:
+            s = count / (len(texto) ** 0.5)
+            
+    score = s
     
     # Tarefa 5 — Controle moderado de PDFs compilados / Notebooklm
     if entry.get("section") == "Notebooklm":
@@ -1645,6 +1652,15 @@ def recover_chunks(corpus: list, keywords: set, query_text: str = "") -> list:
                     boost += 5.0  # Boost para promover termos literais fortes
         
         total_score = s + boost
+        
+        # --- SPRINT 8.9-B: Boost por correspondência forte de nome/arquivo para corpus_ocr ---
+        if entry.get("section") == "corpus_ocr" and query_text:
+            fn_lower = (entry.get("arquivo") or "").lower().replace(".md", "").replace("_", " ")
+            query_terms = query_text.lower().split()
+            matches = sum(1 for term in query_terms if len(term) > 2 and term in fn_lower)
+            if matches >= 2:
+                total_score += 2.0 + (matches * 0.5) # Boost moderado se pelo menos 2 termos do arquivo baterem
+        
         if total_score > 0:
             scored.append({**entry, "_score": total_score, "_key": source_key(entry)})
 
