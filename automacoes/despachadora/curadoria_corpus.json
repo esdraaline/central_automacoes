@@ -299,6 +299,14 @@
             "padrao_arquivo": "OS Informativo On line Ordem Serviço nº CPI10-003.20.17.pdf",
             "motivo": "SUBSTITUIDO_POR_OCR_LOTE_3",
             "observacao": "Substituido pelo .md correspondente extraido no OCR Lote 3"
+        },
+        {
+            "padrao_arquivo": "P1/1415-1993 código de postura valparaiso.PDF",
+            "motivo": "SUBSTITUIDO_POR_OCR_LOTE_4"
+        },
+        {
+            "padrao_arquivo": "P1/1870-1994 decreto regulamenta codigo de postura valparaiso.PDF",
+            "motivo": "SUBSTITUIDO_POR_OCR_LOTE_4"
         }
     ],
     "reclassificar": [

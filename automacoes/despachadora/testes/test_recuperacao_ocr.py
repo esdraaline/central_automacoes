@@ -6,6 +6,11 @@ with open(CORPUS_PATH, 'r', encoding='utf-8') as f:
     corpus = json.load(f)
 
 consultas = [
+    # Lote 4
+    ("codigo de postura valparaiso", "Lei_1415_93_Codigo_Postura_Valparaiso.md"),
+    ("regulamenta codigo de postura valparaiso 1870", "Decreto_1870_94_Codigo_Postura_Valparaiso.md"),
+    
+    # Lotes 1-3
     ("instruções IPM suspensão PAE", "Bol_G_132_IPM_Susp_PAE.md"),
     ("NI PM3 004 03 13 ICC", "NI_PM3_004_03_13_ICC.md"),
     ("acidente viatura PAAVI NI PM3 002 02 17", "NI_PM3_002_02_17.md"),
