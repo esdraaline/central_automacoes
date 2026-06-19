@@ -21,11 +21,23 @@ def test_ambiente_ocr():
 
     if tesseract_cmd:
         try:
+            # Tentar default primeiro
             resultado_langs = subprocess.run([tesseract_cmd, "--list-langs"], capture_output=True, text=True)
             if "por" in resultado_langs.stdout:
-                print("Tesseract Idiomas: 'por' (Português) DISPONÍVEL")
+                print("Tesseract Idiomas: 'por' (Português) DISPONÍVEL (Padrão)")
             else:
-                print("Tesseract Idiomas: 'por' (Português) AUSENTE")
+                # Tentar pasta local
+                local_tessdata = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "saidas", "tessdata"))
+                if os.path.exists(os.path.join(local_tessdata, "por.traineddata")):
+                    env = os.environ.copy()
+                    env["TESSDATA_PREFIX"] = local_tessdata
+                    resultado_langs_local = subprocess.run([tesseract_cmd, "--list-langs"], env=env, capture_output=True, text=True)
+                    if "por" in resultado_langs_local.stdout:
+                        print(f"Tesseract Idiomas: 'por' (Português) DISPONÍVEL (Local: {local_tessdata})")
+                    else:
+                        print("Tesseract Idiomas: 'por' (Português) AUSENTE")
+                else:
+                    print("Tesseract Idiomas: 'por' (Português) AUSENTE")
         except Exception as e:
             print(f"Erro ao listar idiomas: {e}")
 
