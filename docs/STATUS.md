@@ -144,3 +144,12 @@ Ambos os notebooks estao sincronizados em 07/06/2026:
 ## Como manter este arquivo
 
 Ao fim de cada sprint, atualizar: a data, **Onde estou**, **Ja feito**, **Proximo passo** e **Bloqueios**. Mantenha curto - e uma foto, nao um diario. O diario detalhado fica no ROADMAP.md (Historico).
+
+
+## Atualização OCR (Sprint 8.9-d)
+- OCR operacional;
+- Lotes 1-3 concluídos;
+- 19 OCRs no corpus;
+- Índice atual com 728 chunks;
+- Recuperação OCR calibrada;
+- Próximos lotes devem continuar pequenos.

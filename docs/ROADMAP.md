@@ -323,3 +323,12 @@ Entregáveis:
 - [ ] **8.6-c** — Revisão de push/deploy
 - [ ] **8.6-d** — Monitoramento de bloqueios do validador pós-Gemini
 
+
+
+## Atualização OCR (Sprint 8.9-d)
+- OCR operacional;
+- Lotes 1-3 concluídos;
+- 19 OCRs no corpus;
+- Índice atual com 728 chunks;
+- Recuperação OCR calibrada;
+- Próximos lotes devem continuar pequenos.
