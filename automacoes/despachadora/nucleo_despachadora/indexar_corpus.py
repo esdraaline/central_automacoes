@@ -432,6 +432,12 @@ def main():
     if corpus_manual_dir.is_dir():
         for fp in sorted(corpus_manual_dir.glob("*.md")):
             all_files.append(("corpus_manual", fp))
+
+    # Coletar arquivos de corpus_ocr
+    corpus_ocr_dir = _DESP_DIR / "corpus_ocr"
+    if corpus_ocr_dir.is_dir():
+        for fp in sorted(corpus_ocr_dir.glob("*.md")):
+            all_files.append(("corpus_ocr", fp))
             
     print(f"Arquivos encontrados no corpus: {len(all_files)}")
 
@@ -440,7 +446,7 @@ def main():
     doc_batch  = []
 
     for section, fpath in all_files:
-        if section == "corpus_manual":
+        if section in ("corpus_manual", "corpus_ocr"):
             rel = fpath.name
         else:
             section_root = _SKILL_ROOT / section if section else _SKILL_ROOT
@@ -448,7 +454,7 @@ def main():
             
         key = incremental_key(section, rel)
         if key in existing:
-            if section == "corpus_manual" or "Segmentos" in rel:
+            if section in ("corpus_manual", "corpus_ocr") or "Segmentos" in rel:
                 # Remove from existing so the new version overwrites it
                 del existing[key]
             else:
