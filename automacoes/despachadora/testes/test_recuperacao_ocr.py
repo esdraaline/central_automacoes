@@ -18,7 +18,13 @@ consultas = [
     ("nota serviço CoordOpPM 001 03 16", "Nota_Servico_CoordOpPM_001_03_16.md"),
     ("nota urgente COPOM OS 005 04 19", "Nota_Urgente_COPOM_OS_005_04_19.md"),
     ("OS CoordOpPM 028 21 24", "OS_CoordOpPM_028_21_24.md"),
-    ("fiscalização ciclomotor sinopse 02 18", "Sinopse_02_18_Fiscal_Ciclomotor.md")
+    ("fiscalização ciclomotor sinopse 02 18", "Sinopse_02_18_Fiscal_Ciclomotor.md"),
+    ("OS CPI 10 002 30 16 regularização revista de armários", "OS_CPI10_002_30_16_Revista_Armarios.md"),
+    ("OS informativo on line CPI 10 003 20 17", "OS_CPI10_003_20_17.md"),
+    ("Ordem de serviço 2BPMI 001 30 14", "OS_2BPMI_001_30_14.md"),
+    ("OC PM3 008 02 16 DEJEM", "OC_PM3_008_02_16_DEJEM.md"),
+    ("codigo para tipificação de ocorrências 1961", "Codigos_Tipificacao_Ocorrencias.md"),
+    ("codigos para encerramento de ocorrencia 1962", "Codigos_Encerramento_Ocorrencia.md")
 ]
 
 print("| consulta | OCR esperado | posição | status | observação |")
