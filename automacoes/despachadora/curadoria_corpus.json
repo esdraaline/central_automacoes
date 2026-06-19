@@ -229,6 +229,46 @@
       "padrao_arquivo": "NI PM3_004_03_13 ICC.pdf",
       "motivo": "SUBSTITUIDO_POR_OCR_LOTE_1",
       "substituido_por": "automacoes/despachadora/corpus_ocr/NI_PM3_004_03_13_ICC.md"
+    },
+    {
+      "padrao_arquivo": "OS/NI_001_02_15_resolução 57.pdf",
+      "motivo": "SUBSTITUIDO_POR_OCR_LOTE_2",
+      "substituido_por": "automacoes/despachadora/corpus_ocr/NI_001_02_15_Resolucao_57.md"
+    },
+    {
+      "padrao_arquivo": "Notebooklm/Supervisor Regional/DTZ PM3_002_02_16 DEJEM.pdf",
+      "motivo": "SUBSTITUIDO_POR_OCR_LOTE_2",
+      "substituido_por": "automacoes/despachadora/corpus_ocr/DTZ_PM3_002_02_16_DEJEM.md"
+    },
+    {
+      "padrao_arquivo": "Ordem de Serviço nº CoordOpPM-028.21.24, de 15OUT24 (3) (1).pdf",
+      "motivo": "SUBSTITUIDO_POR_OCR_LOTE_2",
+      "substituido_por": "automacoes/despachadora/corpus_ocr/OS_CoordOpPM_028_21_24.md"
+    },
+    {
+      "padrao_arquivo": "Nota de Serviço nº CoordOpPM-001-03-16 Operação Direção Segura Integrada - I-2016.pdf",
+      "motivo": "SUBSTITUIDO_POR_OCR_LOTE_2",
+      "substituido_por": "automacoes/despachadora/corpus_ocr/Nota_Servico_CoordOpPM_001_03_16.md"
+    },
+    {
+      "padrao_arquivo": "OS NOta urgente copom OSv Coord Op PM 005 04 19 - Ocor de grav ou repercussão (1).pdf",
+      "motivo": "SUBSTITUIDO_POR_OCR_LOTE_2",
+      "substituido_por": "automacoes/despachadora/corpus_ocr/Nota_Urgente_COPOM_OS_005_04_19.md"
+    },
+    {
+      "padrao_arquivo": "NI - B - Exercícios de aquecimento prévio de condução de viatura policial de duas rodas.pdf",
+      "motivo": "SUBSTITUIDO_POR_OCR_LOTE_2",
+      "substituido_por": "automacoes/despachadora/corpus_ocr/NI_Exercicios_Aquecimento_Conducao_Moto.md"
+    },
+    {
+      "padrao_arquivo": "Sinopse nº 02-18 Fiscal. de Ciclomotor.pdf",
+      "motivo": "SUBSTITUIDO_POR_OCR_LOTE_2",
+      "substituido_por": "automacoes/despachadora/corpus_ocr/Sinopse_02_18_Fiscal_Ciclomotor.md"
+    },
+    {
+      "padrao_arquivo": "Notebooklm/Supervisor Regional/OC PM3_007_02_16 DEJEM.pdf",
+      "motivo": "SUBSTITUIDO_POR_OCR_LOTE_2",
+      "substituido_por": "automacoes/despachadora/corpus_ocr/OC_PM3_007_02_16_DEJEM.md"
     }
   ],
   "reclassificar": [
