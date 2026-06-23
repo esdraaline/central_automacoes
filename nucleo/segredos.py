@@ -18,7 +18,7 @@ _SCHEMA: Dict[str, List[str]] = {
     "vpn":    ["VPN_USER",      "VPN_PASSWORD"],
     "siopm":  ["SIOPM_USER",    "SIOPM_PASSWORD"],
     "dejem":  ["DEJEM_USUARIO", "DEJEM_SENHA"],
-    "orion":  ["ORION_USER",    "ORION_PASSWORD"],
+    "orion":  ["ORION_USER",    "ORION_PASSWORD", "ORION_URL"],
     # Fase 7 — Despachadora
     # get("gemini")  → {"api_key": "..."}
     # get("corpus")  → {"path": "G:\\Meu Drive\\..."}  (letra de unidade por máquina)

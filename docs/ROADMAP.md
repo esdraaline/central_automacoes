@@ -73,6 +73,8 @@ Como ler: as fases são o mapa geral. Cada fase é quebrada em sprints com taref
 | 3.2 | Consulta por município/período; extração dos indicadores da página. | Dados extraídos corretamente para pelo menos 1 município de teste. |
 | 3.3 | Saída em `saidas/orion_<municipio>_<data>.txt`. Log ao vivo. | Arquivo gerado; painel não trava durante extração. |
 
+**Sprint 3.1 — estado em 23/06/2026:** implementação concluída em código; validação em campo pendente da configuração de `ORION_URL` e confirmação dos seletores reais da tela interna. Entregues: núcleo `login_orion.py`, automação plugável `orion_indicadores`, configuração segura de URL/credenciais, diagnóstico sem exposição de valores e testes locais simulados.
+
 **Itens da fase:**
 - [ ] 2 · Consultar indicadores criminais (somente leitura)
 

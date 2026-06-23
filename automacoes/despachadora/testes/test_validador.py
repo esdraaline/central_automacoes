@@ -40,6 +40,15 @@ CTX_MODELOS = """
 Modelo de despacho padrão da 5ª Cia PM.
 """
 
+CTX_NORMATIVO += """
+
+[FONTE: corpus_manual/Investigacao_Preliminar_I16.md]
+Artigo 67 da I-16-PM: a investigação preliminar serve para colher subsídios
+quando ainda não há elementos suficientes. Deve terminar em 10 (dez) dias
+improrrogáveis. O encarregado deve entrevistar as pessoas, sendo vedada a
+adoção de meios formais de apuração, inclusive oitivas e pedido de exames periciais.
+"""
+
 
 def run_test(name, resposta, expect_block, ctx_norm=CTX_NORMATIVO, ctx_mod=CTX_MODELOS):
     bloqueada, violacoes, alertas = validar_saida_despachadora(resposta, ctx_norm, ctx_mod)
@@ -224,6 +233,157 @@ Análise sem mencionar incompetência.
     expect_block=True
 ))
 
+# 13. Decisão de IP não pode ser mascarada como PADRÃO nem herdar cautela
+# de outro bullet do mesmo bloco.
+results.append(run_test(
+    "PADRÃO instaurando IP com sugestão cautelosa em bullet vizinho",
+    """**2. ANÁLISE JURÍDICA**
+
+[VERIFICAR: fundamento para IP não localizado].
+
+**3. DECISÃO**
+* [PADRÃO] Determinar a autuação do expediente como Investigação Preliminar (IP).
+* [SUGESTÃO] Verificar posteriormente os Artigos 82 e 84 da I-16-PM.
+
+**4. TEXTO PRONTO**
+
+Texto simples.""",
+    expect_block=True,
+    ctx_norm=""
+))
+
+# 14. Prazo incompatível com a I-16-PM.
+results.append(run_test(
+    "IP com prazo incorreto de 30 dias",
+    """**2. ANÁLISE JURÍDICA**
+
+[FUNDAMENTO] A Investigação Preliminar é cabível para colher subsídios. [FONTE: corpus_manual/Investigacao_Preliminar_I16.md]
+
+**4. TEXTO PRONTO**
+
+1. Dou por instaurada a Investigação Preliminar.
+2. O prazo será de 30 (trinta) dias.""",
+    expect_block=True
+))
+
+# 15. IP não admite oitiva formal.
+results.append(run_test(
+    "IP determinando oitiva formal",
+    """**2. ANÁLISE JURÍDICA**
+
+[FUNDAMENTO] A Investigação Preliminar é cabível para colher subsídios. [FONTE: corpus_manual/Investigacao_Preliminar_I16.md]
+
+**4. TEXTO PRONTO**
+
+1. Dou por instaurada a Investigação Preliminar.
+2. O encarregado deverá proceder à oitiva do condutor.""",
+    expect_block=True
+))
+
+# 16. Fluxo correto: fundamento expresso, 10 dias e entrevistas informais.
+results.append(run_test(
+    "IP lastreada com prazo e instrução corretos",
+    """**2. ANÁLISE JURÍDICA**
+
+[FUNDAMENTO] O Artigo 67 da I-16-PM admite Investigação Preliminar quando ainda faltam subsídios para decidir sobre outro procedimento. [FONTE: corpus_manual/Investigacao_Preliminar_I16.md]
+
+**3. DECISÃO**
+
+[FUNDAMENTO] Determino a instauração da Investigação Preliminar para colher os subsídios faltantes. [FONTE: corpus_manual/Investigacao_Preliminar_I16.md]
+
+**4. TEXTO PRONTO**
+
+1. Dou por instaurada a Investigação Preliminar.
+2. O encarregado deverá entrevistar as pessoas que saibam do fato e juntar os documentos disponíveis.
+3. O procedimento será encerrado em 10 (dez) dias improrrogáveis.""",
+    expect_block=False
+))
+
+# 17. Mencionar a proibição de meios formais não equivale a determiná-los.
+results.append(run_test(
+    "IP descrevendo corretamente a vedação de oitivas formais",
+    """**2. ANÁLISE JURÍDICA**
+
+[FUNDAMENTO] Na Investigação Preliminar, a I-16-PM determina entrevistas e veda a adoção de Termo de Declaração, Inquirição Sumária e pedido de Exames Periciais. [FONTE: corpus_manual/Investigacao_Preliminar_I16.md]
+
+**4. TEXTO PRONTO**
+
+1. O encarregado deverá entrevistar as pessoas que saibam do fato, sem realizar oitivas formais.
+2. O procedimento será encerrado em 10 (dez) dias improrrogáveis.""",
+    expect_block=False
+))
+
+# 18. IP nasce por despacho, não por portaria.
+results.append(run_test(
+    "IP indevidamente autuada como portaria",
+    """**2. ANÁLISE JURÍDICA**
+
+[FUNDAMENTO] A Investigação Preliminar é cabível. [FONTE: corpus_manual/Investigacao_Preliminar_I16.md]
+
+**4. TEXTO PRONTO**
+
+1. Dou por instaurada a Investigação Preliminar, autuada sob o número de portaria 001/26.
+2. O prazo será de 10 (dez) dias.""",
+    expect_block=True
+))
+
+# 19. Falta de orçamento não impede automaticamente Sindicância.
+results.append(run_test(
+    "Falta de orçamento como impedimento automático à Sindicância",
+    """**2. ANÁLISE JURÍDICA**
+
+[FUNDAMENTO] A Investigação Preliminar é cabível para colher subsídios. [FONTE: corpus_manual/Investigacao_Preliminar_I16.md]
+
+**4. TEXTO PRONTO**
+
+1. A ausência de orçamento do reparo inviabiliza a instauração de Sindicância.
+2. Dou por instaurada a Investigação Preliminar pelo prazo de 10 (dez) dias.""",
+    expect_block=True
+))
+
+# 20. A classificação em tabela é forma, não fundamento jurídico.
+results.append(run_test(
+    "Tabela de classificação com IP",
+    """**1. CLASSIFICAÇÃO**
+
+| [PADRÃO] | |
+| :--- | :--- |
+| **Tipo de documento** | Despacho de Instauração de Investigação Preliminar |
+| **Assunto** | Acidente com viatura |
+| **Urgência** | Ordinária |
+
+**2. ANÁLISE JURÍDICA**
+
+[FUNDAMENTO] A Investigação Preliminar é cabível. [FONTE: corpus_manual/Investigacao_Preliminar_I16.md]""",
+    expect_block=False
+))
+
+# 21. Termo inicial não pode ser publicação/assinatura/notificação.
+results.append(run_test(
+    "IP contada da publicação do despacho",
+    """**2. ANÁLISE JURÍDICA**
+
+[FUNDAMENTO] A Investigação Preliminar será encerrada em 10 dias. [FONTE: corpus_manual/Investigacao_Preliminar_I16.md]
+
+**4. TEXTO PRONTO**
+
+1. O prazo será de 10 dias, contados a partir da data de publicação deste despacho.""",
+    expect_block=True
+))
+
+# 22. IP não deve produzir novo laudo ou orçamento como diligência formal.
+results.append(run_test(
+    "IP determinando obtenção de novo laudo",
+    """**2. ANÁLISE JURÍDICA**
+
+[FUNDAMENTO] A Investigação Preliminar é cabível. [FONTE: corpus_manual/Investigacao_Preliminar_I16.md]
+
+**3. DECISÃO**
+
+[PADRÃO] Determino que o encarregado oficie ao setor de manutenção para obter laudo técnico e três orçamentos.""",
+    expect_block=True
+))
+
 print()
 print("=" * 70)
 total = len(results)
@@ -235,3 +395,6 @@ if failed == 0:
 else:
     print("❌ ALGUNS TESTES FALHARAM — revisar ajustes")
 print("=" * 70)
+
+if failed:
+    sys.exit(1)

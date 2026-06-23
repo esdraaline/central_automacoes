@@ -165,3 +165,16 @@ O SEI não será automatizado na Central de Automações. Login, acesso via gov.
 **Motivo:** Aditividade é regra para a IA, não para o humano. O portão de verificação (planilha revisada linha a linha) garante que nenhuma remoção acontece sem decisão consciente do operador.
 
 ---
+
+## D-14 · Órion: URL configurável, VPN e operação somente leitura ✅
+**Data:** 23/06/2026
+
+**Decisão:**
+- A URL do Órion será fornecida por máquina via `ORION_URL` em `segredos.env`; nenhum endereço interno será presumido ou gravado no código.
+- O login usa Playwright com Microsoft Edge visível e VPN obrigatória.
+- A automação do Sprint 3.1 apenas autentica e mantém a sessão aberta; não consulta, altera ou envia dados.
+- Seletores são tolerantes e, em caso de falha, o log registra apenas estrutura de elementos, nunca valores digitados ou credenciais.
+
+**Motivo:** o endereço e a tela são internos e ainda não foram validados em campo. A configuração explícita evita dependência de URL inventada e preserva o caráter somente leitura da Fase 3.
+
+---

@@ -1,6 +1,6 @@
 # Status Atual
 Foto do "onde estou agora". Atualizado ao fim de cada sprint.
-**Ultima atualizacao: 17/06/2026 (12h23)**
+**Ultima atualizacao: 23/06/2026**
 
 ---
 
@@ -8,17 +8,20 @@ Foto do "onde estou agora". Atualizado ao fim de cada sprint.
 
 | Campo | Valor |
 |---|---|
-| **Fase em execucao** | Fase 8 concluída; Fase 3 Órion em planejamento |
+| **Fase em execucao** | Fase 3 — Órion |
 | **Ultima fase concluida** | Fase 8 — Enriquecimento da Base e Curadoria do Corpus (17/06/2026) |
-| **Sprint atual** | Sprint 8.5 concluída localmente — Checkpoint técnico estabilizado |
+| **Sprint atual** | Sprint 3.1 implementada localmente; validação em campo pendente |
 | **Ultimo sprint concluido** | Sprint 8.9-e – OCR Lote 4 controlado (19/06/2026) |
-| **Status** | Sprint 8.9-e concluída localmente e push para main realizado. Lotes 1-4 integrados. |
-| **Proximo passo (trilha principal)** | Sprint 8.9-f – OCR Lote 5 controlado |
-| **Proxima fase** | Fase 3 – Órion (consulta de indicadores criminais) |
+| **Status** | Botão Abrir Órion, login Playwright e configuração segura prontos. Falta informar `ORION_URL` e validar seletores reais pela VPN. |
+| **Proximo passo (trilha principal)** | Configurar `ORION_URL` e validar o Sprint 3.1 em campo |
+| **Proxima fase** | Sprint 3.2 — consulta por município e período |
 
 ---
 
 ## Ja feito
+
+- **Checkpoint Despachadora (23/06/2026)** — criada fonte autônoma da Investigação Preliminar com I-16-PM Art. 67 e RDPM Art. 31; recuperação garantida; prazo de 10 dias, entrevistas e competência condicionada protegidos por normalização/validação; autocorreção segura e tratamento de cota diária Gemini implementados; testes locais aprovados. O índice local passou a 729 entradas, mas permanece fora do fluxo de commit conforme D-12.
+- **Fase 3 · Sprint 3.1 (implementação local em 23/06/2026)** — criados `nucleo/login_orion.py` e `automacoes/orion_indicadores/`; botão Abrir Órion descoberto pelo painel; VPN obrigatória, Edge visível, credenciais e URL via `nucleo/segredos`; testes simulados de contrato e sessão aprovados. Aceite em campo pendente da URL interna.
 
 - **Sprint 8.5 — Curadoria, Fontes Autônomas e Segmentação (CONCLUÍDO em 17/06/2026)** — Corpus totalmente curado com manifesto ativo (`curadoria_corpus.json`). Criadas 5 fontes oficiais autônomas limpas para fundamentos críticos. PDF `orientações direito militar.pdf` (1,15M chars, 481 págs) segmentado literalmente em 15 arquivos Markdown sob `Normas/Orientacoes_Direito_Militar_Segmentos/`, e o PDF bruto original foi excluído da indexação. Ajustada a calibração de score e o ranking do Caso 2 (acidente com viatura) para priorizar POP de acidente, NIs vigentes e fontes autônomas específicas. Teste de compilação sem erros. Commit local dcd4eb3 e 0554bcf gerados.
 - **Sprint 8.4-quater — Validador Pós-Gemini (CONCLUÍDO em 17/06/2026)** — Validador determinístico pós-resposta com 4 níveis de fonte (`[FUNDAMENTO]`, `[PADRÃO]`/`[FONTE-MODELO]`, `[SUGESTÃO IA]`, `[VERIFICAR]`). Impede que conhecimento acumulado do Gemini seja entregue como fundamento jurídico definitivo sem fonte documental. 7 regras (A–G) implementadas, 14/14 cenários simulados passaram. Aceito para avanço operacional; validação ampliada futura pendente.
@@ -83,16 +86,13 @@ Teste end-to-end:
 
 ## Proximo passo
 
-**Trilha Despachadora:** Sprint 8.5 — Curadoria do corpus e melhoria de cobertura normativa.
+**Trilha principal:** concluir o Sprint 3.1 do Órion em campo.
 
-Itens sugeridos:
-- Inserir Súmula 473 de forma autônoma no corpus.
-- Inserir Súmula Vinculante nº 11 de forma autônoma no corpus.
-- Revisar classificação de documentos fáticos marcados como NORMA.
-- Separar precedentes internos de fundamentos normativos.
-- Melhorar fontes de competência de IPM, Sindicância e autotutela.
-
-**Trilha principal:** Fase 3 — Órion (consulta de indicadores criminais).
+1. Obter a URL interna exata da tela de login.
+2. Adicionar `ORION_URL` ao `segredos.env` local.
+3. Conectar a VPN e clicar em **Abrir Órion**.
+4. Se os seletores diferirem, usar o diagnóstico seguro do log para ajustar `login_orion.py`.
+5. Confirmar sessão ativa e então iniciar o Sprint 3.2.
 
 ---
 
@@ -153,3 +153,10 @@ Ao fim de cada sprint, atualizar: a data, **Onde estou**, **Ja feito**, **Proxim
 - Índice atual com 728 chunks (estável via curadoria e substituição);
 - Recuperação OCR calibrada e OK_FORTE;
 - Próximos lotes devem continuar pequenos e controlados.
+
+## Atualização Órion (Sprint 3.1)
+- Estrutura local implementada: `nucleo/login_orion.py` e automação `orion_indicadores`;
+- botão **Abrir Órion** descoberto pelo painel;
+- credenciais ampliadas com `ORION_URL`, sem valor hardcoded;
+- testes locais de contrato, sessão simulada e compilação aprovados;
+- pendente: informar `ORION_URL` em `segredos.env` e validar o login real pela VPN.

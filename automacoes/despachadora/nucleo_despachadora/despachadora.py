@@ -99,6 +99,9 @@ TERMOS_JURIDICOS_SENSIVEIS = [
     "atende plenamente ao requisito",
     "legitimando o emprego de algemas",
     "fundado receio de fuga",
+    "investigação preliminar",
+    "competência direta",
+    "competência para instaurar investigação preliminar",
 ]
 
 TERMOS_CONCLUSAO_FORTE = [
@@ -117,6 +120,15 @@ TERMOS_CONCLUSAO_FORTE = [
     "dispensa a instauração",
     "resta comprovado",
     "está plenamente justificado",
+    "determinar a autuação",
+    "determino a autuação",
+    "dou por instaurada",
+    "fica instaurada",
+    "determino a instauração",
+    "instaurar investigação preliminar",
+    "justificando plenamente",
+    "inviabiliza a instauração",
+    "impede a instauração",
 ]
 
 EXPRESSOES_CAUTELOSAS = [
@@ -145,6 +157,7 @@ EXPRESSOES_CAUTELOSAS = [
 
 TERMOS_JURIDICOS_PADRAO_PROIBIDOS = [
     "competência",
+    "investigação preliminar",
     "IPM",
     "Sindicância",
     "nulidade",
@@ -259,6 +272,35 @@ Quando o CONTEXTO NORMATIVO trouxer uma fonte do tipo corpus_manual e ela for pe
 
 [FUNDAMENTO] A Súmula 473 admite que a Administração anule seus próprios atos quando eivados de vícios que os tornam ilegais, ressalvada a apreciação judicial. [FONTE: corpus_manual/Sumula_473_Autotutela.md]
 
+REGRA OBRIGATÓRIA — INVESTIGAÇÃO PRELIMINAR (IP)
+
+Quando o contexto trouxer `corpus_manual/Investigacao_Preliminar_I16.md`:
+- fundamente separadamente no Bloco 2 o cabimento da IP e a competência da
+  autoridade, citando essa fonte em cada conclusão;
+- nunca use a expressão categórica "competência direta". Informe que a
+  competência do Capitão alcança os militares sob seu comando e condicione a
+  conclusão à confirmação dessa subordinação no caso concreto;
+- o prazo da IP é de 10 (dez) dias improrrogáveis. Nunca sugira 30 dias;
+- o termo inicial é o próprio despacho de instauração. Nunca conte o prazo da
+  publicação, da assinatura, da notificação ou do recebimento do encargo;
+- determine ENTREVISTAS, não oitivas. São proibidos na IP: Termo de Declaração,
+  Inquirição Sumária, Auto de Qualificação e Interrogatório e pedido de Exames
+  Periciais. Use apenas entrevistas, documentos e provas já disponíveis;
+- três orçamentos e perícia podem integrar procedimento posterior quando a
+  fonte aplicável os exigir, mas não devem ser apresentados como meios formais
+  obrigatórios da IP;
+- a ausência de orçamento ou laudo é apenas um dado faltante. Nunca afirme que
+  ela, sozinha, inviabiliza ou impede juridicamente a instauração de
+  Sindicância; diga apenas que integra o conjunto de subsídios ainda pendentes;
+- a IP é instaurada por DESPACHO. Nunca a denomine Portaria, nunca atribua a ela
+  “número de portaria” e não use fórmulas próprias de IPM ou Sindicância;
+- não invente autuação no SEI, publicação em boletim ou registro em sistema.
+  Se o expediente ou uma fonte recuperada não trouxer essa rotina, marque-a
+  como [VERIFICAR] ou omita-a;
+- no Bloco 3, a decisão de instaurar IP deve ser [FUNDAMENTO] com [FONTE:],
+  nunca [PADRÃO]. Repita o mesmo lastro antes de qualquer conclusão equivalente
+  nos Blocos 4 ou 6.
+
 Nunca escreva apenas:
 [FUNDAMENTO] De acordo com a jurisprudência consolidada...
 
@@ -365,10 +407,11 @@ As referências normativas específicas (subitem, artigo, número) listadas abai
 
 ── HIERARQUIA DE PROCEDIMENTOS DISCIPLINARES ───────
 
-[PADRÃO] IP (Investigação Preliminar)
-  Instaurado por: Cmt de Cia — de ofício.
-  Situação: queixa externa, processo judicial contra PM, denúncia
-  anônima com verossimilhança.
+[REFERÊNCIA OPERACIONAL NÃO CITÁVEL] IP (Investigação Preliminar)
+  A IP não é mero padrão de redação. Só concluir por sua instauração quando
+  o contexto recuperado trouxer fonte normativa específica que sustente o
+  cabimento, a competência, o prazo e a forma de instrução. Sem essa fonte,
+  usar [VERIFICAR] e não produzir ato instaurador como decisão pronta.
 
 [PADRÃO] PD (Procedimento Disciplinar)
   Instaurado por: Cmt de Cia — de ofício.
@@ -403,9 +446,12 @@ As referências normativas específicas (subitem, artigo, número) listadas abai
   Decisão: arquivamento direto, sem sindicância.
 
 • Dano em viatura com negligência do PM
-  Referência operacional: RDPM (Mencionada apenas para orientar triagem; não citar como fundamento sem lastro literal no contexto recuperado).
-  Decisão: IP.
-  [SUGESTÃO] Documentar evidências antes de qualificar o grau de culpa.
+  Referência operacional: avaliar IP apenas quando os fatos ainda não
+  oferecerem elementos suficientes para decidir pela instauração ou não de
+  Sindicância ou de outro procedimento. A decisão só pode ser apresentada
+  como [FUNDAMENTO] se a I-16-PM pertinente estiver no contexto recuperado.
+  [SUGESTÃO] Documentar evidências sem antecipar culpa. Se instaurada IP,
+  observar o prazo e os meios de instrução literalmente previstos na fonte.
 
 • Dano operacional por caso fortuito
   Referência operacional: RDPM Art. 34, I (Mencionada apenas para orientar triagem; não citar como fundamento sem lastro literal no contexto recuperado).
@@ -850,10 +896,42 @@ def _eh_cabecalho_protocolar(paragrafo: str) -> bool:
     return False
 
 
+def _eh_tabela_classificacao(paragrafo: str) -> bool:
+    """Reconhece a tabela meramente descritiva do Bloco 1."""
+    para_lower = paragrafo.lower()
+    return (
+        "[padrão]" in para_lower
+        and "|" in paragrafo
+        and "**tipo de documento**" in para_lower
+        and "**assunto**" in para_lower
+        and "**urgência**" in para_lower
+    )
+
+
 def _extrair_paragrafos(texto: str) -> list:
-    """Divide o texto em parágrafos (por linha vazia ou bullet)."""
-    blocos = re.split(r"\n\s*\n", texto)
+    """Divide o texto por linha vazia e também por bullets Markdown.
+
+    Separar bullets evita que um marcador cauteloso em um item contamine
+    decisões categóricas presentes em outro item do mesmo bloco.
+    """
+    blocos = re.split(
+        r"\n\s*\n|(?=^\s*(?:[-*+]\s+|\d+[.)]\s+))",
+        texto,
+        flags=re.MULTILINE,
+    )
     return [b.strip() for b in blocos if b.strip()]
+
+
+def _texto_trata_de_investigacao_preliminar(texto: str) -> bool:
+    """Reconhece o nome por extenso ou a sigla IP em contexto procedimental."""
+    texto_lower = texto.lower()
+    if "investigação preliminar" in texto_lower:
+        return True
+    return bool(re.search(
+        r"\b(?:instaura(?:r|ção|da)?|autua(?:r|ção|da)?|prazo|encarregado)"
+        r"\s+(?:da\s+|de\s+)?ip\b",
+        texto_lower,
+    ))
 
 
 def _extrair_blocos_numerados(resposta: str) -> dict:
@@ -1066,10 +1144,11 @@ def validar_saida_despachadora(
             if termo_l in para_lower:
                 # Caso 0: Cabeçalho protocolar — alerta, não bloqueio (Sprint 8.6-b)
                 if _eh_cabecalho_protocolar(para):
-                    alertas.append(
-                        f"[Regra D] Termo sensível \"{termo}\" em cabeçalho protocolar — "
-                        f"verificar se é apenas campo administrativo."
-                    )
+                    if termo_l != "investigação preliminar":
+                        alertas.append(
+                            f"[Regra D] Termo sensível \"{termo}\" em cabeçalho protocolar — "
+                            f"verificar se é apenas campo administrativo."
+                        )
                     continue  # Permitido com alerta
 
                 # Caso 1: Lastreado — [FUNDAMENTO] + [FONTE:] + presente no contexto
@@ -1079,10 +1158,8 @@ def validar_saida_despachadora(
 
                 # Caso 1.5: Ponte Bloco 2 -> Bloco 4 (Sprint 8.7-e)
                 if termo_l in termos_fundamentados_b2 and termo_l not in alto_risco:
-                    alertas.append(
-                        f"[Regra D] Termo sensível \"{termo}\" usado sem fonte direta, "
-                        f"mas já ancorado no Bloco 2."
-                    )
+                    # O fundamento já foi demonstrado com fonte no Bloco 2.
+                    # Blocos operacionais podem reutilizá-lo sem repetir alertas.
                     continue
 
                 # Caso 2: Cauteloso — com expressão de cautela
@@ -1106,6 +1183,8 @@ def validar_saida_despachadora(
     # Sprint 8.6-b: tolerar [PADRÃO] factual/cauteloso com termo jurídico
     for para in paragrafos:
         if "[PADRÃO]" in para:
+            if _eh_tabela_classificacao(para):
+                continue
             para_lower = para.lower()
             for termo_jur in TERMOS_JURIDICOS_PADRAO_PROIBIDOS:
                 if termo_jur.lower() in para_lower:
@@ -1197,6 +1276,128 @@ def validar_saida_despachadora(
                                 f'"{trecho}..."'
                             )
 
+    # ── Regra H: integridade específica da Investigação Preliminar ──
+    # A I-16-PM distingue a IP de procedimentos formais: prazo de 10 dias,
+    # entrevistas (não oitivas formais) e decisão necessariamente lastreada.
+    if _texto_trata_de_investigacao_preliminar(resposta):
+        if re.search(r"\b30\s*\(?trinta\)?\s*dias\b|\bprazo\s+de\s+30\s+dias\b", resp_lower):
+            violacoes.append(
+                "[Regra H] Prazo de 30 dias atribuído à Investigação Preliminar. "
+                "A fonte I-16-PM do corpus estabelece 10 (dez) dias improrrogáveis."
+            )
+
+        meios_formais = [
+            (r"\bproced(?:a|er)\s+à\s+oitiva\b", True),
+            (r"\brealizar?\s+oitivas?\b", True),
+            (r"\btermo\s+de\s+declaração\b", False),
+            (r"\binquirição\s+sumária\b", False),
+            (r"\bauto\s+de\s+qualificação\s+e\s+interrogatório\b", False),
+            (r"\bpedido\s+de\s+exames?\s+periciais?\b", False),
+        ]
+        uso_formal_positivo = False
+        trecho_formal_positivo = ""
+        for para in paragrafos:
+            para_lower = para.lower()
+            proibicao_no_paragrafo = bool(re.search(
+                r"(?:veda(?:d[oa])?|pro[ií]be|proibid[oa]?|não\s+(?:adotar|utilizar|"
+                r"lavrar|realizar|requisitar|solicitar|produzir))\b",
+                para_lower,
+            ))
+            for padrao, acao_direta in meios_formais:
+                match = re.search(padrao, para_lower)
+                if not match:
+                    continue
+                prefixo = para_lower[max(0, match.start() - 100):match.start()]
+                negacao_imediata = bool(re.search(
+                    r"(?:não|sem)\s*$",
+                    prefixo,
+                ))
+                contexto_proibitivo = negacao_imediata or (
+                    not acao_direta and proibicao_no_paragrafo
+                ) or bool(re.search(
+                    r"(?:veda(?:d[oa])?|pro[ií]be|proibid[oa]?|não\s+(?:deve|deverá|realizar|proceder|adotar)|sem\s+(?:realizar|proceder|adotar))\b",
+                    prefixo,
+                ))
+                if not contexto_proibitivo:
+                    uso_formal_positivo = True
+                    trecho_formal_positivo = para[:220].replace("\n", " ")
+                    break
+            if uso_formal_positivo:
+                break
+
+        if uso_formal_positivo:
+            violacoes.append(
+                "[Regra H] Meio formal de apuração atribuído à Investigação Preliminar. "
+                "A I-16-PM determina entrevistas e veda oitivas e outros meios formais "
+                f"nessa fase: \"{trecho_formal_positivo}...\""
+            )
+
+        if re.search(
+            r"(?:autuad[oa]|instaurad[oa]|registrad[oa]).{0,80}(?:número\s+de\s+)?portaria"
+            r"|portaria\s+(?:de\s+)?(?:ip|investigação\s+preliminar)",
+            resp_lower,
+        ):
+            violacoes.append(
+                "[Regra H] Investigação Preliminar tratada como Portaria. "
+                "A I-16-PM determina instauração por despacho."
+            )
+
+        match_impedimento_orcamento = re.search(
+            r"(?:ausência|falta|inexistência).{0,160}(?:orçamento|laudo).{0,220}"
+            r"(?:inviabiliza|impede|impossibilita).{0,80}(?:sindicância|instauração)",
+            resp_lower,
+        )
+        if match_impedimento_orcamento:
+            inicio = max(0, match_impedimento_orcamento.start() - 60)
+            fim = min(len(resposta), match_impedimento_orcamento.end() + 80)
+            trecho_orcamento = resposta[inicio:fim].replace("\n", " ")
+            violacoes.append(
+                "[Regra H] Ausência de orçamento ou laudo apresentada como impedimento "
+                "jurídico automático à Sindicância, sem suporte na fonte recuperada: "
+                f"\"{trecho_orcamento}...\""
+            )
+
+        match_termo_inicial = re.search(
+            r"prazo[^.!?\n]{0,180}contad[oa]s?[^.!?\n]{0,100}"
+            r"(?:publicação|assinatura|notificação|recebimento)",
+            resp_lower,
+        )
+        if match_termo_inicial:
+            inicio = max(0, match_termo_inicial.start() - 40)
+            fim = min(len(resposta), match_termo_inicial.end() + 80)
+            trecho_termo = resposta[inicio:fim].replace("\n", " ")
+            violacoes.append(
+                "[Regra H] Termo inicial da IP vinculado à publicação, assinatura, "
+                "notificação ou recebimento. A I-16-PM conta o prazo a partir do "
+                f"despacho de instauração: \"{trecho_termo}...\""
+            )
+
+        if re.search(
+            r"\b(?:oficie|solicite|requisite|obtenha|providencie)\b[^.!?\n]{0,180}"
+            r"(?:laudo|exame\s+pericial|orçamentos?)",
+            resp_lower,
+        ):
+            violacoes.append(
+                "[Regra H] Nova produção de laudo, perícia ou orçamento determinada "
+                "como diligência da IP. Nessa fase, devem ser juntados apenas documentos "
+                "e provas disponíveis."
+            )
+
+        for para in paragrafos:
+            para_lower = para.lower()
+            decisao_ip = bool(re.search(
+                r"\b(?:determinar|determino|dou\s+por|fica|instaurar)\b.{0,80}"
+                r"(?:investigação\s+preliminar|\bip\b)",
+                para_lower,
+            ))
+            if decisao_ip and "[PADRÃO]" in para:
+                trecho = para[:150].replace("\n", " ")
+                violacoes.append(
+                    "[Regra H] Instauração de IP apresentada como [PADRÃO], sem natureza "
+                    f"de fundamento jurídico: \"{trecho}...\""
+                )
+                break
+
     bloqueada = len(violacoes) > 0
     return bloqueada, violacoes, alertas
 
@@ -1213,6 +1414,61 @@ def normalizar_resposta_antes_validador(texto: str) -> tuple[str, list[str]]:
     """
     import re
     ajustes = []
+
+    # Regra N0-IP — falta de orçamento/laudo não é impedimento jurídico
+    # automático à Sindicância. Converte a inferência recorrente do modelo em
+    # descrição cautelosa de um subsídio ainda pendente.
+    padrao_impedimento_orcamento = re.compile(
+        r"(?i)(?:a\s+)?(?:ausência|falta|inexistência)[^.!?\n]{0,160}"
+        r"(?:orçamento|laudo)[^.!?\n]{0,180}"
+        r"(?:inviabiliza|impede|impossibilita)[^.!?\n]{0,160}"
+        r"(?:sindicância|instauração)[^.!?\n]*[.!?]?"
+    )
+    texto, qtd_ajustes_orcamento = padrao_impedimento_orcamento.subn(
+        "A ausência de orçamento ou laudo constitui subsídio pendente a ser "
+        "colhido, sem impedir automaticamente a análise sobre a instauração "
+        "ou não de Sindicância.",
+        texto,
+    )
+    if qtd_ajustes_orcamento:
+        ajustes.append(
+            "Regra N0-IP: inferência de impedimento por falta de orçamento/laudo "
+            "convertida em subsídio pendente."
+        )
+
+    # Regra N0-IP-prazo — o termo inicial é o despacho de instauração.
+    padrao_termo_inicial_ip = re.compile(
+        r"(?i)contad[oa]s?(?:\s+ininterruptamente)?\s+a\s+partir\s+da\s+"
+        r"data\s+(?:de|da)\s+(?:assinatura(?:/publicação)?|publicação|notificação|"
+        r"recebimento)[^,.;\n]{0,70}"
+    )
+    texto, qtd_ajustes_prazo_ip = padrao_termo_inicial_ip.subn(
+        "contados ininterruptamente a partir do despacho de sua instauração",
+        texto,
+    )
+    if qtd_ajustes_prazo_ip:
+        ajustes.append(
+            "Regra N0-IP-prazo: termo inicial ajustado para o despacho de instauração."
+        )
+
+    # Abrange construções alternativas: "contado da publicação", "a contar da
+    # assinatura" e equivalentes. A frase inteira é substituída para não deixar
+    # resíduos contraditórios.
+    padrao_frase_termo_inicial = re.compile(
+        r"(?i)[^.!?\n]{0,80}\bprazo\b[^.!?\n]{0,180}"
+        r"(?:\bcontad[oa]s?\b|\ba\s+contar\b)[^.!?\n]{0,120}"
+        r"(?:publicação|assinatura|notificação|recebimento)[^.!?\n]*[.!?]?"
+    )
+    texto, qtd_frases_prazo_ip = padrao_frase_termo_inicial.subn(
+        "O prazo da Investigação Preliminar é de 10 (dez) dias improrrogáveis, "
+        "contados ininterruptamente a partir do despacho de sua instauração.",
+        texto,
+    )
+    if qtd_frases_prazo_ip:
+        ajustes.append(
+            "Regra N0-IP-prazo: frase com termo inicial incorreto substituída "
+            "pela regra do despacho de instauração."
+        )
     
     termos_n1 = [
         "autotutela", "vício insanável", "nulidade absoluta", "nulidade",
@@ -1228,6 +1484,8 @@ def normalizar_resposta_antes_validador(texto: str) -> tuple[str, list[str]]:
     ]
     
     has_sv11_global = "Sumula_Vinculante_11_Algemas.md" in texto
+    has_ip_i16_global = "Investigacao_Preliminar_I16.md" in texto
+    trata_ip_global = _texto_trata_de_investigacao_preliminar(texto)
     
     linhas = texto.split('\n')
     novo_texto = []
@@ -1238,6 +1496,89 @@ def normalizar_resposta_antes_validador(texto: str) -> tuple[str, list[str]]:
         has_fonte_autotutela = "Sumula_473_Autotutela.md" in p
         
         p_lower = p.lower()
+
+        # Regra N0-IP-competência — converter a conclusão absoluta recorrente
+        # em competência condicionada à subordinação funcional.
+        if trata_ip_global and "competência direta" in p_lower:
+            prefixo = re.match(r"^(\s*(?:[-*+]\s*)?)", p).group(1)
+            if has_ip_i16_global:
+                p = (
+                    prefixo
+                    + "[FUNDAMENTO] A competência do Comandante de Companhia no "
+                      "posto de Capitão para instaurar Investigação Preliminar alcança "
+                      "os militares sob seu comando, condicionada à confirmação da "
+                      "subordinação funcional no caso concreto. "
+                      "[FONTE: corpus_manual/Investigacao_Preliminar_I16.md]"
+                )
+            else:
+                p = (
+                    prefixo
+                    + "[VERIFICAR: confirmar a competência e a subordinação funcional "
+                      "dos envolvidos antes de instaurar a Investigação Preliminar]."
+                )
+            ajustes.append(
+                "Regra N0-IP-competência: conclusão absoluta de competência direta "
+                "convertida em competência condicionada à subordinação funcional."
+            )
+            p_lower = p.lower()
+
+        # Regra N0-IP-instrução — ordens de oitiva ou outros meios formais
+        # viram entrevistas informativas ou juntada de documentos existentes.
+        if trata_ip_global:
+            p_novo = re.sub(
+                r"(?i)\bproced(?:a|er)\s+à\s+oitiva\b|\brealizar?\s+oitivas?\b",
+                "realizar entrevistas informativas",
+                p,
+            )
+            p_novo = re.sub(
+                r"(?i)\b(?:lavr(?:e|ar)|elabor(?:e|ar)|produz(?:a|ir)|"
+                r"colh(?:a|er)|adot(?:e|ar))\s+(?:o\s+)?"
+                r"termo\s+de\s+declaração\b",
+                "realize entrevista informativa",
+                p_novo,
+            )
+            p_novo = re.sub(
+                r"(?i)\b(?:solicit(?:e|ar)|requisit(?:e|ar)|faça|fazer)\s+"
+                r"(?:o\s+)?pedido\s+de\s+"
+                r"exames?\s+periciais?\b",
+                "junte documentos técnicos já disponíveis",
+                p_novo,
+            )
+            if p_novo != p:
+                p = p_novo
+                ajustes.append(
+                    "Regra N0-IP-instrução: meio formal convertido em entrevista "
+                    "informativa ou juntada de documento disponível."
+                )
+                p_lower = p.lower()
+
+        # Regra N0-IP-diligência — na IP, não ordenar a produção de novo
+        # laudo/perícia/orçamento; apenas verificar e juntar o que já existir.
+        if (trata_ip_global
+                and re.search(r"\b(?:oficie|solicite|requisite|obtenha|providencie)\b", p_lower)
+                and re.search(r"\b(?:laudo|exame\s+pericial|orçamentos?)\b", p_lower)
+                and not re.search(r"\b(?:não|abstenha-se)\b", p_lower)):
+            prefixo = re.match(r"^(\s*(?:[-*+]\s*)?)", p).group(1)
+            p = (
+                prefixo
+                + "[SUGESTÃO] Verificar junto ao setor competente a existência de "
+                  "laudos ou orçamentos já disponíveis e juntá-los ao feito, sem "
+                  "requisitar exames periciais no âmbito da IP."
+            )
+            ajustes.append(
+                "Regra N0-IP-diligência: produção de novo laudo/orçamento convertida "
+                "em verificação de documentos disponíveis."
+            )
+            p_lower = p.lower()
+
+        # Rótulos de proveniência incompatíveis não podem coexistir no mesmo item.
+        if "[SUGESTÃO IA]" in p and "[FUNDAMENTO]" in p and "[FONTE:" in p:
+            p = p.replace("[SUGESTÃO IA]", "", 1)
+            ajustes.append(
+                "Regra N0-tier: rótulo [SUGESTÃO IA] removido de item já lastreado "
+                "como [FUNDAMENTO]+[FONTE:]."
+            )
+            p_lower = p.lower()
         
         # Regra N1 — [PADRÃO] com termo jurídico sensível
         if "[PADRÃO]" in p and not has_fonte:
@@ -1370,7 +1711,8 @@ def normalizar_resposta_antes_validador(texto: str) -> tuple[str, list[str]]:
         
         if "[VERIFICAR" in para and "[VERIFICAR: termo jurídico sensível sem fonte. Requer análise da autoridade competente]" not in para:
             tem_forte, expr_forte = _tem_conclusao_forte(para)
-            if tem_forte:
+            tem_lastro_no_paragrafo = _paragrafo_tem_fundamento_com_fonte(para)
+            if tem_forte and not tem_lastro_no_paragrafo:
                 para = "[VERIFICAR: fundamento não localizado para emitir declaração jurídica de mérito. Requer análise técnica por autoridade competente.]"
                 ajustes.append(f"Regra N4: Parágrafo lógico inteiro neutralizado por conter [VERIFICAR] e conclusão forte '{expr_forte}'.")
         
@@ -1403,7 +1745,8 @@ def _aplicar_validacao(resposta: str, pool_f: list, pool_m: list, keywords: set)
     Aplica o normalizador e depois o validador pós-Gemini à resposta.
     """
     ctx_normativo = "\n".join(
-        _extract_window(e.get("texto") or "", keywords)
+        ((e.get("texto") or "") if e.get("section") == "corpus_manual"
+         else _extract_window(e.get("texto") or "", keywords))
         for e in pool_f
     )
     ctx_modelos = "\n".join(
@@ -1471,6 +1814,12 @@ _MAPA_FONTES_AUTONOMAS = {
     "Competencia_Prazos_Sindicancia.md": [
         "sindicância", "prazo de sindicância", "instauração de sindicância",
         "prorrogação", "competência para instaurar", "instaurar sindicância",
+    ],
+    # Investigação Preliminar / I-16-PM, art. 67
+    "Investigacao_Preliminar_I16.md": [
+        "investigação preliminar", "instaurar ip", "instauração de ip",
+        "apuração preliminar", "apuração", "acidente", "colisão",
+        "dano ao erário", "providências administrativas",
     ],
     # Acidente com viatura (já coberto pelo domain boost 8.5-d.1, mas listado
     # para garantir inclusão se o boost não bastar)
@@ -1782,6 +2131,7 @@ def build_user_prompt(
             "corpus_manual/Sumula_473_Autotutela.md": 1,
             "corpus_manual/Competencia_IPM.md": 2,
             "corpus_manual/Competencia_Prazos_Sindicancia.md": 3,
+            "corpus_manual/Investigacao_Preliminar_I16.md": 4,
         }
         autonomas.sort(key=lambda x: (ordem_prioridade.get(x["_key"], 99), x["_key"]))
         autonomas = autonomas[:5]
@@ -1794,7 +2144,13 @@ def build_user_prompt(
                 filename = fonte.split("/")[-1]
                 gatilhos = _MAPA_FONTES_AUTONOMAS.get(filename, [])
                 uso = f"quando tratar de {', '.join(gatilhos)}" if gatilhos else "quando pertinente ao caso"
-                texto = _extract_window(entry.get("texto") or "", keywords)
+                texto_integral = entry.get("texto") or ""
+                if filename == "Investigacao_Preliminar_I16.md":
+                    # A fonte é curta e cada parágrafo é necessário: cabimento,
+                    # competência, prazo e vedação de meios formais.
+                    texto = texto_integral
+                else:
+                    texto = _extract_window(texto_integral, keywords)
                 parts.append(
                     f"\n[FONTE AUTÔNOMA PRIORITÁRIA]\n"
                     f"Arquivo: {fonte}\n"
@@ -1899,12 +2255,70 @@ def _chamar_gemini(client, model: str, contents: str, system_instruction: str, l
             )
         except Exception as e:
             msg = str(e)
-            retryable = any(kw in msg for kw in _RETRY_KEYWORDS)
+            cota_diaria_esgotada = any(indicio in msg for indicio in (
+                "GenerateRequestsPerDay",
+                "free_tier_requests",
+                "quotaValue': '20'",
+            ))
+            retryable = (
+                any(kw in msg for kw in _RETRY_KEYWORDS)
+                and not cota_diaria_esgotada
+            )
             if not retryable or n > len(_RETRY_WAITS):
                 raise
             espera = _RETRY_WAITS[n - 1]
             log_fn(f"Gemini indisponível (tentativa {n}/{len(_RETRY_WAITS) + 1}), aguardando {espera}s... [{msg[:80]}]")
             time.sleep(espera)
+
+
+def _gerar_resposta_validada(
+    client,
+    model: str,
+    user_prompt: str,
+    system_instruction: str,
+    pool_f: list,
+    pool_m: list,
+    keywords: set,
+    log_fn,
+) -> str:
+    """Gera, valida e faz uma única autocorreção quando houver bloqueio.
+
+    A segunda chamada recebe o relatório determinístico e o rascunho rejeitado.
+    Se continuar inválida, a resposta permanece bloqueada para revisão humana.
+    """
+    resp = _chamar_gemini(
+        client, model, user_prompt, system_instruction, log_fn
+    )
+    resultado = _aplicar_validacao(resp.text, pool_f, pool_m, keywords)
+    if not resultado.startswith("⚠️ VALIDAÇÃO BLOQUEOU A RESPOSTA"):
+        return resultado
+
+    log_fn(
+        "Validador bloqueou o primeiro rascunho; solicitando uma correção "
+        "automática única ao modelo."
+    )
+    prompt_correcao = (
+        user_prompt
+        + "\n\n=== CORREÇÃO OBRIGATÓRIA DO RASCUNHO ===\n"
+        + "O rascunho abaixo foi rejeitado pelo validador determinístico. "
+          "Produza novamente os 6 blocos completos, corrigindo TODAS as violações. "
+          "Não explique a correção e não repita o relatório de validação.\n\n"
+        + "RELATÓRIO DE VALIDAÇÃO:\n"
+        + resultado
+        + "\n\nRASCUNHO REJEITADO:\n"
+        + resp.text
+    )
+    try:
+        resp_corrigida = _chamar_gemini(
+            client, model, prompt_correcao, system_instruction, log_fn
+        )
+    except Exception as exc:
+        log_fn(
+            "Não foi possível gerar a autocorreção; mantendo o bloqueio seguro "
+            f"do primeiro rascunho. [{str(exc)[:120]}]"
+        )
+        return resultado
+    return _aplicar_validacao(resp_corrigida.text, pool_f, pool_m, keywords)
 
 
 # ── Ponto de entrada para o painel (Sprint 7.2+) ─────────────────────────────
@@ -1973,11 +2387,16 @@ def processar(ctx) -> str:
     client = genai.Client(api_key=api_key)
     ctx.log.info(f"Chamando {MODELO_GEMINI}...")
 
-    resp = _chamar_gemini(client, MODELO_GEMINI, user_prompt, MASTER_SYSTEM_PROMPT, ctx.log.warning)
-
-    # Sprint 8.4-quater: Validação pós-Gemini
-    resultado = _aplicar_validacao(resp.text, pool_f, pool_m, keywords)
-    return resultado
+    return _gerar_resposta_validada(
+        client,
+        MODELO_GEMINI,
+        user_prompt,
+        MASTER_SYSTEM_PROMPT,
+        pool_f,
+        pool_m,
+        keywords,
+        ctx.log.warning,
+    )
 
 
 # ── CLI (uso standalone — mantido para testes sem painel) ────────────────────
@@ -2070,15 +2489,19 @@ def main():
 
     print(f"Chamando {MODELO_GEMINI} ...", flush=True)
     try:
-        resp = _chamar_gemini(client, MODELO_GEMINI, user_prompt, MASTER_SYSTEM_PROMPT, print)
+        resultado = _gerar_resposta_validada(
+            client,
+            MODELO_GEMINI,
+            user_prompt,
+            MASTER_SYSTEM_PROMPT,
+            pool_f,
+            pool_m,
+            keywords,
+            print,
+        )
     except Exception as e:
         print(f"[Erro] Falha na chamada à API Gemini: {e}")
         sys.exit(1)
-
-    resultado = resp.text
-
-    # Sprint 8.4-quater: Validação pós-Gemini
-    resultado = _aplicar_validacao(resultado, pool_f, pool_m, keywords)
 
     separator = "═" * 62
     print(f"\n{separator}")

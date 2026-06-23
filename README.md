@@ -10,9 +10,10 @@ Painel desktop único (Python + customtkinter) que descobre e executa automaçõ
 |---|---|
 | Fase 0 — Fundação (nucleo/ + painel + BOPM) | ✅ Concluída |
 | Fase 1 — Logins (Mapa Força + Dejem/Delegada) | ✅ Concluída |
-| Fase 2 — Validar BOPM | ⏳ Próxima |
-| Fase 7 — Despachadora do Comandante | ⏳ Disponível (trilha paralela) |
-| Fases 3–6 | ⏳ Planejadas |
+| Fase 2 — Validar BOPM | ✅ Concluída |
+| Fase 3 — Órion | 🚧 Sprint 3.1 implementada; validação em campo pendente |
+| Fase 7/8 — Despachadora do Comandante | ✅ Operacional e endurecida |
+| Fases 4–6 | ⏳ Planejadas |
 
 Para o estado detalhado, consulte `docs/STATUS.md`.
 Para o roadmap completo com sprints e critérios de aceite, consulte `docs/ROADMAP.md`.
@@ -26,7 +27,7 @@ cd C:\Projetos\central_automacoes
 python painel.py
 ```
 
-Requisito: `segredos.env` preenchido (copiar de `segredos.env.exemplo`).
+Requisito: `segredos.env` preenchido (copiar de `segredos.env.exemplo`). Para o Órion, preencher também `ORION_URL` com o endereço interno exato.
 
 ---
 
